@@ -1,7 +1,6 @@
-_createClass(Scratch3ML4KImageDataBlocks, [{
-    key: "getInfo",
-    value: function getInfo() {
-      return {
+class cloudlink {
+	getInfo() {
+		return {
         id: 'mlforkidsImageData',
         name: 'Images',
         blocks: [{
