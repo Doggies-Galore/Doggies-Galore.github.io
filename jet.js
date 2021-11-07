@@ -1,6 +1,7 @@
 class cloudlink {
-	getInfo() {
-		return {
+    key: "getInfo",
+    value: function getInfo() {
+      return {
         id: 'mlforkidsImageData',
         name: 'Images',
         blocks: [{
@@ -253,5 +254,4 @@ class cloudlink {
     }
   }]);
 
-  return Scratch3ML4KImageDataBlocks;
-}();
+Scratch.extensions.register(new cloudlink());
