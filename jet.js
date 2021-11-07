@@ -1,4 +1,4 @@
-  _createClass(Scratch3ML4KImageDataBlocks, [{
+class mlforkidsImageData {
     key: "getInfo",
     value: function getInfo() {
       return {
@@ -473,4 +473,5 @@ var Scratch3ML4KImagenetBlocks = /*#__PURE__*/function () {
   }]);
 
   return Scratch3ML4KImagenetBlocks;
-}();
+}():
+Scratch.extensions.register(new mlforkidsImageData());
