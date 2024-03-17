@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<content collectionGUID="74F9E222-EE09-4CB3-8BB5-168B9E45FA3C">
+  <lastEdited clientType="local-build-20240316" date="2024-03-17 04:17:32 +0000"/>
+  <textBox id="generic-header-attribute" dynamic="no" visible="yes">
+    <richText>&lt;b&gt;Smaller Things&lt;/b&gt;</richText>
+  </textBox>
+  <textBox id="generic-title-attributes" dynamic="no" visible="yes">
+    <richText>First Entry - iWeb Hell</richText>
+  </textBox>
+  <textBox id="generic-body-attributes" dynamic="no" visible="yes">
+    <richText>I recently remembered that Apple had excellent Apache services in early versions of OS X. I then remembered that they later introduced a consumer WYSIWYG editor as part of iLife. I wanted to refresh my github pages browser experience... so I ended up going with iWeb... or at least... trying to.&#xD;&#xD;</richText>
+  </textBox>
+  <textBox id="generic-datefield-attributes" dynamic="no" visible="yes">
+    <richText>&lt;b&gt;This took me way too long... sooo worth it.&lt;/b&gt;</richText>
+  </textBox>
+  <image id="generic-picture-attributes" dynamic="no" visible="yes" src="16_First_Entry_-_iWeb_Hell_files/shapeimage_2.png" left="0px" top="0px" width="400px" height="300px"/>
+</content>
