@@ -1,0 +1,99 @@
+import os
+from scapy.all import *
+import subprocess
+import csv
+from datetime import datetime
+
+# Set your wireless interface here
+interface = "wlan0"  # replace with your Wi-Fi interface name
+wifi_channel = 6  # Set the Wi-Fi channel to listen on
+csv_filename = "wifi_networks.csv"
+
+# Dictionary to store MAC addresses and their signal strengths
+devices = {}
+networks = {}  # Dictionary to store SSIDs and their signal strengths
+
+# Function to set the interface to monitor mode
+def enable_monitor_mode(interface):
+    print(f"[*] Setting {interface} to monitor mode...")
+    subprocess.run(["sudo", "ip", "link", "set", interface, "down"])
+    subprocess.run(["sudo", "iwconfig", interface, "mode", "monitor"])
+    subprocess.run(["sudo", "ip", "link", "set", interface, "up"])
+    print(f"[*] {interface} is now in monitor mode.")
+
+# Function to set the Wi-Fi channel
+def set_channel(interface, channel):
+    print(f"[*] Setting {interface} to channel {channel}...")
+    subprocess.run(["sudo", "iwconfig", interface, "channel", str(channel)])
+    print(f"[*] {interface} is now on channel {channel}.")
+
+# Function to clear the screen
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+# Function to display the list of devices and their signal strengths
+def display_devices():
+    clear_screen()
+    print(f"Detected devices on channel {wifi_channel}:\n")
+    for mac, rssi in devices.items():
+        print(f"Device: {mac} | Signal strength (dBm): {rssi}")
+
+# Function to display nearby networks
+def display_networks():
+    print("\nNearby Networks:\n")
+    for ssid, info in networks.items():
+        print(f"SSID: {ssid} | Signal strength (dBm): {info['signal_strength']} | Noise: {info.get('noise', 'N/A')}")
+
+# Function to log network data to a CSV
+def save_to_csv():
+    with open(csv_filename, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["SSID", "Signal Strength (dBm)", "Noise (dBm)", "Timestamp"])
+        
+        for ssid, info in networks.items():
+            writer.writerow([ssid, info['signal_strength'], info.get('noise', 'N/A'), datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
+
+# Packet handler
+def packet_handler(packet):
+    # We're interested in 802.11 packets (Wi-Fi frames)
+    if packet.haslayer(Dot11):
+        # Get the signal strength (RSSI) from Radiotap header
+        if packet.haslayer(RadioTap) and hasattr(packet[RadioTap], 'dBm_AntSignal'):
+            rssi = packet[RadioTap].dBm_AntSignal
+            mac_address = packet.addr2
+            
+            # Update device information
+            if mac_address:
+                devices[mac_address] = rssi
+                display_devices()
+
+            # Check for beacon or probe response (network SSID info)
+            if packet.type == 0 and (packet.subtype == 8 or packet.subtype == 5):  # Beacon or Probe Response
+                ssid = packet.info.decode() if packet.info else "<Hidden SSID>"
+                if packet.haslayer(Dot11Elt):
+                    # Extract noise value from RadioTap if available
+                    noise = packet.dBm_noise if hasattr(packet, 'dBm_noise') else 'N/A'
+                    
+                    # Update the networks dictionary with the SSID and signal strength
+                    networks[ssid] = {
+                        'signal_strength': rssi,
+                        'noise': noise
+                    }
+                    display_networks()
+                    
+                    # Save to CSV every time a network is detected
+                    save_to_csv()
+
+# Main function
+def main():
+    # Enable monitor mode and set the desired Wi-Fi channel
+    enable_monitor_mode(interface)
+    set_channel(interface, wifi_channel)
+    
+    print(f"[*] Listening for packets on channel {wifi_channel}...")
+
+    # Capture packets indefinitely and handle each one with packet_handler
+    sniff(iface=interface, prn=packet_handler, store=0)
+
+if __name__ == "__main__":
+    main()
