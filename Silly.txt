@@ -49,13 +49,480 @@
     //REMOVED: AP_DEVCTL for HFD - not needed
 
     //{ "Main/Startup(once)"
-      WAIT
       SET:Count:1
-      PLAY ACTION+ 1DogData
+      PLAY ACTION+ 115DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 122DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 81DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 397DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 343DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 37DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 257DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 260DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 316DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 202DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 213DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 73DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 246DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 118DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 11DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
       PLAY ACTION+ 2DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 90DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 166DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 133DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 379DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 76DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 41DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 302DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 216DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 23DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 274DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ .DS_Store
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 89DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 329DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 136DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 7DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 84DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 286DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 392DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 127DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 172DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 371DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 32DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 346DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 207DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 324DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 159DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 67DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 35DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 341DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 262DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 314DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 169DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 323DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 389DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 117DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 29DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 175DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 83DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 384DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 38DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 131DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 258DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 398DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 211DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 71DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 244DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 24DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 208DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 68DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 161DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 5DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 300DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 74DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 337DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 214DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 21DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 128DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 8DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 30DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 232DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 205DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 65DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 86DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 358DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 125DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 170DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 79DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 219DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 88DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 217DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 356DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 22DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 6DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 162DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 328DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 126DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 173DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 85DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 393DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 253DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 33DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 370DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 206DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 231DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 66DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 158DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 80DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 396DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 123DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 176DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 342DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 36DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 63DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 203DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 212DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 72DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 27DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 119DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 364DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 10DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 167DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 132DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 378DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -67,259 +534,7 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 5DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 6DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 7DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 8DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 9DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 10DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 11DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 12DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 13DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 14DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 15DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 16DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 17DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 18DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 19DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 20DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 21DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 22DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 23DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 24DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 25DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 26DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 27DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 28DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 29DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 30DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 31DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 32DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 33DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 34DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 35DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 36DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 37DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 38DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 39DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 40DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 41DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 42DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 43DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 44DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 45DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 46DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 47DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 48DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 49DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 50DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 51DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 52DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 53DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 54DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 55DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 56DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 57DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 58DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 59DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 60DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 61DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 62DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 63DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 64DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 65DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 66DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 67DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 68DogData
+      PLAY ACTION+ 209DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -327,875 +542,7 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 70DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 71DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 72DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 73DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 74DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 75DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 76DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 77DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 78DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 79DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 80DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 81DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 82DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 83DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 84DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 85DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 86DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 87DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 88DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 89DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 90DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 91DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 92DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 93DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 94DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 95DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 96DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 97DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 98DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 99DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 100DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 101DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 102DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 103DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 104DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 105DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 106DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 107DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 108DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 109DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 110DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 111DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 112DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 113DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 114DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 115DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 116DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 117DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 118DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 119DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 120DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 121DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 122DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 123DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 124DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 125DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 126DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 127DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 128DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 129DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 130DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 131DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 132DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 133DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 134DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 135DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 136DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 137DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 138DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 139DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 140DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 141DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 142DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 143DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 144DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 145DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 146DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 147DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 148DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 149DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 150DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 151DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 152DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 153DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 154DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 155DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 156DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 157DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 158DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 159DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ 160DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 161DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 162DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 163DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 164DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 165DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 166DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 167DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 168DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 169DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 170DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 171DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 172DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 173DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 174DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 175DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 176DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 177DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 178DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 179DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 180DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 181DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 182DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 183DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 184DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 185DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 186DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 187DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 188DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 189DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 190DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 191DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 192DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 193DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 194DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 195DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 196DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 197DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 198DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 199DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 200DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 201DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 202DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 203DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 204DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 205DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 206DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 207DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 208DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 209DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 210DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 211DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 212DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 213DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 214DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 215DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 216DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 217DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 218DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 219DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 220DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 221DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 222DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 223DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 224DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 225DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 226DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 227DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 228DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 229DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 230DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 231DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 232DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 233DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 234DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 235DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 236DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 237DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 238DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 239DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 240DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 241DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 242DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 243DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 244DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 245DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 246DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 247DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 248DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 249DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 250DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 251DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 252DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 253DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 254DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 255DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 256DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 257DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 258DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 259DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 260DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 261DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 262DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 263DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 264DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 265DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 266DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 267DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 268DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 269DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 270DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 271DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 272DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 273DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 274DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 275DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 276DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 277DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 278DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 279DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 280DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 281DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 282DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 283DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 284DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 285DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 286DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 287DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -1203,83 +550,75 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 289DogData
+      PLAY ACTION+ 75DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 290DogData
+      PLAY ACTION+ 215DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 291DogData
+      PLAY ACTION+ 129DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 292DogData
+      PLAY ACTION+ 240DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 293DogData
+      PLAY ACTION+ 31DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 294DogData
+      PLAY ACTION+ 204DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 295DogData
+      PLAY ACTION+ 64DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 296DogData
+      PLAY ACTION+ 9DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 297DogData
+      PLAY ACTION+ 124DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 298DogData
+      PLAY ACTION+ 171DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 299DogData
+      PLAY ACTION+ 218DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 300DogData
+      PLAY ACTION+ 87DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 301DogData
+      PLAY ACTION+ 34DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 302DogData
+      PLAY ACTION+ 168DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 303DogData
+      PLAY ACTION+ 82DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 304DogData
+      PLAY ACTION+ 28DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 305DogData
+      PLAY ACTION+ 116DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 306DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 307DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 308DogData
+      PLAY ACTION+ 174DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -1287,303 +626,11 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 310DogData
+      PLAY ACTION+ 165DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 311DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 312DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 313DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 314DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 315DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 316DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 317DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 318DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 319DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 320DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 321DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 322DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 323DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 324DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 325DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 326DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 327DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 328DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 329DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 330DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 331DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 332DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 333DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 334DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 335DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 336DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 337DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 338DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 339DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 340DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 341DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 342DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 343DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 344DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 345DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 346DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 347DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 348DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 349DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 350DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 351DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 352DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 353DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 354DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 355DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 356DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 357DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 358DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 359DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 360DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 361DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 362DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 363DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 364DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 365DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 366DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 367DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 368DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 369DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 370DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 371DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 372DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 373DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 374DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 375DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 376DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 377DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 378DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 379DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 380DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 381DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 382DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 383DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 384DogData
+      PLAY ACTION+ 130DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -1591,58 +638,35 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 386DogData
+      PLAY ACTION+ 1DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 387DogData
+      PLAY ACTION+ 93DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 388DogData
+      PLAY ACTION+ 210DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 389DogData
+      PLAY ACTION+ 70DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 390DogData
+      PLAY ACTION+ 179DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 391DogData
+      PLAY ACTION+ 272DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 392DogData
+      PLAY ACTION+ 12DogData
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 393DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 394DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 395DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 396DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 397DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 398DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
+      PLAY ACTION+ 351DogData
     //}
 
     // clear globals and sensors
