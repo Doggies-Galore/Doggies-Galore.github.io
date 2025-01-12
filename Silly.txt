@@ -1,0 +1,2404 @@
+/////////////////////////////////////////////////////////////
+// default RCodePlus Program
+// version 7 (.01) for ERS-7 and RCODE-7 (Not RCodePlus)
+// released with YART 7.01
+// Features removed from RCodePlus (2x0/31x) version marked with '//REMOVED: '
+
+// YART compatible
+    // that's what the //{ //} things are for
+
+// "Mini-Obey Cat 7" - VERY MINIMAL
+// Mini Obey Cat provide a very basic personality
+//  You can customize this using any text editor
+//  Please read the comments in this file to figure out what is happening
+
+// NOTES:
+// - provides simple functionality using built-in motions and sounds
+// - a LAN connection is helpful for debugging
+// - works on ERS-7 model AIBOs
+
+/////////////////////////////////////////////////////////////
+
+:Main
+    // This is where the program starts
+
+    GLOBAL doPrint 0
+
+    VLOAD doPrint
+    IF AiboId != 0 THEN
+        // LAN is connected, print status
+        SET doPrint 1
+    ENDIF
+
+    //REMOVED: no debug mode
+
+    IF doPrint != 0 THEN
+        PRINT "RCODE Basic YART Program 7 [.01]"
+        PRINT "Program will PRINT status information"
+    ENDIF
+
+    IF AiboType != 7 THEN
+        PRINT "only works on ERS-7"
+        HALT
+    ENDIF
+
+    PRINT "-"
+
+    //REMOVED: no RCR_Init without RCodePlus - learning new names not supported
+    //REMOVED: AP_Vocab, AP_VLang features - only 1 vocabulary for RCODE 7 (right now)
+    //REMOVED: AP_DEVCTL for HFD - not needed
+
+    //{ "Main/Startup(once)"
+      WAIT
+      SET:Count:1
+      PLAY ACTION+ 1DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 2DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 3DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 4DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 5DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 6DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 7DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 8DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 9DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 10DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 11DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 12DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 13DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 14DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 15DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 16DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 17DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 18DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 19DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 20DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 21DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 22DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 23DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 24DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 25DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 26DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 27DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 28DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 29DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 30DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 31DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 32DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 33DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 34DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 35DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 36DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 37DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 38DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 39DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 40DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 41DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 42DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 43DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 44DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 45DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 46DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 47DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 48DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 49DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 50DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 51DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 52DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 53DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 54DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 55DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 56DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 57DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 58DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 59DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 60DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 61DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 62DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 63DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 64DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 65DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 66DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 67DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 68DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 69DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 70DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 71DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 72DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 73DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 74DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 75DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 76DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 77DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 78DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 79DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 80DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 81DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 82DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 83DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 84DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 85DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 86DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 87DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 88DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 89DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 90DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 91DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 92DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 93DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 94DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 95DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 96DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 97DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 98DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 99DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 100DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 101DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 102DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 103DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 104DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 105DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 106DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 107DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 108DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 109DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 110DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 111DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 112DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 113DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 114DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 115DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 116DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 117DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 118DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 119DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 120DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 121DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 122DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 123DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 124DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 125DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 126DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 127DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 128DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 129DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 130DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 131DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 132DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 133DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 134DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 135DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 136DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 137DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 138DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 139DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 140DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 141DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 142DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 143DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 144DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 145DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 146DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 147DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 148DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 149DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 150DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 151DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 152DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 153DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 154DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 155DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 156DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 157DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 158DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 159DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 160DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 161DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 162DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 163DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 164DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 165DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 166DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 167DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 168DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 169DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 170DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 171DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 172DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 173DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 174DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 175DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 176DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 177DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 178DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 179DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 180DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 181DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 182DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 183DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 184DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 185DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 186DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 187DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 188DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 189DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 190DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 191DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 192DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 193DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 194DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 195DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 196DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 197DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 198DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 199DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 200DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 201DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 202DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 203DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 204DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 205DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 206DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 207DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 208DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 209DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 210DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 211DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 212DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 213DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 214DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 215DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 216DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 217DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 218DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 219DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 220DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 221DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 222DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 223DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 224DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 225DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 226DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 227DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 228DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 229DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 230DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 231DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 232DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 233DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 234DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 235DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 236DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 237DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 238DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 239DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 240DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 241DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 242DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 243DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 244DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 245DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 246DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 247DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 248DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 249DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 250DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 251DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 252DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 253DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 254DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 255DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 256DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 257DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 258DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 259DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 260DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 261DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 262DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 263DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 264DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 265DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 266DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 267DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 268DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 269DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 270DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 271DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 272DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 273DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 274DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 275DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 276DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 277DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 278DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 279DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 280DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 281DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 282DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 283DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 284DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 285DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 286DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 287DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 288DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 289DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 290DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 291DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 292DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 293DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 294DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 295DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 296DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 297DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 298DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 299DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 300DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 301DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 302DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 303DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 304DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 305DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 306DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 307DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 308DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 309DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 310DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 311DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 312DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 313DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 314DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 315DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 316DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 317DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 318DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 319DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 320DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 321DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 322DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 323DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 324DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 325DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 326DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 327DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 328DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 329DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 330DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 331DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 332DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 333DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 334DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 335DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 336DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 337DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 338DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 339DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 340DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 341DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 342DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 343DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 344DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 345DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 346DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 347DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 348DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 349DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 350DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 351DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 352DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 353DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 354DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 355DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 356DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 357DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 358DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 359DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 360DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 361DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 362DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 363DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 364DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 365DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 366DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 367DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 368DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 369DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 370DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 371DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 372DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 373DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 374DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 375DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 376DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 377DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 378DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 379DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 380DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 381DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 382DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 383DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 384DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 385DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 386DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 387DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 388DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 389DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 390DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 391DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 392DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 393DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 394DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 395DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 396DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 397DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+      PLAY ACTION+ 398DogData
+      WAIT
+      ADD:Count:1
+      VSAVE:Count
+    //}
+
+    // clear globals and sensors
+
+    CLR SENSORS
+    LOCAL lastPink 0
+    LOCAL lastBone 0
+    LOCAL idleCount 0
+
+    LOCAL postureOld -1
+    LOCAL postureNow -1
+
+    // Main Loop
+    WHILE 1 = 1
+
+        // Voice and sound
+        // do not change the code here
+        //  instead edit "????_Handler"
+
+        IF AU_Voice > 0 THEN
+            PUSH AU_Voice_ID
+            //REMOVED: AP_Voice_Level, AP_Voice_Pitch, AP_Voice_Horz
+            CALL Voice_Handler:1
+            SET AU_Voice 0
+            LET idleCount 0 
+        ENDIF
+
+        //REMOVED: no AP_Loud
+
+        IF AU_AiboTone > 0 THEN
+            PUSH AU_AiboTone_ID
+            CALL AiboTone_Handler:1
+            SET AU_AiboTone 0
+            LET idleCount 0 
+        ENDIF
+
+        IF AU_AiboSound > 0 THEN
+            PUSH AU_AiboSound_ID
+            CALL AiboSound_Handler:1
+            SET AU_AiboSound 0
+            LET idleCount 0 
+        ENDIF
+
+        //REMOVED: no AP_Noise, AP_Rhythm
+
+        IF Pink_Ball <> 0 THEN
+            IF lastPink == 0 THEN
+                PUSH Pink_Ball_H
+                PUSH Pink_Ball_V
+                PUSH Pink_Ball_D
+                CALL PinkBall_Found_Handler:3
+                SET lastPink 1
+            ENDIF
+            PUSH Pink_Ball_H
+            PUSH Pink_Ball_V
+            PUSH Pink_Ball_D
+            CALL PinkBall_Any_Handler:3
+            LET idleCount 0 
+        ELSE
+            IF lastPink != 0 THEN
+                CALL PinkBall_Lost_Handler
+                SET lastPink 0
+                LET idleCount 0 
+            ENDIF
+        ENDIF
+
+        // Bone just like ball
+        IF AIBONE <> 0 THEN
+            IF lastBone == 0 THEN
+                PUSH AIBONE_H
+                PUSH AIBONE_V
+                PUSH AIBONE_D
+                CALL Bone_Found_Handler:3
+                SET lastBone 1
+            ENDIF
+            PUSH AIBONE_H
+            PUSH AIBONE_V
+            PUSH AIBONE_D
+            CALL Bone_Any_Handler:3
+            LET idleCount 0 
+        ELSE
+            IF lastBone != 0 THEN
+                CALL Bone_Lost_Handler
+                SET lastBone 0
+                LET idleCount 0 
+            ENDIF
+        ENDIF
+
+        // simple Face change only
+        //REMOVED: AP_FaceDetect with nearness and direction
+        //REMOVED: face lost logic
+        IF Face <> 0 THEN
+			CALL Face_Found_Handler
+            SET Face 0
+			LET idleCount 0 
+        ENDIF
+
+        //REMOVED: other colors (AP_COLORLVL)
+
+        ////////////////////////////////
+        // ERS-7 sensors
+
+        IF Head_ON <> 0 THEN
+            IF doPrint <> 0 THEN
+                PRINT "Sensor: Head_ON"
+            ENDIF
+            //{ "Sensor/Head pressed"
+            //}
+            SET Head_ON 0
+            LET idleCount 0 
+        ENDIF
+
+        IF Jaw_ON <> 0 THEN
+            IF doPrint <> 0 THEN
+                PRINT "Sensor: Jaw_ON"
+            ENDIF
+            //{ "Sensor/Jaw pressed"
+              PLAY ACTION TURN 180
+              WAIT
+            //}
+            SET Jaw_ON 0
+            LET idleCount 0 
+        ENDIF
+
+        IF BackF_ON <> 0 THEN
+            IF doPrint <> 0 THEN
+                PRINT "Sensor: BackF_ON"
+            ENDIF
+            //{ "Sensor/BackFront pressed"
+              PLAY ACTION STAND
+              WAIT
+            //}
+            SET BackF_ON 0
+            LET idleCount 0 
+        ENDIF
+
+        IF BackM_ON <> 0 THEN
+            IF doPrint <> 0 THEN
+                PRINT "Sensor: BackM_ON"
+            ENDIF
+            //{ "Sensor/BackMiddle pressed"
+              PLAY ACTION SIT
+              WAIT
+            //}
+            SET BackM_ON 0
+            LET idleCount 0 
+        ENDIF
+
+        IF BackR_ON <> 0 THEN
+            IF doPrint <> 0 THEN
+                PRINT "Sensor: BackR_ON"
+            ENDIF
+            //{ "Sensor/BackRear pressed"
+              PLAY ACTION LIE
+              WAIT
+            //}
+            SET BackR_ON 0
+            LET idleCount 0 
+        ENDIF
+
+        IF Back_Pat <> 0 THEN
+            IF doPrint <> 0 THEN
+                PRINT "Sensor: Back_Pat"
+            ENDIF
+            //{ "Sensor/Back Pat"
+              PLAY ACTION STAND
+              WAIT
+            //}
+            SET Back_Pat 0
+            LET idleCount 0 
+        ENDIF
+
+        IF BackR_Hit <> 0 THEN
+            IF doPrint <> 0 THEN
+                PRINT "Sensor: BackR_Hit"
+            ENDIF
+            //{ "Sensor/Back Rear Hit"
+            //}
+            SET BackR_Hit 0
+            LET idleCount 0 
+        ENDIF
+
+        IF Head_LONG <> 0 THEN
+            IF doPrint <> 0 THEN
+                PRINT "Sensor: Head_LONG"
+            ENDIF
+            //{ "Sensor/Head press long time"
+              PLAY ACTION LIE
+              WAIT
+            //}
+            SET Head_LONG 0a
+            LET idleCount 0 
+        ENDIF
+
+        IF BackFR_LONG <> 0 THEN
+            IF doPrint <> 0 THEN
+                PRINT "Sensor: BackFR_LONG"
+            ENDIF
+            //{ "Sensor/BackFront+Rear long time"
+              PLAY ACTION LIE
+              WAIT
+            //}
+            SET BackFR_LONG 0
+            LET idleCount 0 
+        ENDIF
+
+        IF BackF_Jaw_LONG <> 0 THEN
+            IF doPrint <> 0 THEN
+                PRINT "Sensor: BackF_Jaw_LONG"
+            ENDIF
+            //{ "Sensor/BackFront+Jaw long time"
+              PLAY ACTION LIE
+              WAIT
+            //}
+            SET BackF_Jaw_LONG 0
+            LET idleCount 0 
+        ENDIF
+
+        LET postureOld postureNow
+        LET postureNow Posture1  // posture in case it has changed
+
+        IF postureNow == 3 THEN
+            // currently in the LIE DOWN position
+            // front paws can be used for input
+            IF postureOld <> 3 THEN
+                IF doPrint <> 0 THEN
+                    PRINT "postureNew=SLEEP - will respond to front paws"
+                ENDIF
+                SET RFLeg_ON 0 // clear old values
+                SET LFLeg_ON 0
+            ENDIF
+
+            IF RFLeg_ON <> 0 THEN
+                IF doPrint <> 0 THEN
+                    PRINT "Sensor: Front RFLeg_ON (LIEDOWN)"
+                ENDIF
+                //{ "Sensor/RF Paw (sleep position)"
+                //}
+                SET RFLeg_ON 0
+                LET idleCount 0 
+            ENDIF
+
+            IF LFLeg_ON <> 0 THEN
+                IF doPrint <> 0 THEN
+                    PRINT "Sensor: Front LFLeg_ON (LIEDOWN)"
+                ENDIF
+                //{ "Sensor/LF Paw (sleep position)"
+                //}
+                SET LFLeg_ON 0
+                LET idleCount 0 
+            ENDIF
+        ENDIF
+
+
+//TOADD: new Distance and Distance_Cliff logic
+//TOADD: ? maybe something with brightness ?
+
+        ADD idleCount 1
+        IF idleCount > 100 THEN
+            // 100 ticks (approx 10 seconds) with nothing happening
+            IF doPrint <> 0 THEN
+                PRINT "Idle: postureNow = %d" postureNow
+            ENDIF
+            IF postureNow == 1 THEN // STAND
+                CALL DoSomethingRandom_Stand
+            ENDIF
+            IF postureNow == 2 THEN // SIT
+                CALL DoSomethingRandom_Sit
+            ENDIF
+            IF postureNow == 3 THEN // LIE / SLEEP
+                CALL DoSomethingRandom_Sleep
+            ENDIF
+            // otherwise walking or something else
+            LET idleCount 0
+        ENDIF
+
+        WAIT 100
+    WEND // end of main loop
+
+EXIT
+
+/////////////////////////////////////////////////////////////
+// Random skits after 10 seconds of idleness
+
+:DoSomethingRandom_Stand
+    LOCAL randVal
+    RND randVal 1 5
+    IF randVal == 1 THEN
+        //{ "Idle/Stand Random#1"
+          PLAY ACTION WALK 0 500
+          WAIT
+        //}
+    ENDIF
+    IF randVal == 2 THEN
+        //{ "Idle/Stand Random#2"
+        //}
+    ENDIF
+    IF randVal == 3 THEN
+        //{ "Idle/Stand Random#3"
+        //}
+    ENDIF
+    IF randVal == 4 THEN
+        //{ "Idle/Stand Random#4"
+          PLAY ACTION SIT // I'm tired of standing around
+          WAIT
+        //}
+    ENDIF
+    IF randVal == 5 THEN
+        //{ "Idle/Stand Random#5"
+          PLAY ACTION LIE // I'm tired of standing around
+          WAIT
+        //}
+    ENDIF
+RETURN
+
+:DoSomethingRandom_Sit
+    LOCAL randVal
+    RND randVal 1 5
+    IF randVal == 1 THEN
+        //{ "Idle/Sit Random#1"
+        //}
+    ENDIF
+    IF randVal == 2 THEN
+        //{ "Idle/Sit Random#2"
+        //}
+    ENDIF
+    IF randVal == 3 THEN
+        //{ "Idle/Sit Random#3"
+        //}
+    ENDIF
+    IF randVal == 4 THEN
+        //{ "Idle/Sit Random#4"
+          PLAY ACTION STAND // Let's get moving
+          WAIT
+        //}
+    ENDIF
+    IF randVal == 5 THEN
+        //{ "Idle/Sit Random#5"
+          PLAY ACTION LIE // I'm tired of sitting around
+          WAIT
+        //}
+    ENDIF
+RETURN
+
+:DoSomethingRandom_Sleep // AKA "lie down"
+    LOCAL randVal
+    RND randVal 1 5
+    IF randVal == 1 THEN
+        //{ "Idle/Sleep Random#1"
+        //}
+    ENDIF
+    IF randVal == 2 THEN
+        //{ "Idle/Sleep Random#2"
+        //}
+    ENDIF
+    IF randVal == 3 THEN
+        //{ "Idle/Sleep Random#3"
+        //}
+    ENDIF
+    IF randVal == 4 THEN
+        //{ "Idle/Sleep Random#4"
+          PLAY ACTION STAND
+          WAIT
+        //}
+    ENDIF
+    IF randVal == 5 THEN
+        //{ "Idle/Sleep Random#5"
+          PLAY ACTION SIT // Get up
+          WAIT
+        //}
+    ENDIF
+RETURN
+
+
+/////////////////////////////////////////////////////////////
+// _Handler routines - YART compatible
+
+:Voice_Handler
+  ARG id
+
+  IF doPrint <> 0 THEN
+    PRINT "Voice_Handler: %d" id
+  ENDIF
+
+  IF id == 1 THEN
+    //{ "AIBO voice command/'AIBO' or <dog's name>"
+      PLAY ACTION KICK 30 1000
+      WAIT
+    //}
+  ENDIF
+  IF id == 0x100 THEN
+    //{ "AIBO voice command/<owner's name>"
+      PLAY ACTION KICK -30 1000
+      WAIT
+    //}
+  ENDIF
+  IF id == 2 THEN
+    //{ "AIBO voice command/'What's your name?'"
+    //}
+  ENDIF
+  IF id == 3 THEN
+    //{ "AIBO voice command/'Say hello'"
+    //}
+  ENDIF
+  IF id == 4 THEN
+    //{ "AIBO voice command/'Shake paw'"
+      PLAY ACTION KICK -30 1000
+      WAIT
+    //}
+  ENDIF
+  IF id == 5 THEN
+    //{ "AIBO voice command/'Morning'"
+    //}
+  ENDIF
+  IF id == 6 THEN
+    //{ "AIBO voice command/'Hello'"
+    //}
+  ENDIF
+  IF id == 7 THEN
+    //{ "AIBO voice command/'Good night'"
+    //}
+  ENDIF
+  IF id == 8 THEN
+    //{ "AIBO voice command/'See you'"
+    //}
+  ENDIF
+  IF id == 9 THEN
+    //{ "AIBO voice command/'How are you?'"
+    //}
+  ENDIF
+  IF id == 10 THEN
+    //{ "AIBO voice command/'Hey AIBO'"
+    //}
+  ENDIF
+  IF id == 11 THEN
+    //{ "AIBO voice command/'Thanks'"
+    //}
+  ENDIF
+  IF id == 12 THEN
+    //{ "AIBO voice command/'Sorry'"
+    //}
+  ENDIF
+  IF id == 13 THEN
+    //{ "AIBO voice command/'Cheer up'"
+    //}
+  ENDIF
+  IF id == 14 THEN
+    //{ "AIBO voice command/'Banzai'"
+    //}
+  ENDIF
+  IF id == 15 THEN
+    //{ "AIBO voice command/'That's right'"
+    //}
+  ENDIF
+  IF id == 16 THEN
+    //{ "AIBO voice command/'That's wrong'"
+    //}
+  ENDIF
+  IF id == 17 THEN
+    //{ "AIBO voice command/'Good AIBO'"
+    //}
+  ENDIF
+  IF id == 18 THEN
+    //{ "AIBO voice command/'Don't do that'"
+    //}
+  ENDIF
+  IF id == 19 THEN
+    //{ "AIBO voice command/'Let's play!'"
+    //}
+  ENDIF
+  IF id == 20 THEN
+    //{ "AIBO voice command/'Sing a song'"
+    //}
+  ENDIF
+  IF id == 21 THEN
+    //{ "AIBO voice command/'Dance'"
+    //}
+  ENDIF
+  IF id == 22 THEN
+    //{ "AIBO voice command/'Show time'"
+    //}
+  ENDIF
+  IF id == 23 THEN
+    //{ "AIBO voice command/'Pose for me'"
+    //}
+  ENDIF
+  IF id == 24 THEN
+    //{ "AIBO voice command/'Clown around'"
+    //}
+  ENDIF
+  IF id == 25 THEN
+    //{ "AIBO voice command/'Show off'"
+    //}
+  ENDIF
+  IF id == 26 THEN
+    //{ "AIBO voice command/'Say message'"
+    //}
+  ENDIF
+  IF id == 27 THEN
+    //{ "AIBO voice command/'Let's be secret'"
+    //}
+  ENDIF
+  IF id == 28 THEN
+    //{ "AIBO voice command/'Open sesame'"
+    //}
+  ENDIF
+  IF id == 29 THEN
+    //{ "AIBO voice command/'Happy day'"
+    //}
+  ENDIF
+  IF id == 30 THEN
+    //{ "AIBO voice command/'Stand up'"
+      PLAY ACTION STAND
+      WAIT
+    //}
+  ENDIF
+  IF id == 31 THEN
+    //{ "AIBO voice command/'Lie down'"
+      PLAY ACTION LIE
+      WAIT
+    //}
+  ENDIF
+  IF id == 32 THEN
+    //{ "AIBO voice command/'Sit down'"
+      PLAY ACTION SIT
+      WAIT
+    //}
+  ENDIF
+  IF id == 33 THEN
+    //{ "AIBO voice command/'Turn right'"
+      PLAY ACTION TURN -90
+      WAIT
+    //}
+  ENDIF
+  IF id == 34 THEN
+    //{ "AIBO voice command/'Turn left'"
+      PLAY ACTION TURN 90
+      WAIT
+    //}
+  ENDIF
+  IF id == 35 THEN
+    //{ "AIBO voice command/'Go forward'"
+      PLAY ACTION WALK 0 500
+      WAIT
+    //}
+  ENDIF
+  IF id == 36 THEN
+    //{ "AIBO voice command/'Go backward'"
+      PLAY ACTION TURN 180
+      WAIT
+    //}
+  ENDIF
+  IF id == 37 THEN
+    //{ "AIBO voice command/'Go ahead'"
+      PLAY ACTION WALK 0 100
+      WAIT
+    //}
+  ENDIF
+  IF id == 38 THEN
+    //{ "AIBO voice command/'Stop'"
+    //}
+  ENDIF
+  IF id == 39 THEN
+    //{ "AIBO voice command/'Faster'"
+    //}
+  ENDIF
+  IF id == 40 THEN
+    //{ "AIBO voice command/'Slow down'"
+    //}
+  ENDIF
+  IF id == 41 THEN
+    //{ "AIBO voice command/'Pink ball'"
+    //}
+  ENDIF
+  IF id == 42 THEN
+    //{ "AIBO voice command/'Right leg kick'"
+      PLAY ACTION KICK -30 1000
+      WAIT
+    //}
+  ENDIF
+  IF id == 43 THEN
+    //{ "AIBO voice command/'Right leg touch'"
+    //}
+  ENDIF
+  IF id == 44 THEN
+    //{ "AIBO voice command/'Left leg kick'"
+      PLAY ACTION KICK 30 1000
+      WAIT
+    //}
+  ENDIF
+  IF id == 45 THEN
+    //{ "AIBO voice command/'Left leg touch'"
+    //}
+  ENDIF
+  IF id == 46 THEN
+    //{ "AIBO voice command/'Ready set go'"
+    //}
+  ENDIF
+  IF id == 47 THEN
+    //{ "AIBO voice command/'You won'"
+    //}
+  ENDIF
+  IF id == 48 THEN
+    //{ "AIBO voice command/'You lost'"
+    //}
+  ENDIF
+  IF id == 49 THEN
+    //{ "AIBO voice command/'Action one'"
+    //}
+  ENDIF
+  IF id == 50 THEN
+    //{ "AIBO voice command/'Action two'"
+    //}
+  ENDIF
+  IF id == 51 THEN
+    //{ "AIBO voice command/'Action three'"
+    //}
+  ENDIF
+  IF id == 52 THEN
+    //{ "AIBO voice command/'Action four'"
+    //}
+  ENDIF
+  IF id == 53 THEN
+    //{ "AIBO voice command/'Action five'"
+    //}
+  ENDIF
+//REVIEW: extended vocabulary
+
+RETURN
+
+///////////////////////
+//REMOVED: Loud_Handler
+
+///////////////////////
+
+:AiboTone_Handler
+  ARG id
+
+  IF doPrint <> 0 THEN
+    PRINT "AiboTone_Handler: %d" id
+  ENDIF
+
+RETURN
+
+///////////////////////
+
+:AiboSound_Handler
+  ARG id
+
+  IF doPrint <> 0 THEN
+    PRINT "AiboSound_Handler: %d" id
+  ENDIF
+
+  //{ "AIBO hears/another AIBO"
+  //}
+RETURN
+
+///////////////////////
+
+//REMOVED: Noise_Handler, Rhythm_Handler
+
+///////////////////////
+// Pink Ball
+
+:PinkBall_Found_Handler
+  ARG hangle
+  ARG vangle
+  ARG dist
+
+  IF doPrint <> 0 THEN
+    PRINT "PinkBall_Found_Handler (%d %d) %d" hangle vangle dist
+  ENDIF
+
+  //{ "AIBO sees/Pink Ball (seen)"
+    PLAY ACTION STAND
+    WAIT
+    PLAY ACTION WALK 0 100
+    WAIT
+  //}
+RETURN
+
+:PinkBall_Lost_Handler
+  IF doPrint <> 0 THEN
+    PRINT "PinkBall_Lost_Handler (%d %d) %d" hangle vangle dist
+  ENDIF
+  //{ "AIBO sees/Pink Ball (lost)"
+    PLAY ACTION SIT
+    WAIT
+  //}
+
+RETURN
+
+:PinkBall_Any_Handler // called quite often when tracking
+  ARG hangle
+  ARG vangle
+  ARG dist
+
+  //{ "AIBO sees/Pink Ball (tracking)"
+  //}
+
+RETURN
+
+///////////////////////
+// Bone
+
+:Bone_Found_Handler
+  ARG hangle
+  ARG vangle
+  ARG dist
+
+  IF doPrint <> 0 THEN
+    PRINT "Bone_Found_Handler (%d %d) %d" hangle vangle dist
+  ENDIF
+
+  //{ "AIBO sees/Bone (seen)"
+    PLAY ACTION STAND
+    WAIT
+    PLAY ACTION WALK 0 -100
+    WAIT
+  //}
+RETURN
+
+:Bone_Lost_Handler
+  IF doPrint <> 0 THEN
+    PRINT "Bone_Lost_Handler (%d %d) %d" hangle vangle dist
+  ENDIF
+  //{ "AIBO sees/Bone (lost)"
+    PLAY ACTION SIT
+    WAIT
+  //}10:28 2024/12/19
+
+RETURN
+
+:Bone_Any_Handler // called quite often when tracking
+  ARG hangle
+  ARG vangle
+  ARG dist
+
+  //{ "AIBO sees/Bone (tracking)"
+  //}
+
+RETURN
+
+///////////////////////
+// Face
+
+:Face_Found_Handler
+  IF doPrint <> 0 THEN
+	PRINT "Sensor: Saw your face"
+  ENDIF
+  //{ "AIBO sees/Human Face (seen)"
+  //}
+RETURN
+
+/////////////////////////////////////////////////////////////
+//REMOVED: Fav/UnFav handlers
+//REMOVED: 'RCR' RCode Runtime, #AP_INCLUDE
+
+/////////////////////////////////////////////////////////////
