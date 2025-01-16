@@ -50,623 +50,539 @@
 
     //{ "Main/Startup(once)"
       SET:Count:1
-      PLAY ACTION+ 115DogData
       WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 122DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 81DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 397DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 343DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 37DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 257DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 260DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 316DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 202DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 213DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 73DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 246DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 118DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 11DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 2DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 90DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 166DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 133DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 379DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 76DogData
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ 41DogData
+      PLAY ACTION+ PenisAtSupperTime1
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 302DogData
+      PLAY ACTION+ PenisAtSupperTime2
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 216DogData
+      PLAY ACTION+ PenisAtSupperTime3
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 23DogData
+      PLAY ACTION+ PenisAtSupperTime4
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 274DogData
+      PLAY ACTION+ PenisAtSupperTime5
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ .DS_Store
+      PLAY ACTION+ PenisAtSupperTime6
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 89DogData
+      PLAY ACTION+ PenisAtSupperTime7
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 329DogData
+      PLAY ACTION+ PenisAtSupperTime8
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 136DogData
+      PLAY ACTION+ PenisAtSupperTime9
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 7DogData
+      PLAY ACTION+ PenisAtSupperTime10
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 84DogData
+      PLAY ACTION+ PenisAtSupperTime11
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 286DogData
+      PLAY ACTION+ PenisAtSupperTime12
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 392DogData
+      PLAY ACTION+ PenisAtSupperTime13
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 127DogData
+      PLAY ACTION+ PenisAtSupperTime14
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 172DogData
+      PLAY ACTION+ PenisAtSupperTime15
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 371DogData
+      PLAY ACTION+ PenisAtSupperTime16
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 32DogData
+      PLAY ACTION+ PenisAtSupperTime17
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 346DogData
+      PLAY ACTION+ PenisAtSupperTime18
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 207DogData
+      PLAY ACTION+ PenisAtSupperTime19
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 324DogData
+      PLAY ACTION+ PenisAtSupperTime20
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 159DogData
+      PLAY ACTION+ PenisAtSupperTime21
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 67DogData
+      PLAY ACTION+ PenisAtSupperTime22
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 35DogData
+      PLAY ACTION+ PenisAtSupperTime23
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 341DogData
+      PLAY ACTION+ PenisAtSupperTime24
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 262DogData
+      PLAY ACTION+ PenisAtSupperTime25
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 314DogData
+      PLAY ACTION+ PenisAtSupperTime26
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 169DogData
+      PLAY ACTION+ PenisAtSupperTime27
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 323DogData
+      PLAY ACTION+ PenisAtSupperTime28
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 389DogData
+      PLAY ACTION+ PenisAtSupperTime29
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 117DogData
+      PLAY ACTION+ PenisAtSupperTime30
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 29DogData
+      PLAY ACTION+ PenisAtSupperTime31
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 175DogData
+      PLAY ACTION+ PenisAtSupperTime32
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 83DogData
+      PLAY ACTION+ PenisAtSupperTime33
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 384DogData
+      PLAY ACTION+ PenisAtSupperTime34
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 38DogData
+      PLAY ACTION+ PenisAtSupperTime35
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 131DogData
+      PLAY ACTION+ PenisAtSupperTime36
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 258DogData
+      PLAY ACTION+ PenisAtSupperTime37
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 398DogData
+      PLAY ACTION+ PenisAtSupperTime38
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 211DogData
+      PLAY ACTION+ PenisAtSupperTime39
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 71DogData
+      PLAY ACTION+ PenisAtSupperTime40
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 244DogData
+      PLAY ACTION+ PenisAtSupperTime41
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 24DogData
+      PLAY ACTION+ PenisAtSupperTime42
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 208DogData
+      PLAY ACTION+ PenisAtSupperTime43
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 68DogData
+      PLAY ACTION+ PenisAtSupperTime44
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 161DogData
+      PLAY ACTION+ PenisAtSupperTime45
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 5DogData
+      PLAY ACTION+ PenisAtSupperTime46
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 300DogData
+      PLAY ACTION+ PenisAtSupperTime47
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 74DogData
+      PLAY ACTION+ PenisAtSupperTime48
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 337DogData
+      PLAY ACTION+ PenisAtSupperTime49
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 214DogData
+      PLAY ACTION+ PenisAtSupperTime50
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 21DogData
+      PLAY ACTION+ PenisAtSupperTime51
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 128DogData
+      PLAY ACTION+ PenisAtSupperTime52
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 8DogData
+      PLAY ACTION+ PenisAtSupperTime53
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 30DogData
+      PLAY ACTION+ PenisAtSupperTime54
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 232DogData
+      PLAY ACTION+ PenisAtSupperTime55
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 205DogData
+      PLAY ACTION+ PenisAtSupperTime56
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 65DogData
+      PLAY ACTION+ PenisAtSupperTime57
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 86DogData
+      PLAY ACTION+ PenisAtSupperTime58
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 358DogData
+      PLAY ACTION+ PenisAtSupperTime59
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 125DogData
+      PLAY ACTION+ PenisAtSupperTime60
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 170DogData
+      PLAY ACTION+ PenisAtSupperTime61
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 79DogData
+      PLAY ACTION+ PenisAtSupperTime62
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 219DogData
+      PLAY ACTION+ PenisAtSupperTime63
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 88DogData
+      PLAY ACTION+ PenisAtSupperTime64
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 217DogData
+      PLAY ACTION+ PenisAtSupperTime65
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 356DogData
+      PLAY ACTION+ PenisAtSupperTime66
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 22DogData
+      PLAY ACTION+ PenisAtSupperTime67
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 6DogData
+      PLAY ACTION+ PenisAtSupperTime68
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 162DogData
+      PLAY ACTION+ PenisAtSupperTime69
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 328DogData
+      PLAY ACTION+ PenisAtSupperTime70
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 126DogData
+      PLAY ACTION+ PenisAtSupperTime71
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 173DogData
+      PLAY ACTION+ PenisAtSupperTime72
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 85DogData
+      PLAY ACTION+ PenisAtSupperTime73
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 393DogData
+      PLAY ACTION+ PenisAtSupperTime74
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 253DogData
+      PLAY ACTION+ PenisAtSupperTime75
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 33DogData
+      PLAY ACTION+ PenisAtSupperTime76
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 370DogData
+      PLAY ACTION+ PenisAtSupperTime77
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 206DogData
+      PLAY ACTION+ PenisAtSupperTime78
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 231DogData
+      PLAY ACTION+ PenisAtSupperTime79
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 66DogData
+      PLAY ACTION+ PenisAtSupperTime80
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 158DogData
+      PLAY ACTION+ PenisAtSupperTime81
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 80DogData
+      PLAY ACTION+ PenisAtSupperTime82
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 396DogData
+      PLAY ACTION+ PenisAtSupperTime83
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 123DogData
+      PLAY ACTION+ PenisAtSupperTime84
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 176DogData
+      PLAY ACTION+ PenisAtSupperTime85
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 342DogData
+      PLAY ACTION+ PenisAtSupperTime86
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 36DogData
+      PLAY ACTION+ PenisAtSupperTime87
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 63DogData
+      PLAY ACTION+ PenisAtSupperTime88
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 203DogData
+      PLAY ACTION+ PenisAtSupperTime89
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 212DogData
+      PLAY ACTION+ PenisAtSupperTime90
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 72DogData
+      PLAY ACTION+ PenisAtSupperTime91
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 27DogData
+      PLAY ACTION+ PenisAtSupperTime92
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 119DogData
+      PLAY ACTION+ PenisAtSupperTime93
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 364DogData
+      PLAY ACTION+ PenisAtSupperTime94
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 10DogData
+      PLAY ACTION+ PenisAtSupperTime95
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 167DogData
+      PLAY ACTION+ PenisAtSupperTime96
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 132DogData
+      PLAY ACTION+ PenisAtSupperTime97
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 378DogData
+      PLAY ACTION+ PenisAtSupperTime98
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 3DogData
+      PLAY ACTION+ PenisAtSupperTime99
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 4DogData
+      PLAY ACTION+ PenisAtSupperTime100
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 209DogData
+      PLAY ACTION+ PenisAtSupperTime101
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 69DogData
+      PLAY ACTION+ PenisAtSupperTime102
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 160DogData
+      PLAY ACTION+ PenisAtSupperTime103
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 288DogData
+      PLAY ACTION+ PenisAtSupperTime104
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 75DogData
+      PLAY ACTION+ PenisAtSupperTime105
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 215DogData
+      PLAY ACTION+ PenisAtSupperTime106
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 129DogData
+      PLAY ACTION+ PenisAtSupperTime107
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 240DogData
+      PLAY ACTION+ PenisAtSupperTime108
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 31DogData
+      PLAY ACTION+ PenisAtSupperTime109
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 204DogData
+      PLAY ACTION+ PenisAtSupperTime110
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 64DogData
+      PLAY ACTION+ PenisAtSupperTime111
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 9DogData
+      PLAY ACTION+ PenisAtSupperTime112
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 124DogData
+      PLAY ACTION+ PenisAtSupperTime113
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 171DogData
+      PLAY ACTION+ PenisAtSupperTime114
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 218DogData
+      PLAY ACTION+ PenisAtSupperTime115
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 87DogData
+      PLAY ACTION+ PenisAtSupperTime116
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 34DogData
+      PLAY ACTION+ PenisAtSupperTime117
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 168DogData
+      PLAY ACTION+ PenisAtSupperTime118
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 82DogData
+      PLAY ACTION+ PenisAtSupperTime119
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 28DogData
+      PLAY ACTION+ PenisAtSupperTime120
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 116DogData
+      PLAY ACTION+ PenisAtSupperTime121
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 174DogData
+      PLAY ACTION+ PenisAtSupperTime122
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 309DogData
+      PLAY ACTION+ PenisAtSupperTime123
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 165DogData
+      PLAY ACTION+ PenisAtSupperTime124
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 130DogData
+      PLAY ACTION+ PenisAtSupperTime125
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 385DogData
+      PLAY ACTION+ PenisAtSupperTime126
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 1DogData
+      PLAY ACTION+ PenisAtSupperTime127
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 93DogData
+      PLAY ACTION+ PenisAtSupperTime128
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 210DogData
+      PLAY ACTION+ PenisAtSupperTime129
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 70DogData
+      PLAY ACTION+ PenisAtSupperTime130
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 179DogData
+      PLAY ACTION+ PenisAtSupperTime131
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 272DogData
+      PLAY ACTION+ PenisAtSupperTime132
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 12DogData
+      PLAY ACTION+ PenisAtSupperTime133
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ 351DogData
     //}
 
     // clear globals and sensors
