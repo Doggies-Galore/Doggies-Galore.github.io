@@ -50,539 +50,539 @@
 
     //{ "Main/Startup(once)"
       SET:Count:1
+      PLAY ACTION+ aibo1
       WAIT
-      PLAY ACTION+ PenisAtSupperTime1
-      WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime2
+      PLAY ACTION+ aibo2
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime3
+      PLAY ACTION+ aibo3
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime4
+      PLAY ACTION+ aibo4
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime5
+      PLAY ACTION+ aibo5
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime6
+      PLAY ACTION+ aibo6
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime7
+      PLAY ACTION+ aibo7
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime8
+      PLAY ACTION+ aibo8
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime9
+      PLAY ACTION+ aibo9
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime10
+      PLAY ACTION+ aibo10
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime11
+      PLAY ACTION+ aibo11
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime12
+      PLAY ACTION+ aibo12
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime13
+      PLAY ACTION+ aibo13
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime14
+      PLAY ACTION+ aibo14
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime15
+      PLAY ACTION+ aibo15
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime16
+      PLAY ACTION+ aibo16
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime17
+      PLAY ACTION+ aibo17
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime18
+      PLAY ACTION+ aibo18
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime19
+      PLAY ACTION+ aibo19
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime20
+      PLAY ACTION+ aibo20
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime21
+      PLAY ACTION+ aibo21
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime22
+      PLAY ACTION+ aibo22
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime23
+      PLAY ACTION+ aibo23
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime24
+      PLAY ACTION+ aibo24
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime25
+      PLAY ACTION+ aibo25
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime26
+      PLAY ACTION+ aibo26
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime27
+      PLAY ACTION+ aibo27
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime28
+      PLAY ACTION+ aibo28
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime29
+      PLAY ACTION+ aibo29
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime30
+      PLAY ACTION+ aibo30
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime31
+      PLAY ACTION+ aibo31
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime32
+      PLAY ACTION+ aibo32
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime33
+      PLAY ACTION+ aibo33
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime34
+      PLAY ACTION+ aibo34
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime35
+      PLAY ACTION+ aibo35
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime36
+      PLAY ACTION+ aibo36
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime37
+      PLAY ACTION+ aibo37
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime38
+      PLAY ACTION+ aibo38
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime39
+      PLAY ACTION+ aibo39
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime40
+      PLAY ACTION+ aibo40
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime41
+      PLAY ACTION+ aibo41
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime42
+      PLAY ACTION+ aibo42
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime43
+      PLAY ACTION+ aibo43
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime44
+      PLAY ACTION+ aibo44
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime45
+      PLAY ACTION+ aibo45
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime46
+      PLAY ACTION+ aibo46
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime47
+      PLAY ACTION+ aibo47
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime48
+      PLAY ACTION+ aibo48
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime49
+      PLAY ACTION+ aibo49
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime50
+      PLAY ACTION+ aibo50
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime51
+      PLAY ACTION+ aibo51
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime52
+      PLAY ACTION+ aibo52
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime53
+      PLAY ACTION+ aibo53
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime54
+      PLAY ACTION+ aibo54
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime55
+      PLAY ACTION+ aibo55
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime56
+      PLAY ACTION+ aibo56
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime57
+      PLAY ACTION+ aibo57
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime58
+      PLAY ACTION+ aibo58
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime59
+      PLAY ACTION+ aibo59
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime60
+      PLAY ACTION+ aibo60
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime61
+      PLAY ACTION+ aibo61
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime62
+      PLAY ACTION+ aibo62
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime63
+      PLAY ACTION+ aibo63
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime64
+      PLAY ACTION+ aibo64
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime65
+      PLAY ACTION+ aibo65
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime66
+      PLAY ACTION+ aibo66
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime67
+      PLAY ACTION+ aibo67
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime68
+      PLAY ACTION+ aibo68
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime69
+      PLAY ACTION+ aibo69
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime70
+      PLAY ACTION+ aibo70
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime71
+      PLAY ACTION+ aibo71
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime72
+      PLAY ACTION+ aibo72
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime73
+      PLAY ACTION+ aibo73
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime74
+      PLAY ACTION+ aibo74
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime75
+      PLAY ACTION+ aibo75
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime76
+      PLAY ACTION+ aibo76
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime77
+      PLAY ACTION+ aibo77
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime78
+      PLAY ACTION+ aibo78
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime79
+      PLAY ACTION+ aibo79
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime80
+      PLAY ACTION+ aibo80
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime81
+      PLAY ACTION+ aibo81
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime82
+      PLAY ACTION+ aibo82
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime83
+      PLAY ACTION+ aibo83
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime84
+      PLAY ACTION+ aibo84
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime85
+      PLAY ACTION+ aibo85
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime86
+      PLAY ACTION+ aibo86
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime87
+      PLAY ACTION+ aibo87
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime88
+      PLAY ACTION+ aibo88
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime89
+      PLAY ACTION+ aibo89
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime90
+      PLAY ACTION+ aibo90
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime91
+      PLAY ACTION+ aibo91
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime92
+      PLAY ACTION+ aibo92
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime93
+      PLAY ACTION+ aibo93
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime94
+      PLAY ACTION+ aibo94
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime95
+      PLAY ACTION+ aibo95
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime96
+      PLAY ACTION+ aibo96
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime97
+      PLAY ACTION+ aibo97
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime98
+      PLAY ACTION+ aibo98
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime99
+      PLAY ACTION+ aibo99
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime100
+      PLAY ACTION+ aibo100
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime101
+      PLAY ACTION+ aibo101
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime102
+      PLAY ACTION+ aibo102
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime103
+      PLAY ACTION+ aibo103
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime104
+      PLAY ACTION+ aibo104
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime105
+      PLAY ACTION+ aibo105
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime106
+      PLAY ACTION+ aibo106
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime107
+      PLAY ACTION+ aibo107
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime108
+      PLAY ACTION+ aibo108
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime109
+      PLAY ACTION+ aibo109
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime110
+      PLAY ACTION+ aibo110
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime111
+      PLAY ACTION+ aibo111
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime112
+      PLAY ACTION+ aibo112
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime113
+      PLAY ACTION+ aibo113
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime114
+      PLAY ACTION+ aibo114
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime115
+      PLAY ACTION+ aibo115
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime116
+      PLAY ACTION+ aibo116
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime117
+      PLAY ACTION+ aibo117
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime118
+      PLAY ACTION+ aibo118
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime119
+      PLAY ACTION+ aibo119
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime120
+      PLAY ACTION+ aibo120
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime121
+      PLAY ACTION+ aibo121
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime122
+      PLAY ACTION+ aibo122
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime123
+      PLAY ACTION+ aibo123
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime124
+      PLAY ACTION+ aibo124
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime125
+      PLAY ACTION+ aibo125
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime126
+      PLAY ACTION+ aibo126
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime127
+      PLAY ACTION+ aibo127
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime128
+      PLAY ACTION+ aibo128
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime129
+      PLAY ACTION+ aibo129
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime130
+      PLAY ACTION+ aibo130
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime131
+      PLAY ACTION+ aibo131
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime132
+      PLAY ACTION+ aibo132
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ PenisAtSupperTime133
+      PLAY ACTION+ aibo133
       WAIT
       ADD:Count:1
       VSAVE:Count
+
     //}
 
     // clear globals and sensors
