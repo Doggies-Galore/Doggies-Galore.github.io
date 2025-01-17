@@ -50,10 +50,6 @@
 
     //{ "Main/Startup(once)"
       SET:Count:1
-      PLAY ACTION+ aibo1
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo2
       WAIT
       ADD:Count:1
@@ -62,27 +58,7 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo4
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo5
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo6
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo7
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo8
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo9
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -110,10 +86,6 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo16
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo17
       WAIT
       ADD:Count:1
@@ -122,35 +94,11 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo19
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo20
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo21
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo22
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo23
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo24
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo25
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo26
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -166,35 +114,7 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo30
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo31
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo32
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo33
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo34
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo35
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo36
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo37
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -206,35 +126,11 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo40
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo41
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo42
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo43
       WAIT
       ADD:Count:1
       VSAVE:Count
       PLAY ACTION+ aibo44
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo45
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo46
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo47
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -246,35 +142,7 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo50
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo51
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo52
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo53
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo54
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo55
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo56
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo57
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -286,19 +154,11 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo60
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo61
       WAIT
       ADD:Count:1
       VSAVE:Count
       PLAY ACTION+ aibo62
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo63
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -310,19 +170,7 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo66
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo67
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo68
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo69
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -346,10 +194,6 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo75
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo76
       WAIT
       ADD:Count:1
@@ -358,27 +202,11 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo78
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo79
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo80
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo81
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo82
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo83
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -390,51 +218,11 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo86
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo87
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo88
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo89
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo90
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo91
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo92
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo93
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo94
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo95
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo96
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo97
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -446,35 +234,7 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo100
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo101
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo102
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo103
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo104
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo105
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo106
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo107
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -483,18 +243,6 @@
       ADD:Count:1
       VSAVE:Count
       PLAY ACTION+ aibo109
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo110
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo111
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo112
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -510,23 +258,7 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo116
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo117
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo118
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo119
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo120
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -534,15 +266,7 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo122
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo123
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo124
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -550,23 +274,7 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo126
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
       PLAY ACTION+ aibo127
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo128
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo129
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-      PLAY ACTION+ aibo130
       WAIT
       ADD:Count:1
       VSAVE:Count
@@ -578,11 +286,6 @@
       WAIT
       ADD:Count:1
       VSAVE:Count
-      PLAY ACTION+ aibo133
-      WAIT
-      ADD:Count:1
-      VSAVE:Count
-
     //}
 
     // clear globals and sensors
