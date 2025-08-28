@@ -608,3 +608,5 @@ def cloud():
     time.sleep(5)
     slow_print("Fine. I'll end the program for you. Happy now? T_T")
     time.sleep(3)
+
+cloud()
