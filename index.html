@@ -225,16 +225,26 @@
                 // Launch after animation
                 setTimeout(() => {
                     const url = app.dataset.url;
+                    const appName = app.querySelector('.app-name').textContent.trim();
+                    const isRemoteBrowser = appName === 'Remote Browser';
+
+                    // List of apps that strictly block iframe embedding
+                    const blocksIframes = ['Google Drive', 'Gmail', 'Classroom', 'Printing', 'Remote OSX'];
 
                     if (url) {
-                        // Push state to enable back button
-                        history.pushState({ app: true }, "");
+                        if (isRemoteBrowser && !blocksIframes.includes(appName)) {
+                            // Use the iframe overlay for compatible apps
+                            history.pushState({ app: true }, "");
 
-                        iframe.src = url;
-                        overlay.style.display = 'block';
-                        // Trigger reflow for transition
-                        overlay.offsetHeight;
-                        overlay.classList.add('visible');
+                            iframe.src = url;
+                            overlay.style.display = 'block';
+                            overlay.offsetHeight;
+                            overlay.classList.add('visible');
+                        } else {
+                            // Direct navigation for apps that block embedding (Google, etc)
+                            // This fulfills the "same window" and "back button" requirement
+                            window.location.href = url;
+                        }
                     }
                 }, 600);
             });
