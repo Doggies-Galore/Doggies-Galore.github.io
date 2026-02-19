@@ -172,29 +172,28 @@
                     const isRemoteBrowser = app.querySelector('.app-name').textContent.trim() === 'Remote Browser';
 
                     if (url) {
-                        if (isRemoteBrowser) {
-                            const win = window.open('about:blank', '_blank', 'popup=yes,fullscreen=yes');
-                            if (win) {
-                                win.document.write(`
-                                    <!DOCTYPE html>
-                                    <html lang="en">
-                                    <head>
-                                        <meta charset="UTF-8">
-                                        <title>Remote Browser</title>
-                                        <style>
-                                            body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
-                                            iframe { border: none; width: 100%; height: 100%; }
-                                        </style>
-                                    </head>
-                                    <body>
-                                        <iframe src="${url}"></iframe>
-                                    </body>
-                                    </html>
-                                `);
-                                win.document.close();
-                            }
-                        } else {
-                            window.open(url, '_blank', 'popup=yes,fullscreen=yes');
+                        const appName = app.querySelector('.app-name').textContent.trim();
+                        const features = `popup=yes,left=0,top=0,width=${screen.availWidth},height=${screen.availHeight}`;
+
+                        const win = window.open('about:blank', '_blank', features);
+                        if (win) {
+                            win.document.write(`
+                                <!DOCTYPE html>
+                                <html lang="en">
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <title>${appName}</title>
+                                    <style>
+                                        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
+                                        iframe { border: none; width: 100%; height: 100%; }
+                                    </style>
+                                </head>
+                                <body>
+                                    <iframe src="${url}"></iframe>
+                                </body>
+                                </html>
+                            `);
+                            win.document.close();
                         }
                     }
 
