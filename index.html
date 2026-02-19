@@ -98,6 +98,30 @@
             z-index: 20;
             text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
         }
+
+        #app-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 100;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        #app-overlay.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        #app-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
     </style>
 </head>
 
@@ -125,9 +149,15 @@
         </div>
     </div>
 
+    <div id="app-overlay">
+        <iframe id="app-iframe"></iframe>
+    </div>
+
     <script>
         const apps = document.querySelectorAll('.app');
         const datetimeEl = document.getElementById('datetime');
+        const overlay = document.getElementById('app-overlay');
+        const iframe = document.getElementById('app-iframe');
         let animating = false;
 
         // Update date/time
@@ -139,6 +169,32 @@
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
+
+        function closeApp() {
+            overlay.classList.remove('visible');
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                iframe.src = 'about:blank';
+
+                // Return to menu state
+                datetimeEl.style.opacity = '1';
+                apps.forEach(a => {
+                    a.style.transition = 'all 0.5s ease-in-out';
+                    a.style.transform = 'translate(0, 0) scale(1)';
+                    a.style.opacity = '1';
+                });
+                setTimeout(() => {
+                    animating = false;
+                    apps.forEach(a => a.style.transition = '');
+                }, 500);
+            }, 400);
+        }
+
+        window.addEventListener('popstate', (event) => {
+            if (overlay.classList.contains('visible')) {
+                closeApp();
+            }
+        });
 
         apps.forEach(app => {
             app.addEventListener('click', () => {
@@ -169,51 +225,17 @@
                 // Launch after animation
                 setTimeout(() => {
                     const url = app.dataset.url;
-                    const isRemoteBrowser = app.querySelector('.app-name').textContent.trim() === 'Remote Browser';
 
                     if (url) {
-                        const appName = app.querySelector('.app-name').textContent.trim();
-                        const features = `popup=yes,left=0,top=0,width=${screen.availWidth},height=${screen.availHeight}`;
+                        // Push state to enable back button
+                        history.pushState({ app: true }, "");
 
-                        const win = window.open('about:blank', '_blank', features);
-                        if (win) {
-                            win.document.write(`
-                                <!DOCTYPE html>
-                                <html lang="en">
-                                <head>
-                                    <meta charset="UTF-8">
-                                    <title>${appName}</title>
-                                    <style>
-                                        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
-                                        iframe { border: none; width: 100%; height: 100%; }
-                                    </style>
-                                </head>
-                                <body>
-                                    <iframe src="${url}"></iframe>
-                                </body>
-                                </html>
-                            `);
-                            win.document.close();
-                        }
+                        iframe.src = url;
+                        overlay.style.display = 'block';
+                        // Trigger reflow for transition
+                        overlay.offsetHeight;
+                        overlay.classList.add('visible');
                     }
-
-                    // Wait for window to regain focus, then wait 1 more second
-                    const onFocus = () => {
-                        setTimeout(() => {
-                            datetimeEl.style.opacity = '1';
-                            apps.forEach(a => {
-                                a.style.transition = 'all 0.5s ease-in-out';
-                                a.style.transform = 'translate(0, 0) scale(1)';
-                                a.style.opacity = '1';
-                            });
-                            setTimeout(() => {
-                                animating = false;
-                                apps.forEach(a => a.style.transition = '');
-                            }, 500);
-                        }, 250); // Wait 0.25 seconds after regaining focus
-                        window.removeEventListener('focus', onFocus);
-                    };
-                    window.addEventListener('focus', onFocus);
                 }, 600);
             });
         });
