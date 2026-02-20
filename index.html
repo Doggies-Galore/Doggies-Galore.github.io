@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Launcher</title>
     <style>
+        :root {
+            --bg-color: #000;
+            --accent-color: #fff;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,12 +19,13 @@
         }
 
         body {
-            background: #000;
+            background: var(--bg-color);
             font-family: 'Helvetica Neue', Arial, sans-serif;
             overflow: hidden;
             width: 100vw;
             height: 100vh;
             cursor: default;
+            transition: background 0.5s ease;
         }
 
         #grid {
@@ -32,11 +39,12 @@
             gap: 1.5vmin;
             width: 97vw;
             height: 85vh;
+            z-index: 10;
         }
 
         .app {
             position: relative;
-            border: 5px solid #fff;
+            border: 5px solid var(--accent-color);
             border-radius: 40px;
             display: flex;
             align-items: center;
@@ -47,52 +55,116 @@
         }
 
         .app:hover {
-            transform: scale(1.02);
+            transform: scale(1.015);
         }
 
         .app-name {
-            color: #fff;
+            color: var(--accent-color);
             font-size: 4vw;
             font-weight: bold;
             text-align: center;
             user-select: none;
         }
 
-        #date {
+        #header {
             position: absolute;
-            top: 15px;
-            left: 20px;
-            color: #fff;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .header-item {
+            color: var(--accent-color);
             font-size: 3vw;
             font-weight: bold;
             user-select: none;
             transition: opacity 0.6s;
         }
 
-        #time {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            color: #fff;
-            font-size: 3vw;
-            font-weight: bold;
-            text-align: right;
-            user-select: none;
-            transition: opacity 0.6s;
+        /* Overlay Styles */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
         }
 
-        @keyframes zoomBlack {
-            to {
-                transform: scale(4.5);
-                opacity: 0;
-            }
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .overlay-title {
+            color: var(--accent-color);
+            font-size: 5vw;
+            margin-bottom: 40px;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            color: var(--accent-color);
+            font-size: 3vw;
+            cursor: pointer;
+            border: 2px solid var(--accent-color);
+            padding: 10px 20px;
+            border-radius: 15px;
+            pointer-events: auto;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .theme-btn {
+            padding: 20px 40px;
+            border: 3px solid var(--accent-color);
+            color: var(--accent-color);
+            border-radius: 20px;
+            font-size: 2vw;
+            cursor: pointer;
+            background: transparent;
+            transition: all 0.2s;
+        }
+
+        .theme-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .about-text {
+            color: var(--accent-color);
+            font-size: 3vw;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
-    <div id="date"></div>
-    <div id="time"></div>
+    <div id="header">
+        <div id="date" class="header-item"></div>
+        <div id="time" class="header-item"></div>
+    </div>
+
     <div id="grid">
         <div class="app"
             data-url="https://app.jumpdesktop.com/jump#authCreds=true&neuronid=CD-01GC8ZEZNY21WKT06QCZNG4PXA">
@@ -101,11 +173,11 @@
         <div class="app" data-url="https://mediastation.tail76b4d2.ts.net/vnc.html?autoconnect=1">
             <div class="app-name">Remote Browser</div>
         </div>
-        <div class="app" data-action="files">
-            <div class="app-name">Files</div>
+        <div class="app" data-action="settings">
+            <div class="app-name">Launcher Settings</div>
         </div>
-        <div class="app" data-action="apps">
-            <div class="app-name">System Apps</div>
+        <div class="app" data-action="about">
+            <div class="app-name">About</div>
         </div>
         <div class="app" data-url="https://papercut.jeffco.k12.co.us:9192/client">
             <div class="app-name">Printing</div>
@@ -115,11 +187,42 @@
         </div>
     </div>
 
+    <div id="settings-overlay" class="overlay">
+        <div class="close-btn" onclick="closeOverlay('settings-overlay')">Close</div>
+        <h1 class="overlay-title">Settings</h1>
+        <div class="settings-grid">
+            <button class="theme-btn" onclick="setTheme('#000', '#fff')">OLED Black</button>
+            <button class="theme-btn" onclick="setTheme('#1a1a1a', '#fff')">Dark Gray</button>
+            <button class="theme-btn" onclick="setTheme('#001524', '#ffecd1')">Midnight</button>
+            <button class="theme-btn" onclick="setTheme('#fff', '#000')">Light Mode</button>
+        </div>
+    </div>
+
+    <div id="about-overlay" class="overlay">
+        <div class="close-btn" onclick="closeOverlay('about-overlay')">Close</div>
+        <h1 class="overlay-title">About Launcher</h1>
+        <p class="about-text">Version 0.1</p>
+        <p class="about-text" style="margin-top:20px; opacity:0.6; font-size:1.5vw;">Designed for High-Performance
+            Desktop Environments</p>
+    </div>
+
     <script>
         const apps = document.querySelectorAll('.app');
+        const headerItems = document.querySelectorAll('.header-item');
         const dateEl = document.getElementById('date');
         const timeEl = document.getElementById('time');
         let animating = false;
+
+        function setTheme(bg, accent) {
+            document.documentElement.style.setProperty('--bg-color', bg);
+            document.documentElement.style.setProperty('--accent-color', accent);
+            localStorage.setItem('launcher-bg', bg);
+            localStorage.setItem('launcher-accent', accent);
+        }
+
+        const savedBg = localStorage.getItem('launcher-bg');
+        const savedAccent = localStorage.getItem('launcher-accent');
+        if (savedBg) setTheme(savedBg, savedAccent || '#fff');
 
         function updateDateTime() {
             const now = new Date();
@@ -150,53 +253,50 @@
             if (animating) return;
             animating = true;
 
-            // Save state for back animation
-            sessionStorage.setItem('lastAppIndex', index);
-
+            const action = app.dataset.action;
+            const url = app.dataset.url;
+            const transitionStyle = 'all 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
             const transitionData = getAppTransitionData(index);
-            dateEl.style.opacity = '0';
-            timeEl.style.opacity = '0';
+
+            headerItems.forEach(item => item.style.opacity = '0');
 
             apps.forEach((a, i) => {
-                a.style.transition = 'all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                a.style.transition = transitionStyle;
                 a.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
                 a.style.opacity = '0';
                 a.style.pointerEvents = 'none';
             });
 
+            sessionStorage.setItem('lastAppIndex', index);
+
             setTimeout(() => {
-                const url = app.dataset.url;
-                const action = app.dataset.action;
-
-                if (url) {
+                if (action === 'settings') {
+                    document.getElementById('settings-overlay').classList.add('active');
+                    animating = false;
+                } else if (action === 'about') {
+                    document.getElementById('about-overlay').classList.add('active');
+                    animating = false;
+                } else if (url) {
                     window.location.href = url;
-                } else if (action === 'files') {
-                    window.location.href = 'file:///home/chronos/user/MyFiles';
-                } else if (action === 'apps') {
-                    window.location.href = 'chrome://apps';
                 }
-
-                // Backup reset if navigation doesn't happen or we return via window focus
-                const onFocus = () => {
-                    resetAnimations();
-                    window.removeEventListener('focus', onFocus);
-                };
-                window.addEventListener('focus', onFocus);
-            }, 600);
+            }, 750);
         }
 
-        function resetAnimations(immediate = false) {
+        function closeOverlay(id) {
+            document.getElementById(id).classList.remove('active');
+            resetAnimations();
+        }
+
+        function resetAnimations() {
             const lastIndex = sessionStorage.getItem('lastAppIndex');
             if (lastIndex === null) {
-                // Regular load
                 apps.forEach(a => {
-                    a.style.transition = immediate ? 'none' : 'all 0.5s ease-out';
+                    a.style.transition = 'all 0.6s ease-out';
                     a.style.transform = 'translate(0, 0) scale(1)';
                     a.style.opacity = '1';
                     a.style.pointerEvents = 'auto';
                 });
-                dateEl.style.opacity = '1';
-                timeEl.style.opacity = '1';
+                headerItems.forEach(item => item.style.opacity = '1');
                 animating = false;
                 return;
             }
@@ -204,34 +304,31 @@
             animating = true;
             const index = parseInt(lastIndex);
             const transitionData = getAppTransitionData(index);
+            const transitionStyle = 'all 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
 
-            // Phase 1: Set to exploded state instantly
             apps.forEach((a, i) => {
                 a.style.transition = 'none';
                 a.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
                 a.style.opacity = '0';
                 a.style.pointerEvents = 'none';
             });
-            dateEl.style.opacity = '0';
-            timeEl.style.opacity = '0';
+            headerItems.forEach(item => item.style.opacity = '0');
 
-            // Phase 2: Animate back to normal
             requestAnimationFrame(() => {
                 setTimeout(() => {
                     apps.forEach((a, i) => {
-                        a.style.transition = 'all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                        a.style.transition = transitionStyle;
                         a.style.transform = 'translate(0, 0) scale(1)';
                         a.style.opacity = '1';
                         a.style.pointerEvents = 'auto';
                     });
-                    dateEl.style.opacity = '1';
-                    timeEl.style.opacity = '1';
+                    headerItems.forEach(item => item.style.opacity = '1');
 
                     setTimeout(() => {
                         animating = false;
                         apps.forEach(a => a.style.transition = '');
                         sessionStorage.removeItem('lastAppIndex');
-                    }, 650);
+                    }, 800);
                 }, 50);
             });
         }
@@ -240,18 +337,13 @@
             app.addEventListener('click', () => launchApp(app, index));
         });
 
-        // Listen for history navigation (back/forward)
-        window.addEventListener('pageshow', (event) => {
-            resetAnimations();
-        });
+        window.addEventListener('pageshow', () => resetAnimations());
 
-        // Fullscreen logic
         const triggerFullscreen = () => {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().catch(() => { });
             }
         };
-
         document.addEventListener('DOMContentLoaded', triggerFullscreen);
         document.body.addEventListener('click', triggerFullscreen, { once: true });
     </script>
