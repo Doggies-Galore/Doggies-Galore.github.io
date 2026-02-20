@@ -185,7 +185,7 @@
             data-fade="#f0f0f0">
             <div class="app-name">Remote OSX</div>
         </div>
-        <div class="app" data-url="https://mediastation.tail76b4d2.ts.net/vnc.html?autoconnect=1" data-fade="#808080">
+        <div class="app" data-url="https://mediastation.tail76b4d2.ts.net/vnc.html?autoconnect=1" data-fade="#111111">
             <div class="app-name">Remote Browser</div>
         </div>
         <div class="app" data-action="settings">
@@ -261,12 +261,19 @@
         setInterval(updateDateTime, 1000);
 
         function getAppTransitionData(appIndex) {
+            // Temporarily ignore transforms to get native coordinates
+            const originalTransforms = [];
+            apps.forEach(a => {
+                originalTransforms.push(a.style.transform);
+                a.style.transform = 'none';
+            });
+
             const app = apps[appIndex];
             const rect = app.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
 
-            return Array.from(apps).map(otherApp => {
+            const data = Array.from(apps).map(otherApp => {
                 const otherRect = otherApp.getBoundingClientRect();
                 const otherCenterX = otherRect.left + otherRect.width / 2;
                 const otherCenterY = otherRect.top + otherRect.height / 2;
@@ -275,6 +282,13 @@
                     dy: (otherCenterY - centerY) * 4
                 };
             });
+
+            // Restore transforms
+            apps.forEach((a, i) => {
+                a.style.transform = originalTransforms[i];
+            });
+
+            return data;
         }
 
         function launchApp(app, index) {
