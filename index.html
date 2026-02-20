@@ -5,11 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Launcher</title>
+    <script>
+        // Prevent flashing the grid before zoom-out animation plays
+        if (sessionStorage.getItem('lastAppIndex') !== null) {
+            document.documentElement.classList.add('navigating-back');
+        }
+    </script>
     <style>
         :root {
             --bg-color: #000;
             --accent-color: #fff;
-            --glass: rgba(255, 255, 255, 0.1);
         }
 
         * {
@@ -19,13 +24,19 @@
         }
 
         body {
-            background: var(--bg-color);
+            background-color: var(--bg-color);
             font-family: 'Helvetica Neue', Arial, sans-serif;
             overflow: hidden;
             width: 100vw;
             height: 100vh;
             cursor: default;
-            transition: background 0.5s ease;
+            transition: background-color 0.5s ease;
+        }
+
+        html.navigating-back #grid,
+        html.navigating-back #header {
+            opacity: 0 !important;
+            transition: none !important;
         }
 
         #grid {
@@ -93,7 +104,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--bg-color);
+            background-color: var(--bg-color);
             z-index: 100;
             display: flex;
             flex-direction: column;
@@ -131,12 +142,14 @@
 
         .settings-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
+            max-height: 70vh;
+            padding: 20px;
         }
 
         .theme-btn {
-            padding: 20px 40px;
+            padding: 15px 20px;
             border: 3px solid var(--accent-color);
             color: var(--accent-color);
             border-radius: 20px;
@@ -144,10 +157,11 @@
             cursor: pointer;
             background: transparent;
             transition: all 0.2s;
+            font-weight: bold;
         }
 
         .theme-btn:hover {
-            background: var(--accent-color);
+            background-color: var(--accent-color);
             color: var(--bg-color);
         }
 
@@ -167,10 +181,11 @@
 
     <div id="grid">
         <div class="app"
-            data-url="https://app.jumpdesktop.com/jump#authCreds=true&neuronid=CD-01GC8ZEZNY21WKT06QCZNG4PXA">
+            data-url="https://app.jumpdesktop.com/jump#authCreds=true&neuronid=CD-01GC8ZEZNY21WKT06QCZNG4PXA"
+            data-fade="#f0f0f0">
             <div class="app-name">Remote OSX</div>
         </div>
-        <div class="app" data-url="https://mediastation.tail76b4d2.ts.net/vnc.html?autoconnect=1">
+        <div class="app" data-url="https://mediastation.tail76b4d2.ts.net/vnc.html?autoconnect=1" data-fade="#808080">
             <div class="app-name">Remote Browser</div>
         </div>
         <div class="app" data-action="settings">
@@ -179,27 +194,37 @@
         <div class="app" data-action="about">
             <div class="app-name">About</div>
         </div>
-        <div class="app" data-url="https://papercut.jeffco.k12.co.us:9192/client">
+        <div class="app" data-url="https://papercut.jeffco.k12.co.us:9192/client" data-fade="#f0f0f0">
             <div class="app-name">Printing</div>
         </div>
-        <div class="app" data-url="https://classroom.google.com/h">
+        <div class="app" data-url="https://classroom.google.com/h" data-fade="#ffffff">
             <div class="app-name">Classroom</div>
         </div>
     </div>
 
     <div id="settings-overlay" class="overlay">
-        <div class="close-btn" onclick="closeOverlay('settings-overlay')">Close</div>
+        <div class="close-btn" id="close-settings-btn">Close</div>
         <h1 class="overlay-title">Settings</h1>
         <div class="settings-grid">
-            <button class="theme-btn" onclick="setTheme('#000', '#fff')">OLED Black</button>
-            <button class="theme-btn" onclick="setTheme('#1a1a1a', '#fff')">Dark Gray</button>
+            <button class="theme-btn" onclick="setTheme('#000000', '#ffffff')">OLED Black</button>
+            <button class="theme-btn" onclick="setTheme('#1a1a1a', '#ffffff')">Dark Gray</button>
+            <button class="theme-btn" onclick="setTheme('#ffffff', '#000000')">Light Mode</button>
             <button class="theme-btn" onclick="setTheme('#001524', '#ffecd1')">Midnight</button>
-            <button class="theme-btn" onclick="setTheme('#fff', '#000')">Light Mode</button>
+
+            <button class="theme-btn" onclick="setTheme('#2d1b4e', '#d4b8ff')">Purple</button>
+            <button class="theme-btn" onclick="setTheme('#4a1528', '#ffb3c6')">Pink</button>
+            <button class="theme-btn" onclick="setTheme('#3d1c00', '#ffb067')">Orange</button>
+            <button class="theme-btn" onclick="setTheme('#0b2b1d', '#a3ffcc')">Forest</button>
+
+            <button class="theme-btn" onclick="setTheme('#001f3f', '#80c4ff')">Ocean</button>
+            <button class="theme-btn" onclick="setTheme('#330000', '#ff9999')">Crimson</button>
+            <button class="theme-btn" onclick="setTheme('#0d1117', '#00ff00')">Hacker</button>
+            <button class="theme-btn" onclick="setTheme('#2d0c18', '#ffcc80')">Sunset</button>
         </div>
     </div>
 
     <div id="about-overlay" class="overlay">
-        <div class="close-btn" onclick="closeOverlay('about-overlay')">Close</div>
+        <div class="close-btn" id="close-about-btn">Close</div>
         <h1 class="overlay-title">About Launcher</h1>
         <p class="about-text">Version 0.1</p>
         <p class="about-text" style="margin-top:20px; opacity:0.6; font-size:1.5vw;">Designed for High-Performance
@@ -218,6 +243,8 @@
             document.documentElement.style.setProperty('--accent-color', accent);
             localStorage.setItem('launcher-bg', bg);
             localStorage.setItem('launcher-accent', accent);
+            // reset any dynamic background color
+            document.body.style.backgroundColor = '';
         }
 
         const savedBg = localStorage.getItem('launcher-bg');
@@ -227,7 +254,8 @@
         function updateDateTime() {
             const now = new Date();
             dateEl.textContent = now.toLocaleDateString(undefined, { weekday: 'short', month: 'numeric', day: 'numeric' });
-            timeEl.textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+            // Using hour12: false for 24-hour mode support
+            timeEl.textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: false });
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
@@ -255,8 +283,15 @@
 
             const action = app.dataset.action;
             const url = app.dataset.url;
+            const fadeColor = app.dataset.fade;
+
             const transitionStyle = 'all 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
             const transitionData = getAppTransitionData(index);
+
+            // Apply fade color to background if specified
+            if (fadeColor) {
+                document.body.style.backgroundColor = fadeColor;
+            }
 
             headerItems.forEach(item => item.style.opacity = '0');
 
@@ -283,11 +318,20 @@
         }
 
         function closeOverlay(id) {
+            if (animating) return;
             document.getElementById(id).classList.remove('active');
             resetAnimations();
         }
 
+        // Attach event listeners safely
+        document.getElementById('close-settings-btn').addEventListener('click', () => closeOverlay('settings-overlay'));
+        document.getElementById('close-about-btn').addEventListener('click', () => closeOverlay('about-overlay'));
+
         function resetAnimations() {
+            // Restore original theme background color
+            document.body.style.backgroundColor = '';
+            document.documentElement.classList.remove('navigating-back');
+
             const lastIndex = sessionStorage.getItem('lastAppIndex');
             if (lastIndex === null) {
                 apps.forEach(a => {
@@ -337,7 +381,11 @@
             app.addEventListener('click', () => launchApp(app, index));
         });
 
-        window.addEventListener('pageshow', () => resetAnimations());
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted || sessionStorage.getItem('lastAppIndex') !== null) {
+                resetAnimations();
+            }
+        });
 
         const triggerFullscreen = () => {
             if (!document.fullscreenElement) {
