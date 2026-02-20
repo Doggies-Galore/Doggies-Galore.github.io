@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Launcher</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -15,118 +14,85 @@
 
         body {
             background: #000;
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
             overflow: hidden;
             width: 100vw;
             height: 100vh;
             cursor: default;
         }
 
-        /* Subtle radial gradient to prevent pure flatness */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0) 80%);
-            pointer-events: none;
-        }
-
         #grid {
             position: absolute;
-            top: 50%;
+            top: 55%;
             left: 50%;
             transform: translate(-50%, -50%);
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(2, 1fr);
-            gap: 4vmin;
-            width: 80vw;
-            height: 60vh;
-            z-index: 10;
+            gap: 1.5vmin;
+            width: 97vw;
+            height: 85vh;
         }
 
         .app {
             position: relative;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 32px;
+            border: 5px solid #fff;
+            border-radius: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s ease;
+            background: transparent;
         }
 
         .app:hover {
-            transform: scale(1.05);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
+            transform: scale(1.02);
         }
 
         .app-name {
             color: #fff;
-            font-size: 2vw;
-            font-weight: 700;
+            font-size: 4vw;
+            font-weight: bold;
             text-align: center;
             user-select: none;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
         }
 
-        .animating {
-            pointer-events: none;
-        }
-
-        #datetime {
+        #date {
             position: absolute;
-            top: 40px;
-            right: 50px;
+            top: 15px;
+            left: 20px;
             color: #fff;
-            font-size: 2.2vw;
-            font-weight: 700;
-            text-align: right;
-            line-height: 1.2;
+            font-size: 3vw;
+            font-weight: bold;
             user-select: none;
             transition: opacity 0.6s;
-            z-index: 20;
-            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
         }
 
-        #app-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #000;
-            z-index: 100;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.4s ease;
+        #time {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #fff;
+            font-size: 3vw;
+            font-weight: bold;
+            text-align: right;
+            user-select: none;
+            transition: opacity 0.6s;
         }
 
-        #app-overlay.visible {
-            display: block;
-            opacity: 1;
-        }
-
-        #app-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        @keyframes zoomBlack {
+            to {
+                transform: scale(4.5);
+                opacity: 0;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div id="datetime"></div>
+    <div id="date"></div>
+    <div id="time"></div>
     <div id="grid">
         <div class="app"
             data-url="https://app.jumpdesktop.com/jump#authCreds=true&neuronid=CD-01GC8ZEZNY21WKT06QCZNG4PXA">
@@ -135,11 +101,11 @@
         <div class="app" data-url="https://mediastation.tail76b4d2.ts.net/vnc.html?autoconnect=1">
             <div class="app-name">Remote Browser</div>
         </div>
-        <div class="app" data-url="https://drive.google.com">
-            <div class="app-name">Google Drive</div>
+        <div class="app" data-action="files">
+            <div class="app-name">Files</div>
         </div>
-        <div class="app" data-url="https://mail.google.com">
-            <div class="app-name">Gmail</div>
+        <div class="app" data-action="apps">
+            <div class="app-name">System Apps</div>
         </div>
         <div class="app" data-url="https://papercut.jeffco.k12.co.us:9192/client">
             <div class="app-name">Printing</div>
@@ -149,120 +115,145 @@
         </div>
     </div>
 
-    <div id="app-overlay">
-        <iframe id="app-iframe"></iframe>
-    </div>
-
     <script>
         const apps = document.querySelectorAll('.app');
-        const datetimeEl = document.getElementById('datetime');
-        const overlay = document.getElementById('app-overlay');
-        const iframe = document.getElementById('app-iframe');
+        const dateEl = document.getElementById('date');
+        const timeEl = document.getElementById('time');
         let animating = false;
 
-        // Update date/time
         function updateDateTime() {
             const now = new Date();
-            const date = `${now.getMonth() + 1}/${now.getDate()}`;
-            const time = now.toTimeString().slice(0, 8);
-            datetimeEl.innerHTML = `${date}<br>${time}`;
+            dateEl.textContent = now.toLocaleDateString(undefined, { weekday: 'short', month: 'numeric', day: 'numeric' });
+            timeEl.textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
 
-        function closeApp() {
-            overlay.classList.remove('visible');
-            setTimeout(() => {
-                overlay.style.display = 'none';
-                iframe.src = 'about:blank';
+        function getAppTransitionData(appIndex) {
+            const app = apps[appIndex];
+            const rect = app.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
 
-                // Return to menu state
-                datetimeEl.style.opacity = '1';
-                apps.forEach(a => {
-                    a.style.transition = 'all 0.5s ease-in-out';
-                    a.style.transform = 'translate(0, 0) scale(1)';
-                    a.style.opacity = '1';
-                });
-                setTimeout(() => {
-                    animating = false;
-                    apps.forEach(a => a.style.transition = '');
-                }, 500);
-            }, 400);
+            return Array.from(apps).map(otherApp => {
+                const otherRect = otherApp.getBoundingClientRect();
+                const otherCenterX = otherRect.left + otherRect.width / 2;
+                const otherCenterY = otherRect.top + otherRect.height / 2;
+                return {
+                    dx: (otherCenterX - centerX) * 4,
+                    dy: (otherCenterY - centerY) * 4
+                };
+            });
         }
 
-        window.addEventListener('popstate', (event) => {
-            if (overlay.classList.contains('visible')) {
-                closeApp();
-            }
-        });
+        function launchApp(app, index) {
+            if (animating) return;
+            animating = true;
 
-        apps.forEach(app => {
-            app.addEventListener('click', () => {
-                if (animating) return;
-                animating = true;
+            // Save state for back animation
+            sessionStorage.setItem('lastAppIndex', index);
 
-                const rect = app.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
+            const transitionData = getAppTransitionData(index);
+            dateEl.style.opacity = '0';
+            timeEl.style.opacity = '0';
 
-                // Fade out datetime
-                datetimeEl.style.opacity = '0';
-
-                // Animate all apps zooming toward clicked app
-                apps.forEach(otherApp => {
-                    const otherRect = otherApp.getBoundingClientRect();
-                    const otherCenterX = otherRect.left + otherRect.width / 2;
-                    const otherCenterY = otherRect.top + otherRect.height / 2;
-
-                    const deltaX = otherCenterX - centerX;
-                    const deltaY = otherCenterY - centerY;
-
-                    otherApp.style.transition = 'all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
-                    otherApp.style.transform = `translate(${deltaX * 3}px, ${deltaY * 3}px) scale(4.5)`;
-                    otherApp.style.opacity = '0';
-                });
-
-                // Launch after animation
-                setTimeout(() => {
-                    const url = app.dataset.url;
-                    const appName = app.querySelector('.app-name').textContent.trim();
-                    const isRemoteBrowser = appName === 'Remote Browser';
-
-                    // List of apps that strictly block iframe embedding
-                    const blocksIframes = ['Google Drive', 'Gmail', 'Classroom', 'Printing', 'Remote OSX'];
-
-                    if (url) {
-                        if (isRemoteBrowser && !blocksIframes.includes(appName)) {
-                            // Use the iframe overlay for compatible apps
-                            history.pushState({ app: true }, "");
-
-                            iframe.src = url;
-                            overlay.style.display = 'block';
-                            overlay.offsetHeight;
-                            overlay.classList.add('visible');
-                        } else {
-                            // Direct navigation for apps that block embedding (Google, etc)
-                            // This fulfills the "same window" and "back button" requirement
-                            window.location.href = url;
-                        }
-                    }
-                }, 600);
+            apps.forEach((a, i) => {
+                a.style.transition = 'all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                a.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
+                a.style.opacity = '0';
+                a.style.pointerEvents = 'none';
             });
-        });
 
-        // Fullscreen on load
-        document.addEventListener('DOMContentLoaded', () => {
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(() => { });
+            setTimeout(() => {
+                const url = app.dataset.url;
+                const action = app.dataset.action;
+
+                if (url) {
+                    window.location.href = url;
+                } else if (action === 'files') {
+                    window.location.href = 'file:///home/chronos/user/MyFiles';
+                } else if (action === 'apps') {
+                    window.location.href = 'chrome://apps';
+                }
+
+                // Backup reset if navigation doesn't happen or we return via window focus
+                const onFocus = () => {
+                    resetAnimations();
+                    window.removeEventListener('focus', onFocus);
+                };
+                window.addEventListener('focus', onFocus);
+            }, 600);
+        }
+
+        function resetAnimations(immediate = false) {
+            const lastIndex = sessionStorage.getItem('lastAppIndex');
+            if (lastIndex === null) {
+                // Regular load
+                apps.forEach(a => {
+                    a.style.transition = immediate ? 'none' : 'all 0.5s ease-out';
+                    a.style.transform = 'translate(0, 0) scale(1)';
+                    a.style.opacity = '1';
+                    a.style.pointerEvents = 'auto';
+                });
+                dateEl.style.opacity = '1';
+                timeEl.style.opacity = '1';
+                animating = false;
+                return;
             }
+
+            animating = true;
+            const index = parseInt(lastIndex);
+            const transitionData = getAppTransitionData(index);
+
+            // Phase 1: Set to exploded state instantly
+            apps.forEach((a, i) => {
+                a.style.transition = 'none';
+                a.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
+                a.style.opacity = '0';
+                a.style.pointerEvents = 'none';
+            });
+            dateEl.style.opacity = '0';
+            timeEl.style.opacity = '0';
+
+            // Phase 2: Animate back to normal
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    apps.forEach((a, i) => {
+                        a.style.transition = 'all 0.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                        a.style.transform = 'translate(0, 0) scale(1)';
+                        a.style.opacity = '1';
+                        a.style.pointerEvents = 'auto';
+                    });
+                    dateEl.style.opacity = '1';
+                    timeEl.style.opacity = '1';
+
+                    setTimeout(() => {
+                        animating = false;
+                        apps.forEach(a => a.style.transition = '');
+                        sessionStorage.removeItem('lastAppIndex');
+                    }, 650);
+                }, 50);
+            });
+        }
+
+        apps.forEach((app, index) => {
+            app.addEventListener('click', () => launchApp(app, index));
         });
 
-        // Click to enter fullscreen if needed
-        document.body.addEventListener('click', () => {
+        // Listen for history navigation (back/forward)
+        window.addEventListener('pageshow', (event) => {
+            resetAnimations();
+        });
+
+        // Fullscreen logic
+        const triggerFullscreen = () => {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().catch(() => { });
             }
-        }, { once: true });
+        };
+
+        document.addEventListener('DOMContentLoaded', triggerFullscreen);
+        document.body.addEventListener('click', triggerFullscreen, { once: true });
     </script>
 </body>
 
