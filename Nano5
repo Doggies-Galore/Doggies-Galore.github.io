@@ -1,0 +1,62 @@
+#!/bin/bash
+set -e
+
+# ---------------------------
+# Step 0: Install dependencies
+# ---------------------------
+echo "Updating system and installing dependencies..."
+sudo apt update
+sudo apt install -y \
+    build-essential \
+    git \
+    wget \
+    python3 \
+    python3-pip \
+    libopenblas-dev \
+    cmake \
+    gcc-8 g++-8
+
+# ---------------------------
+# Step 1: Clone and checkout compatible commit
+# ---------------------------
+echo "Cloning llama.cpp repository..."
+if [ ! -d "llama.cpp" ]; then
+    git clone https://github.com/ggerganov/llama.cpp.git
+fi
+
+cd llama.cpp
+git fetch
+git checkout a33e6a0
+echo "Checked out commit a33e6a0 (Jetson Nano compatible)."
+
+# ---------------------------
+# Step 2: Apply CUDA 10.2 patches
+# ---------------------------
+echo "Applying CUDA 10.2 patches..."
+
+# Quick manual fixes (as per instructions)
+sed -i 's/MK_NVCCFLAGS += -O3/MK_NVCCFLAGS += -maxrregcount=80/g' Makefile
+sed -i 's/MK_CXXFLAGS += -mcpu=native//g' Makefile
+
+echo "Patches applied."
+
+# ---------------------------
+# Step 3: Set GCC 8.5 for Jetson
+# ---------------------------
+export CC=/usr/bin/gcc-8
+export CXX=/usr/bin/g++-8
+
+# ---------------------------
+# Step 4: Clean previous builds
+# ---------------------------
+make clean || true
+
+# ---------------------------
+# Step 5: Build with CUDA acceleration
+# ---------------------------
+echo "Building llama.cpp with CUDA for Jetson Nano..."
+make LLAMA_CUBLAS=1 CUDA_DOCKER_ARCH=sm_53 -j$(nproc)
+
+echo "Build complete!"
+echo "Binary location: $(pwd)/main"
+echo "You can now place GGUF models in $(pwd)/../models and run ./main -m models/<model>.gguf"
