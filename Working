@@ -1,0 +1,16 @@
+table inet filter {
+    chain forward {
+        type filter hook forward priority 0;
+        policy drop;
+
+        iif "eth0" oif "wlan0" accept
+        iif "wlan0" oif "eth0" ct state related,established accept
+    }
+}
+
+table ip nat {
+    chain postrouting {
+        type nat hook postrouting priority 100;
+        oif "wlan0" masquerade
+    }
+}
