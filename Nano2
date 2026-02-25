@@ -1,0 +1,41 @@
+#!/bin/bash
+set -e
+
+echo "Updating system..."
+sudo apt update
+sudo apt install -y \
+    build-essential \
+    git \
+    cmake \
+    python3 \
+    python3-pip \
+    libopenblas-dev \
+    wget
+
+echo "Cloning llama.cpp..."
+if [ ! -d "llama.cpp" ]; then
+    git clone https://github.com/ggerganov/llama.cpp
+fi
+
+cd llama.cpp
+
+echo "Creating build directory..."
+mkdir -p build
+cd build
+
+echo "Configuring with CMake for Jetson Nano (CUDA 10.2, SM53)..."
+
+cmake .. \
+    -DLLAMA_CUBLAS=ON \
+    -DCMAKE_CUDA_ARCHITECTURES=53 \
+    -DCMAKE_BUILD_TYPE=Release
+
+echo "Building..."
+cmake --build . -j$(nproc)
+
+echo "Creating models directory..."
+mkdir -p ../models
+
+echo "Build complete!"
+echo "Main binary: llama.cpp/build/bin/llama-cli"
+echo "Server binary: llama.cpp/build/bin/llama-server"
