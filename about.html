@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Launcher</title>
+    <style>
+        :root {
+            --bg-color: #000;
+            --accent-color: #fff;
+        }
+
+        html {
+            background-color: var(--bg-color);
+            transition: background-color 0.75s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: transparent;
+            color: var(--accent-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            transition: background-color 0.75s ease, opacity 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.4s cubic-bezier(0.4, 0.0, 0.2, 1) forwards !important;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px solid var(--accent-color);
+            border-radius: 30px;
+            padding: 60px;
+            text-align: center;
+            max-width: 800px;
+        }
+
+        .title {
+            font-size: 4vw;
+            margin-bottom: 20px;
+            font-weight: bold;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 2vw;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .quote {
+            font-size: 1.5vw;
+            opacity: 0.6;
+            font-style: italic;
+            margin-top: 30px;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 40px;
+            top: 40px;
+            color: var(--accent-color);
+            font-size: 2vw;
+            cursor: pointer;
+            border: 3px solid var(--accent-color);
+            padding: 10px 25px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        const bg = localStorage.getItem('launcher-bg') || '#000';
+        const accent = localStorage.getItem('launcher-accent') || '#fff';
+        document.documentElement.style.setProperty('--bg-color', bg);
+        document.documentElement.style.setProperty('--accent-color', accent);
+    </script>
+    <a href="launcher toonis.html" class="close-btn">Back</a>
+    <div class="card">
+        <div class="title">About Launcher</div>
+        <div class="subtitle">Version 0.1 (the rainy way)</div>
+        <div class="subtitle">Designed for High-Performance Desktop Environments</div>
+        <div class="quote">"this 97 year old diner still serves launcher the rainy way"</div>
+    </div>
+    <script>
+        const triggerFullscreen = () => { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(() => { }); } };
+        document.addEventListener('DOMContentLoaded', triggerFullscreen);
+        document.body.addEventListener('click', triggerFullscreen, { once: true });
+
+        // History API back button interceptor
+        history.replaceState({ page: 'applet' }, '');
+        history.pushState({ page: 'applet-active' }, '');
+        window.addEventListener('popstate', (e) => {
+            if (e.state && e.state.page === 'applet') {
+                document.body.classList.add('fade-out');
+                setTimeout(() => { window.location.href = 'launcher toonis.html'; }, 400);
+            }
+        });
+
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.body.classList.add('fade-out');
+                setTimeout(() => { window.location.href = btn.href; }, 400);
+            });
+        });
+    </script>
+</body>
+
+</html>

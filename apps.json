@@ -1,0 +1,82 @@
+{
+    "apps": [
+        {
+            "id": "remote-osx",
+            "name": "Remote OSX",
+            "url": "https://app.jumpdesktop.com/jump#authCreds=true&neuronid=CD-01GC8ZEZNY21WKT06QCZNG4PXA",
+            "fade": "#f0f0f0"
+        },
+        {
+            "id": "remote-browser",
+            "name": "Remote Browser",
+            "url": "https://mediastation.tail76b4d2.ts.net/vnc.html?autoconnect=1",
+            "fade": "#111111"
+        },
+        {
+            "id": "remote-linux",
+            "name": "Remote Linux",
+            "url": "https://connect.raspberrypi.com/devices/2ae11a69-25e3-4c13-93a2-86a3955d5003/screen-sharing-session",
+            "fade": "#111111"
+        },
+        {
+            "id": "launcher-settings",
+            "name": "Launcher Settings",
+            "url": "settings.html",
+            "fade": "theme"
+        },
+        {
+            "id": "about",
+            "name": "About",
+            "url": "about.html",
+            "fade": "theme"
+        },
+        {
+            "id": "printing",
+            "name": "Printing",
+            "url": "https://papercut.jeffco.k12.co.us:9192/client",
+            "fade": "#f0f0f0"
+        },
+        {
+            "id": "classroom",
+            "name": "Classroom",
+            "url": "https://classroom.google.com/h",
+            "fade": "#ffffff"
+        },
+        {
+            "id": "apps",
+            "name": "Apps",
+            "url": "apps.html",
+            "fade": "theme"
+        },
+        {
+            "id": "re-arrange",
+            "name": "Re-Arrange",
+            "url": "rearrange.html",
+            "fade": "theme"
+        },
+        {
+            "id": "rainyware",
+            "name": "Rainyware",
+            "url": "https://rainyware.rainsounds2.com",
+            "fade": "#0000ff"
+        },
+        {
+            "id": "parsec",
+            "name": "Parsec",
+            "url": "https://web.parsec.com",
+            "fade": "#000000"
+        },
+        {
+            "id": "spotify",
+            "name": "Spotify",
+            "url": "https://spotify.com",
+            "fade": "#1db954"
+        },
+        {
+            "id": "apple-music",
+            "name": "Apple Music",
+            "url": "https://music.apple.com",
+            "fade": "#fa243c"
+        }
+    ]
+}

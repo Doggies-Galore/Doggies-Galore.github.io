@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Re-Arrange Apps</title>
+    <style>
+        :root {
+            --bg-color: #000;
+            --accent-color: #fff;
+        }
+
+        html {
+            background-color: var(--bg-color);
+            transition: background-color 0.75s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: transparent;
+            color: var(--accent-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.75s ease, opacity 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.4s cubic-bezier(0.4, 0.0, 0.2, 1) forwards !important;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .close-btn,
+        .save-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+            font-size: 2vw;
+            border: 3px solid var(--accent-color);
+            padding: 10px 25px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .close-btn {
+            right: 20px;
+        }
+
+        .save-btn {
+            left: 20px;
+        }
+
+        .close-btn:hover,
+        .save-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .close-btn:focus-visible,
+        .save-btn:focus-visible {
+            outline: 3px solid var(--accent-color);
+            outline-offset: 5px;
+        }
+
+        h1 {
+            font-size: 4vw;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 15px;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        .grid-container {
+            flex: 1;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 2vw;
+        }
+
+        .grid-3x3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 110px);
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 20px;
+            border: 2px dashed var(--accent-color);
+        }
+
+        .grid-slot {
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .grid-slot.drag-over {
+            background: rgba(255, 255, 255, 0.2);
+            border-style: dashed;
+        }
+
+        .drawer-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 20px;
+            border: 2px solid var(--accent-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-drawer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            overflow-y: auto;
+            max-height: 50vh;
+        }
+
+        .draggable-app {
+            background: rgba(0, 0, 0, 0.5);
+            border: 3px solid var(--accent-color);
+            border-radius: 20px;
+            padding: 10px;
+            text-align: center;
+            user-select: none;
+            cursor: grab;
+            font-weight: bold;
+            font-size: 1.4vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+        }
+
+        .draggable-app:active {
+            cursor: grabbing;
+        }
+
+        .draggable-app:focus-visible {
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        .draggable-app.in-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            border-color: #4CAF50;
+            width: 100%;
+            height: 100%;
+        }
+
+        #delete-zone {
+            margin-top: 20px;
+            border: 2px dashed #ff4c4c;
+            color: #ff4c4c;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #delete-zone:focus-visible {
+            outline: 3px solid #ff4c4c;
+            outline-offset: 5px;
+        }
+
+        #delete-zone.drag-over {
+            background: rgba(255, 76, 76, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        document.documentElement.style.setProperty('--bg-color', localStorage.getItem('launcher-bg') || '#000');
+        document.documentElement.style.setProperty('--accent-color', localStorage.getItem('launcher-accent') || '#fff');
+    </script>
+    <div class="header">
+        <button class="save-btn" id="save-btn" tabIndex="0" aria-label="Save Layout">Save Layout</button>
+        <h1>Re-Arrange Config</h1>
+        <a href="launcher toonis.html" class="close-btn" aria-label="Cancel and return">Cancel</a>
+    </div>
+
+    <div class="container">
+        <div class="grid-container">
+            <h2>Launcher Grid</h2>
+            <div class="grid-3x3" id="launcher-grid">
+                <div class="grid-slot" data-index="0"></div>
+                <div class="grid-slot" data-index="1"></div>
+                <div class="grid-slot" data-index="2"></div>
+                <div class="grid-slot" data-index="3"></div>
+                <div class="grid-slot" data-index="4"></div>
+                <div class="grid-slot" data-index="5"></div>
+                <div class="grid-slot" data-index="6"></div>
+                <div class="grid-slot" data-index="7"></div>
+                <div class="grid-slot" data-index="8"></div>
+            </div>
+
+            <div id="delete-zone">Drag here to remove from grid</div>
+        </div>
+
+        <div class="drawer-container">
+            <h2>Downloaded Apps</h2>
+            <div class="app-drawer" id="app-drawer">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let configApps = [];
+        let userGrid = [];
+
+        function init() {
+            const cached = localStorage.getItem('launcher-apps-cache');
+            if (cached) {
+                try { configApps = JSON.parse(cached); } catch (e) { }
+            }
+            if (!configApps || configApps.length === 0) {
+                configApps = [
+                    { id: "launcher-settings", name: "Launcher Settings" },
+                    { id: "apps", name: "Apps" },
+                    { id: "re-arrange", name: "Re-Arrange" }
+                ];
+            }
+
+            try {
+                const saved = localStorage.getItem('launcher-grid');
+                if (saved) userGrid = JSON.parse(saved);
+            } catch (e) { }
+
+            if (!userGrid || !Array.isArray(userGrid) || userGrid.length !== 9) {
+                userGrid = [null, null, null, null, null, null, "launcher-settings", "apps", "re-arrange"];
+            }
+
+            renderDrawer();
+            renderGrid();
+            setupDragAndDrop();
+        }
+
+        function createAppNode(app, inGrid = false) {
+            const div = document.createElement('div');
+            div.className = 'draggable-app' + (inGrid ? ' in-grid' : '');
+            div.draggable = true;
+            div.dataset.id = app.id;
+            div.textContent = app.name;
+            div.tabIndex = 0;
+            div.setAttribute('role', 'button');
+            div.setAttribute('aria-grabbed', 'false');
+
+            div.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', app.id);
+                e.dataTransfer.setData('source', inGrid ? 'grid' : 'drawer');
+                if (inGrid) {
+                    e.dataTransfer.setData('sourceIndex', div.parentElement.dataset.index);
+                }
+                setTimeout(() => div.style.opacity = '0.5', 0);
+            });
+            div.addEventListener('dragend', () => div.style.opacity = '1');
+            return div;
+        }
+
+        function renderDrawer() {
+            const drawer = document.getElementById('app-drawer');
+            drawer.innerHTML = '';
+            configApps.forEach(app => {
+                drawer.appendChild(createAppNode(app, false));
+            });
+        }
+
+        function renderGrid() {
+            const slots = document.querySelectorAll('.grid-slot');
+            slots.forEach((slot, idx) => {
+                slot.innerHTML = '';
+                const appId = userGrid[idx];
+                if (appId) {
+                    const app = configApps.find(a => a.id === appId) || { id: appId, name: appId };
+                    slot.appendChild(createAppNode(app, true));
+                }
+            });
+        }
+
+        function setupDragAndDrop() {
+            const slots = document.querySelectorAll('.grid-slot');
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('drag-over'); });
+                slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+                slot.addEventListener('drop', e => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    const appId = e.dataTransfer.getData('text/plain');
+                    const source = e.dataTransfer.getData('source');
+                    const targetIndex = parseInt(slot.dataset.index);
+
+                    if (source === 'grid') {
+                        const sourceIndex = parseInt(e.dataTransfer.getData('sourceIndex'));
+                        const temp = userGrid[targetIndex];
+                        userGrid[targetIndex] = userGrid[sourceIndex];
+                        userGrid[sourceIndex] = temp;
+                    } else {
+                        if (userGrid[targetIndex] === 're-arrange') {
+                            return;
+                        }
+                        userGrid[targetIndex] = appId;
+                    }
+                    renderGrid();
+                });
+            });
+
+            const delZone = document.getElementById('delete-zone');
+            delZone.addEventListener('dragover', e => { e.preventDefault(); delZone.classList.add('drag-over'); });
+            delZone.addEventListener('dragleave', () => delZone.classList.remove('drag-over'));
+            delZone.addEventListener('drop', e => {
+                e.preventDefault();
+                delZone.classList.remove('drag-over');
+                const source = e.dataTransfer.getData('source');
+                if (source === 'grid') {
+                    const sourceIndex = parseInt(e.dataTransfer.getData('sourceIndex'));
+                    if (userGrid[sourceIndex] === 're-arrange') {
+                        return;
+                    }
+                    userGrid[sourceIndex] = null;
+                    renderGrid();
+                }
+            });
+        }
+
+        document.getElementById('save-btn').addEventListener('click', () => {
+            localStorage.setItem('launcher-grid', JSON.stringify(userGrid));
+            const btn = document.querySelector('.close-btn');
+            document.body.classList.add('fade-out');
+            setTimeout(() => { window.location.href = btn.href; }, 400);
+        });
+
+        init();
+
+        const triggerFullscreen = () => { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(() => { }); } };
+        document.addEventListener('DOMContentLoaded', triggerFullscreen);
+        document.body.addEventListener('click', triggerFullscreen, { once: true });
+
+        // History API back button interceptor
+        history.replaceState({ page: 'applet' }, '');
+        history.pushState({ page: 'applet-active' }, '');
+        window.addEventListener('popstate', (e) => {
+            if (e.state && e.state.page === 'applet') {
+                document.body.classList.add('fade-out');
+                setTimeout(() => { window.location.href = 'launcher toonis.html'; }, 400);
+            }
+        });
+
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.body.classList.add('fade-out');
+                setTimeout(() => { window.location.href = btn.href; }, 400);
+            });
+        });
+    </script>
+</body>
+
+</html>

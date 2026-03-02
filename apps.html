@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Apps</title>
+    <style>
+        :root {
+            --bg-color: #000;
+            --accent-color: #fff;
+        }
+
+        html {
+            background-color: var(--bg-color);
+            transition: background-color 0.75s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: transparent;
+            color: var(--accent-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            margin: 0;
+            min-height: 100vh;
+            overflow-y: auto;
+            transition: background-color 0.75s ease, opacity 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.4s cubic-bezier(0.4, 0.0, 0.2, 1) forwards !important;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+            font-size: 2vw;
+            border: 3px solid var(--accent-color);
+            padding: 10px 25px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .close-btn:focus-visible {
+            outline: 3px solid var(--accent-color);
+            outline-offset: 5px;
+        }
+
+        h1 {
+            font-size: 4vw;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 15px;
+            margin: 0;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .app {
+            border: 4px solid var(--accent-color);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.15s ease, background 0.2s;
+            height: 150px;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 15px;
+        }
+
+        .app:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .app:focus-visible {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.08);
+            outline: 3px solid var(--accent-color);
+            outline-offset: 5px;
+        }
+
+        .app-name {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-align: center;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        document.documentElement.style.setProperty('--bg-color', localStorage.getItem('launcher-bg') || '#000');
+        document.documentElement.style.setProperty('--accent-color', localStorage.getItem('launcher-accent') || '#fff');
+    </script>
+    <div class="header">
+        <h1>All Apps</h1>
+        <a href="launcher toonis.html" class="close-btn">Back</a>
+    </div>
+
+    <div class="app-grid" id="app-grid">
+        <!-- Apps will be injected here -->
+    </div>
+
+    <script>
+        async function loadApps() {
+            let dataApps = [];
+            try {
+                const res = await fetch('apps.json?t=' + new Date().getTime());
+                const data = await res.json();
+                dataApps = data.apps || [];
+                localStorage.setItem('launcher-apps-cache', JSON.stringify(dataApps));
+            } catch (err) {
+                console.warn('Failed to load apps.json, using offline cache', err);
+                const cached = localStorage.getItem('launcher-apps-cache');
+                if (cached) {
+                    try { dataApps = JSON.parse(cached); } catch (e) { }
+                }
+            }
+
+            const grid = document.getElementById('app-grid');
+            if (!dataApps || dataApps.length === 0) {
+                grid.style.display = 'flex';
+                grid.style.justifyContent = 'center';
+                grid.style.alignItems = 'center';
+                grid.innerHTML = '<div style="font-size: 2vw; opacity: 0.7; text-align: center; max-width: 800px; line-height: 1.5; background: rgba(255, 255, 255, 0.05); padding: 40px; border-radius: 20px; border: 2px dashed var(--accent-color); margin-top: 50px;">No offline apps available.<br><br>Please connect to the network to download the apps list.</div>';
+                return;
+            }
+
+            const excludeIds = ['apps', 'launcher-settings', 'about', 're-arrange'];
+
+            dataApps.forEach(app => {
+                if (excludeIds.includes(app.id)) return; // optionally exclude system applets
+
+                const a = document.createElement('a');
+                a.className = 'app';
+                a.href = app.url;
+                a.tabIndex = 0;
+                a.setAttribute('aria-label', app.name);
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'app-name';
+                nameDiv.textContent = app.name;
+
+                a.appendChild(nameDiv);
+                grid.appendChild(a);
+
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (app.fade && app.fade !== 'theme') {
+                        document.body.style.backgroundColor = app.fade;
+                    }
+                    a.style.transition = 'all 0.5s ease';
+                    a.style.transform = 'scale(2.5)';
+                    a.style.opacity = '0';
+                    setTimeout(() => {
+                        window.location.href = app.url;
+                    }, 400);
+                });
+            });
+        }
+        loadApps();
+        const triggerFullscreen = () => { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(() => { }); } };
+        document.addEventListener('DOMContentLoaded', triggerFullscreen);
+        document.body.addEventListener('click', triggerFullscreen, { once: true });
+
+        // History API back button interceptor
+        history.replaceState({ page: 'applet' }, '');
+        history.pushState({ page: 'applet-active' }, '');
+        window.addEventListener('popstate', (e) => {
+            if (e.state && e.state.page === 'applet') {
+                document.body.classList.add('fade-out');
+                setTimeout(() => { window.location.href = 'launcher toonis.html'; }, 400);
+            }
+        });
+
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.body.classList.add('fade-out');
+                setTimeout(() => { window.location.href = btn.href; }, 400);
+            });
+        });
+    </script>
+</body>
+
+</html>
