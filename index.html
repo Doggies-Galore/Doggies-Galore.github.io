@@ -9,6 +9,13 @@
         // Prevent flashing the grid before zoom-out animation plays
         if (sessionStorage.getItem('lastAppIndex') !== null) {
             document.documentElement.classList.add('navigating-back');
+            const fade = sessionStorage.getItem('lastFadeColor');
+            if (fade && fade !== 'theme') {
+                const style = document.createElement('style');
+                style.id = 'temp-fade-style';
+                style.textContent = 'body { background-color: ' + fade + ' !important; transition: none !important; }';
+                document.documentElement.appendChild(style);
+            }
         }
     </script>
     <style>
@@ -30,7 +37,7 @@
             width: 100vw;
             height: 100vh;
             cursor: default;
-            transition: background-color 0.5s ease;
+            transition: background-color 0.75s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
         html.navigating-back #grid,
@@ -46,7 +53,7 @@
             transform: translate(-50%, -50%);
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(2, 1fr);
+            grid-template-rows: repeat(3, 1fr);
             gap: 1.5vmin;
             width: 97vw;
             height: 85vh;
@@ -69,12 +76,20 @@
             transform: scale(1.015);
         }
 
+        .app:focus-visible {
+            transform: scale(1.015);
+            outline: 3px solid var(--accent-color);
+            outline-offset: 5px;
+        }
+
         .app-name {
             color: var(--accent-color);
-            font-size: 4vw;
+            font-size: 3vw;
             font-weight: bold;
             text-align: center;
             user-select: none;
+            padding: 10px;
+            pointer-events: none;
         }
 
         #header {
@@ -87,6 +102,7 @@
             justify-content: space-between;
             z-index: 20;
             pointer-events: none;
+            transition: opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
         .header-item {
@@ -94,276 +110,207 @@
             font-size: 3vw;
             font-weight: bold;
             user-select: none;
-            transition: opacity 0.6s;
         }
 
-        /* Overlay Styles */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-color);
-            z-index: 200;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s ease;
-            overflow-y: auto;
+        .spin {
+            animation-name: spin;
+            animation-duration: 30s;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
         }
 
-        .overlay.active {
-            opacity: 1;
-            pointer-events: auto;
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
         }
 
-        .overlay-title {
+        .error-msg {
             color: var(--accent-color);
-            font-size: 5vw;
-            margin-bottom: 30px;
-            font-weight: bold;
-        }
-
-        .close-btn {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            color: var(--accent-color);
-            font-size: 2.5vw;
-            cursor: pointer;
-            border: 3px solid var(--accent-color);
-            padding: 10px 25px;
-            border-radius: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 300;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-
-        .close-btn:hover {
-            background: var(--accent-color);
-            color: var(--bg-color);
-        }
-
-        .settings-content {
-            width: 100%;
-            max-width: 90vw;
-            display: flex;
-            flex-direction: column;
-            gap: 40px;
-            align-items: center;
-        }
-
-        .settings-section {
-            width: 100%;
-            text-align: center;
-        }
-
-        .section-title {
-            color: var(--accent-color);
-            font-size: 2.5vw;
-            margin-bottom: 20px;
-            opacity: 0.8;
-            border-bottom: 2px solid var(--accent-color);
-            display: inline-block;
-            padding: 0 20px 5px;
-        }
-
-        .settings-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            width: 100%;
-        }
-
-        .theme-btn {
-            padding: 12px;
-            border: 2px solid var(--accent-color);
-            color: var(--accent-color);
-            border-radius: 15px;
-            font-size: 1.5vw;
-            cursor: pointer;
-            background: transparent;
-            transition: all 0.2s;
-            font-weight: bold;
-        }
-
-        .theme-btn:hover {
-            background-color: var(--accent-color);
-            color: var(--bg-color);
-        }
-
-        .controls-row {
-            display: flex;
-            gap: 40px;
-            justify-content: center;
-            align-items: center;
-            color: var(--accent-color);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             font-size: 2vw;
-            font-weight: bold;
-        }
-
-        .control-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-        }
-
-        .control-item input {
-            width: 2vw;
-            height: 2vw;
-            cursor: pointer;
-        }
-
-        .about-text {
-            color: var(--accent-color);
-            font-size: 3vw;
             text-align: center;
-            margin-top: 50px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 20px;
+            border: 2px solid var(--accent-color);
+            z-index: 100;
         }
     </style>
 </head>
 
 <body>
+    <script>
+        const savedBg = localStorage.getItem('launcher-bg');
+        const savedAccent = localStorage.getItem('launcher-accent');
+        if (savedBg) {
+            document.documentElement.style.setProperty('--bg-color', savedBg);
+            document.documentElement.style.setProperty('--accent-color', savedAccent || '#fff');
+        }
+    </script>
+
     <div id="header">
         <div id="date" class="header-item"></div>
-        <div id="time" class="header-item"></div>
-    </div>
-
-    <div id="grid">
-        <div class="app"
-            data-url="https://app.jumpdesktop.com/jump#authCreds=true&neuronid=CD-01GC8ZEZNY21WKT06QCZNG4PXA"
-            data-fade="#f0f0f0">
-            <div class="app-name">Remote OSX</div>
-        </div>
-        <div class="app" data-url="https://mediastation.tail76b4d2.ts.net/vnc.html?autoconnect=1" data-fade="#111111">
-            <div class="app-name">Remote Browser</div>
-        </div>
-        <div class="app" data-action="settings">
-            <div class="app-name">Launcher Settings</div>
-        </div>
-        <div class="app" data-action="about">
-            <div class="app-name">About</div>
-        </div>
-        <div class="app" data-url="https://papercut.jeffco.k12.co.us:9192/client" data-fade="#f0f0f0">
-            <div class="app-name">Printing</div>
-        </div>
-        <div class="app" data-url="https://classroom.google.com/h" data-fade="#ffffff">
-            <div class="app-name">Classroom</div>
+        <div style="display: flex; align-items: center;" class="header-item">
+            <svg id="offline-icon" style="display: none; width: 3vw; height: 3vw; margin-right: 15px;"
+                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Offline">
+                <line x1="2" y1="2" x2="22" y2="22"></line>
+                <path d="M8.5 16.5a5 5 0 0 1 7 0"></path>
+                <path d="M5 12.5a11 11 0 0 1 2.37-1.74"></path>
+                <path d="M11.66 8.35a11 11 0 0 1 7.34 4.2"></path>
+                <path d="M1.43 9a16 16 0 0 1 3.2-1.89"></path>
+                <path d="M9.82 4.16a16 16 0 0 1 12.75 4.84"></path>
+                <line x1="12" y1="20" x2="12.01" y2="20"></line>
+            </svg>
+            <div id="time" aria-live="polite"></div>
         </div>
     </div>
 
-    <div id="settings-overlay" class="overlay">
-        <div class="close-btn" id="close-settings-btn">Close</div>
-        <h1 class="overlay-title">Settings</h1>
-
-        <div class="settings-content">
-            <div class="settings-section">
-                <h2 class="section-title">Preferences</h2>
-                <div class="controls-row">
-                    <label class="control-item">
-                        <input type="checkbox" id="check-24hr"> 24-Hour Mode
-                    </label>
-                    <label class="control-item">
-                        <input type="checkbox" id="check-seconds" checked> Show Seconds
-                    </label>
-                </div>
-            </div>
-
-            <div class="settings-section">
-                <h2 class="section-title">Themes</h2>
-                <div class="settings-grid">
-                    <button class="theme-btn" onclick="setTheme('#000000', '#ffffff')">OLED Black</button>
-                    <button class="theme-btn" onclick="setTheme('#1a1a1a', '#ffffff')">Dark Gray</button>
-                    <button class="theme-btn" onclick="setTheme('#ffffff', '#000000')">Light Mode</button>
-                    <button class="theme-btn" onclick="setTheme('#001524', '#ffecd1')">Midnight</button>
-
-                    <button class="theme-btn" onclick="setTheme('#2d1b4e', '#d4b8ff')">Purple</button>
-                    <button class="theme-btn" onclick="setTheme('#4a1528', '#ffb3c6')">Pink</button>
-                    <button class="theme-btn" onclick="setTheme('#3d1c00', '#ffb067')">Orange</button>
-                    <button class="theme-btn" onclick="setTheme('#0b2b1d', '#a3ffcc')">Forest</button>
-
-                    <button class="theme-btn" onclick="setTheme('#001f3f', '#80c4ff')">Ocean</button>
-                    <button class="theme-btn" onclick="setTheme('#330000', '#ff9999')">Crimson</button>
-                    <button class="theme-btn" onclick="setTheme('#0d1117', '#00ff00')">Hacker</button>
-                    <button class="theme-btn" onclick="setTheme('#2d0c18', '#ffcc80')">Sunset</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="about-overlay" class="overlay">
-        <div class="close-btn" id="close-about-btn">Close</div>
-        <h1 class="overlay-title">About Launcher</h1>
-        <div class="settings-content">
-            <p class="about-text">Version 0.1</p>
-            <p class="about-text" style="font-size:1.5vw; opacity:0.6; margin-top:10px;">Designed for High-Performance
-                Desktop Environments</p>
-        </div>
-    </div>
+    <!-- The apps will dynamically populate here -->
+    <div id="grid"></div>
 
     <script>
-        const apps = document.querySelectorAll('.app');
-        const headerItems = document.querySelectorAll('.header-item');
         const dateEl = document.getElementById('date');
         const timeEl = document.getElementById('time');
-        const check24hr = document.getElementById('check-24hr');
-        const checkSeconds = document.getElementById('check-seconds');
-        let animating = false;
-
-        // Load Preferences
         let use24hr = localStorage.getItem('launcher-24hr') === 'true';
         let showSeconds = localStorage.getItem('launcher-seconds') !== 'false';
 
-        check24hr.checked = use24hr;
-        checkSeconds.checked = showSeconds;
-
-        check24hr.addEventListener('change', (e) => {
-            use24hr = e.target.checked;
-            localStorage.setItem('launcher-24hr', use24hr);
+        // Listen for storage changes in case settings applet updates them
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'launcher-24hr') use24hr = e.newValue === 'true';
+            if (e.key === 'launcher-seconds') showSeconds = e.newValue !== 'false';
+            if (e.key === 'launcher-bg') {
+                document.documentElement.style.setProperty('--bg-color', e.newValue);
+                if (!document.documentElement.classList.contains('navigating-back') && !animating) {
+                    document.body.style.backgroundColor = '';
+                }
+            }
+            if (e.key === 'launcher-accent') document.documentElement.style.setProperty('--accent-color', e.newValue);
             updateDateTime();
         });
-
-        checkSeconds.addEventListener('change', (e) => {
-            showSeconds = e.target.checked;
-            localStorage.setItem('launcher-seconds', showSeconds);
-            updateDateTime();
-        });
-
-        function setTheme(bg, accent) {
-            document.documentElement.style.setProperty('--bg-color', bg);
-            document.documentElement.style.setProperty('--accent-color', accent);
-            localStorage.setItem('launcher-bg', bg);
-            localStorage.setItem('launcher-accent', accent);
-            document.body.style.backgroundColor = '';
-        }
-
-        const savedBg = localStorage.getItem('launcher-bg');
-        const savedAccent = localStorage.getItem('launcher-accent');
-        if (savedBg) setTheme(savedBg, savedAccent || '#fff');
 
         function updateDateTime() {
             const now = new Date();
             dateEl.textContent = now.toLocaleDateString(undefined, { weekday: 'short', month: 'numeric', day: 'numeric' });
-
-            const options = {
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: !use24hr
-            };
+            const options = { hour: 'numeric', minute: '2-digit', hour12: !use24hr };
             if (showSeconds) options.second = '2-digit';
-
             timeEl.textContent = now.toLocaleTimeString([], options);
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
 
+        let animating = false;
+        let apps = [];
+
+        async function initLauncher() {
+            let configApps = [];
+            let isOffline = false;
+
+            try {
+                const res = await fetch('apps.json?t=' + new Date().getTime());
+                const config = await res.json();
+                configApps = config.apps || [];
+                localStorage.setItem('launcher-apps-cache', JSON.stringify(configApps));
+                document.getElementById('offline-icon').style.display = 'none';
+            } catch (err) {
+                console.warn("Failed to load apps.json, using offline cache.", err);
+                isOffline = true;
+                document.getElementById('offline-icon').style.display = 'block';
+                const cached = localStorage.getItem('launcher-apps-cache');
+                if (cached) {
+                    try { configApps = JSON.parse(cached); } catch (e) { }
+                }
+            }
+
+            const gridEl = document.getElementById('grid');
+            gridEl.innerHTML = '';
+
+            const fallbackApps = {
+                "launcher-settings": { name: "Launcher Settings", url: "settings.html", fade: "theme" },
+                "apps": { name: "Apps", url: "apps.html", fade: "theme" },
+                "re-arrange": { name: "Re-Arrange", url: "rearrange.html", fade: "theme" }
+            };
+
+            const appMap = { ...fallbackApps };
+            configApps.forEach(app => appMap[app.id] = app);
+
+            let userGrid;
+            try {
+                const saved = localStorage.getItem('launcher-grid');
+                if (saved) userGrid = JSON.parse(saved);
+            } catch (e) { }
+
+            if (!userGrid || !Array.isArray(userGrid) || userGrid.length !== 9) {
+                userGrid = [
+                    null, null, null,
+                    null, null, null,
+                    "launcher-settings", "apps", "re-arrange"
+                ];
+            }
+
+            let appIndex = 0;
+            userGrid.forEach((id) => {
+                if (!id) {
+                    const placeholder = document.createElement('div');
+                    gridEl.appendChild(placeholder);
+                    return;
+                }
+
+                const appData = appMap[id] || { name: 'Unknown', url: '#', fade: '#000000' };
+
+                const div = document.createElement('div');
+                div.className = 'app';
+                div.dataset.url = appData.url;
+                div.dataset.fade = appData.fade;
+                div.tabIndex = 0;
+                div.setAttribute('role', 'button');
+                div.setAttribute('aria-label', appData.name);
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'app-name';
+                nameDiv.textContent = appData.name;
+
+                div.appendChild(nameDiv);
+                gridEl.appendChild(div);
+
+                const currentIndex = appIndex++;
+                div.addEventListener('click', () => launchApp(div, currentIndex));
+                div.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        launchApp(div, currentIndex);
+                    }
+                });
+            });
+
+            apps = document.querySelectorAll('.app');
+            resetAnimations();
+            preloadApps(configApps);
+        }
+
+        function preloadApps(appsData) {
+            const head = document.head;
+            appsData.forEach(a => {
+                if (a.url && !a.url.endsWith('.html') && a.url !== '#') {
+                    const link = document.createElement('link');
+                    link.rel = 'prefetch';
+                    link.href = a.url;
+                    head.appendChild(link);
+                }
+            });
+        }
+
         function getAppTransitionData(appIndex) {
+            if (!apps || apps.length === 0) return [];
+
             const originalTransforms = [];
             apps.forEach(a => {
                 originalTransforms.push(a.style.transform);
@@ -371,6 +318,8 @@
             });
 
             const app = apps[appIndex];
+            if (!app) return [];
+
             const rect = app.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
@@ -396,18 +345,17 @@
             if (animating) return;
             animating = true;
 
-            const action = app.dataset.action;
             const url = app.dataset.url;
             const fadeColor = app.dataset.fade;
 
             const transitionStyle = 'all 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
             const transitionData = getAppTransitionData(index);
 
-            if (fadeColor) {
+            if (fadeColor && fadeColor !== 'theme') {
                 document.body.style.backgroundColor = fadeColor;
             }
 
-            headerItems.forEach(item => item.style.opacity = '0');
+            document.getElementById('header').style.opacity = '0';
 
             apps.forEach((a, i) => {
                 a.style.transition = transitionStyle;
@@ -417,48 +365,43 @@
             });
 
             sessionStorage.setItem('lastAppIndex', index);
+            if (fadeColor) {
+                sessionStorage.setItem('lastFadeColor', fadeColor);
+            } else {
+                sessionStorage.removeItem('lastFadeColor');
+            }
 
             setTimeout(() => {
-                if (action === 'settings') {
-                    document.getElementById('settings-overlay').classList.add('active');
-                    animating = false;
-                } else if (action === 'about') {
-                    document.getElementById('about-overlay').classList.add('active');
-                    animating = false;
-                } else if (url) {
-                    window.location.href = url;
-                }
+                window.location.href = url;
             }, 750);
         }
 
-        function closeOverlay(id) {
-            if (animating) return;
-            document.getElementById(id).classList.remove('active');
-            resetAnimations();
-        }
-
-        document.getElementById('close-settings-btn').addEventListener('click', () => closeOverlay('settings-overlay'));
-        document.getElementById('close-about-btn').addEventListener('click', () => closeOverlay('about-overlay'));
-
         function resetAnimations() {
-            document.body.style.backgroundColor = '';
-            document.documentElement.classList.remove('navigating-back');
-
             const lastIndex = sessionStorage.getItem('lastAppIndex');
-            if (lastIndex === null) {
+
+            if (lastIndex === null || apps.length === 0) {
+                document.body.style.backgroundColor = '';
+                document.documentElement.classList.remove('navigating-back');
                 apps.forEach(a => {
                     a.style.transition = 'all 0.6s ease-out';
                     a.style.transform = 'translate(0, 0) scale(1)';
                     a.style.opacity = '1';
                     a.style.pointerEvents = 'auto';
                 });
-                headerItems.forEach(item => item.style.opacity = '1');
+                document.getElementById('header').style.opacity = '1';
                 animating = false;
                 return;
             }
 
             animating = true;
             const index = parseInt(lastIndex);
+
+            if (index >= apps.length) {
+                sessionStorage.removeItem('lastAppIndex');
+                animating = false;
+                return resetAnimations();
+            }
+
             const transitionData = getAppTransitionData(index);
             const transitionStyle = 'all 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
 
@@ -468,33 +411,56 @@
                 a.style.opacity = '0';
                 a.style.pointerEvents = 'none';
             });
-            headerItems.forEach(item => item.style.opacity = '0');
+            document.getElementById('header').style.opacity = '0';
+            document.getElementById('header').style.transition = 'none';
+
+            const fade = sessionStorage.getItem('lastFadeColor');
+            if (fade && fade !== 'theme') {
+                document.body.style.backgroundColor = fade;
+            }
+
+            const tempStyle = document.getElementById('temp-fade-style');
+            if (tempStyle) tempStyle.remove();
+
+            document.documentElement.classList.remove('navigating-back');
+            void document.body.offsetHeight; // Force layout
 
             requestAnimationFrame(() => {
                 setTimeout(() => {
+                    document.body.style.backgroundColor = '';
+
                     apps.forEach((a, i) => {
                         a.style.transition = transitionStyle;
                         a.style.transform = 'translate(0, 0) scale(1)';
                         a.style.opacity = '1';
                         a.style.pointerEvents = 'auto';
                     });
-                    headerItems.forEach(item => item.style.opacity = '1');
+
+                    document.getElementById('header').style.transition = 'opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                    document.getElementById('header').style.opacity = '1';
 
                     setTimeout(() => {
                         animating = false;
                         apps.forEach(a => a.style.transition = '');
+                        document.getElementById('header').style.transition = 'opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)'; // Restore CSS transition definition instead of none
                         sessionStorage.removeItem('lastAppIndex');
+                        sessionStorage.removeItem('lastFadeColor');
                     }, 800);
                 }, 50);
             });
         }
 
-        apps.forEach((app, index) => {
-            app.addEventListener('click', () => launchApp(app, index));
+        window.addEventListener('pageshow', (event) => {
+            if (apps.length === 0 && !animating) {
+                initLauncher();
+            } else if (event.persisted || performance.navigation.type === 2) {
+                resetAnimations();
+            }
         });
 
-        window.addEventListener('pageshow', () => {
-            resetAnimations();
+        document.addEventListener('DOMContentLoaded', () => {
+            initLauncher();
+            triggerFullscreen();
         });
 
         const triggerFullscreen = () => {
@@ -502,8 +468,16 @@
                 document.documentElement.requestFullscreen().catch(() => { });
             }
         };
-        document.addEventListener('DOMContentLoaded', triggerFullscreen);
         document.body.addEventListener('click', triggerFullscreen, { once: true });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 's' || event.key === 'S') {
+                const allElements = document.querySelectorAll('*');
+                allElements.forEach(element => {
+                    element.classList.toggle('spin');
+                });
+            }
+        });
     </script>
 </body>
 
