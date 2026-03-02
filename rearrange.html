@@ -247,8 +247,8 @@
     </script>
     <div class="header">
         <button class="save-btn" id="save-btn" tabIndex="0" aria-label="Save Layout">Save Layout</button>
-        <h1>Re-Arrange Config</h1>
-        <a href="launcher toonis.html" class="close-btn" aria-label="Cancel and return">Cancel</a>
+        <h1>Arrange Config</h1>
+        <a href="index.html" class="close-btn" aria-label="Cancel and return">Cancel</a>
     </div>
 
     <div class="container">
@@ -281,17 +281,28 @@
         let userGrid = [];
 
         function init() {
+            let allApps = [];
             const cached = localStorage.getItem('launcher-apps-cache');
             if (cached) {
-                try { configApps = JSON.parse(cached); } catch (e) { }
+                try { allApps = JSON.parse(cached); } catch (e) { }
             }
-            if (!configApps || configApps.length === 0) {
-                configApps = [
-                    { id: "launcher-settings", name: "Launcher Settings" },
+
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange"]');
+
+            // System applets that should always be in the drawer
+            const systemIds = ["launcher-settings", "apps", "about", "re-arrange"];
+
+            if (!allApps || allApps.length === 0) {
+                allApps = [
+                    { id: "launcher-settings", name: "Settings" },
                     { id: "apps", name: "Apps" },
-                    { id: "re-arrange", name: "Re-Arrange" }
+                    { id: "about", name: "About" },
+                    { id: "re-arrange", name: "Arrange" }
                 ];
             }
+
+            // Filter to only show downloaded apps or system apps
+            configApps = allApps.filter(app => downloadedIds.includes(app.id) || systemIds.includes(app.id));
 
             try {
                 const saved = localStorage.getItem('launcher-grid');
@@ -413,7 +424,7 @@
         window.addEventListener('popstate', (e) => {
             if (e.state && e.state.page === 'applet') {
                 document.body.classList.add('fade-out');
-                setTimeout(() => { window.location.href = 'launcher toonis.html'; }, 400);
+                setTimeout(() => { window.location.href = 'index.html'; }, 400);
             }
         });
 

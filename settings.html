@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Launcher Settings</title>
+    <title>Settings</title>
     <style>
         :root {
             --bg-color: #000;
@@ -187,6 +187,49 @@
             background: none;
             cursor: pointer;
         }
+
+        .app-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .app-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .app-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .app-name-label {
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .delete-btn {
+            background: #ff4c4c;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .delete-btn:hover {
+            filter: brightness(1.2);
+            transform: scale(1.05);
+        }
     </style>
 </head>
 
@@ -198,8 +241,8 @@
         document.documentElement.style.setProperty('--accent-color', accent);
     </script>
     <div class="header">
-        <h1>Launcher Settings</h1>
-        <a href="launcher toonis.html" class="close-btn">Back</a>
+        <h1>Settings</h1>
+        <a href="index.html" class="close-btn">Back</a>
     </div>
 
     <!-- Clock Settings -->
@@ -208,6 +251,14 @@
         <div class="row">
             <label><input type="checkbox" id="check-24hr"> 24-Hour Mode</label>
             <label style="margin-left: 30px;"><input type="checkbox" id="check-seconds"> Show Seconds</label>
+        </div>
+    </div>
+
+    <!-- App Management -->
+    <div class="section" style="text-align: center;">
+        <h2 class="section-title">App Management</h2>
+        <div id="installed-apps-list" class="app-list">
+            <!-- Apps will be listed here -->
         </div>
     </div>
 
@@ -261,6 +312,64 @@
             localStorage.setItem('launcher-seconds', e.target.checked);
         });
 
+        // App Management Logic
+        async function loadInstalledApps() {
+            const listEl = document.getElementById('installed-apps-list');
+            listEl.innerHTML = '';
+
+            let allApps = [];
+            const cached = localStorage.getItem('launcher-store-cache');
+            if (cached) { allApps = JSON.parse(cached); }
+
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange"]');
+            const systemIds = ["launcher-settings", "apps", "about", "re-arrange"];
+
+            const installed = allApps.filter(app => downloadedIds.includes(app.id) && !systemIds.includes(app.id));
+
+            if (installed.length === 0) {
+                listEl.innerHTML = '<div style="opacity: 0.5; padding: 20px;">No external apps installed.</div>';
+                return;
+            }
+
+            installed.forEach(app => {
+                const item = document.createElement('div');
+                item.className = 'app-item';
+
+                const info = document.createElement('div');
+                info.className = 'app-info';
+                info.innerHTML = `<span class="app-name-label">${app.name}</span><span style="opacity: 0.6; font-size: 0.9rem;">${app.id}</span>`;
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'delete-btn';
+                delBtn.textContent = 'Delete';
+                delBtn.onclick = () => deleteApp(app.id);
+
+                item.appendChild(info);
+                item.appendChild(delBtn);
+                listEl.appendChild(item);
+            });
+        }
+
+        function deleteApp(appId) {
+            if (!confirm(`Delete ${appId}?`)) return;
+
+            // Remove from downloaded list
+            let downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '[]');
+            downloadedIds = downloadedIds.filter(id => id !== appId);
+            localStorage.setItem('launcher-downloaded-ids', JSON.stringify(downloadedIds));
+
+            // Remove from grid
+            let grid = JSON.parse(localStorage.getItem('launcher-grid') || '[]');
+            if (grid.length > 0) {
+                const newGrid = grid.map(id => id === appId ? null : id);
+                localStorage.setItem('launcher-grid', JSON.stringify(newGrid));
+            }
+
+            loadInstalledApps();
+        }
+
+        loadInstalledApps();
+
         function setTheme(bgStr, accentStr) {
             document.documentElement.style.setProperty('--bg-color', bgStr);
             document.documentElement.style.setProperty('--accent-color', accentStr);
@@ -294,7 +403,7 @@
         window.addEventListener('popstate', (e) => {
             if (e.state && e.state.page === 'applet') {
                 document.body.classList.add('fade-out');
-                setTimeout(() => { window.location.href = 'launcher toonis.html'; }, 400);
+                setTimeout(() => { window.location.href = 'index.html'; }, 400);
             }
         });
 

@@ -126,11 +126,11 @@
         document.documentElement.style.setProperty('--bg-color', bg);
         document.documentElement.style.setProperty('--accent-color', accent);
     </script>
-    <a href="launcher toonis.html" class="close-btn">Back</a>
+    <a href="index.html" class="close-btn">Back</a>
     <div class="card">
-        <div class="title">About Launcher</div>
-        <div class="subtitle">Version 0.1 (the rainy way)</div>
-        <div class="subtitle">Designed for High-Performance Desktop Environments</div>
+        <div class="title">About The Launcher</div>
+        <div class="subtitle">Version 0.2 - Move into your Chromebook</div>
+        <div class="subtitle">Designed for High-Performance Desktop Environments (the rainy way)</div>
         <div class="quote">"this 97 year old diner still serves launcher the rainy way"</div>
     </div>
     <script>
@@ -144,7 +144,7 @@
         window.addEventListener('popstate', (e) => {
             if (e.state && e.state.page === 'applet') {
                 document.body.classList.add('fade-out');
-                setTimeout(() => { window.location.href = 'launcher toonis.html'; }, 400);
+                setTimeout(() => { window.location.href = 'index.html'; }, 400);
             }
         });
 

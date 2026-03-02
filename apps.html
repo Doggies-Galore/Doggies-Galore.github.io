@@ -119,14 +119,15 @@
             border: 4px solid var(--accent-color);
             border-radius: 25px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: transform 0.15s ease, background 0.2s;
-            height: 150px;
+            height: 200px;
             text-decoration: none;
             background: rgba(255, 255, 255, 0.02);
-            padding: 15px;
+            padding: 20px;
         }
 
         .app:hover {
@@ -147,6 +148,59 @@
             font-weight: bold;
             text-align: center;
             user-select: none;
+            margin-bottom: 10px;
+        }
+
+        .app-about {
+            color: var(--accent-color);
+            font-size: 1rem;
+            opacity: 0.7;
+            text-align: center;
+            user-select: none;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .download-btn {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .download-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            filter: brightness(0.9);
+        }
+
+        .download-btn:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: default;
+        }
+
+        .offline-banner {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(255, 76, 76, 0.2);
+            border: 2px solid #ff4c4c;
+            color: #ff4c4c;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 30px;
+            display: none;
         }
     </style>
 </head>
@@ -158,7 +212,11 @@
     </script>
     <div class="header">
         <h1>All Apps</h1>
-        <a href="launcher toonis.html" class="close-btn">Back</a>
+        <a href="index.html" class="close-btn">Back</a>
+    </div>
+
+    <div id="offline-banner" class="offline-banner">
+        No Internet Connection. Displaying offline apps only.
     </div>
 
     <div class="app-grid" id="app-grid">
@@ -168,57 +226,103 @@
     <script>
         async function loadApps() {
             let dataApps = [];
+            let isOffline = false;
             try {
                 const res = await fetch('apps.json?t=' + new Date().getTime());
                 const data = await res.json();
                 dataApps = data.apps || [];
-                localStorage.setItem('launcher-apps-cache', JSON.stringify(dataApps));
+                localStorage.setItem('launcher-store-cache', JSON.stringify(dataApps));
             } catch (err) {
-                console.warn('Failed to load apps.json, using offline cache', err);
-                const cached = localStorage.getItem('launcher-apps-cache');
+                console.warn('Offline: using store cache');
+                isOffline = true;
+                const banner = document.getElementById('offline-banner');
+                if (banner) banner.style.display = 'block';
+                const cached = localStorage.getItem('launcher-store-cache');
                 if (cached) {
                     try { dataApps = JSON.parse(cached); } catch (e) { }
+                }
+                if (!dataApps || dataApps.length === 0) {
+                    dataApps = [
+                        { id: "launcher-settings", name: "Settings", url: "settings.html", about: "Configure your launcher." },
+                        { id: "about", name: "About", url: "about.html", about: "Learn more about this project." },
+                        { id: "re-arrange", name: "Arrange", url: "rearrange.html", about: "Organize your apps." }
+                    ];
                 }
             }
 
             const grid = document.getElementById('app-grid');
-            if (!dataApps || dataApps.length === 0) {
-                grid.style.display = 'flex';
-                grid.style.justifyContent = 'center';
-                grid.style.alignItems = 'center';
-                grid.innerHTML = '<div style="font-size: 2vw; opacity: 0.7; text-align: center; max-width: 800px; line-height: 1.5; background: rgba(255, 255, 255, 0.05); padding: 40px; border-radius: 20px; border: 2px dashed var(--accent-color); margin-top: 50px;">No offline apps available.<br><br>Please connect to the network to download the apps list.</div>';
-                return;
-            }
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "about", "re-arrange"]');
 
-            const excludeIds = ['apps', 'launcher-settings', 'about', 're-arrange'];
+            const excludeIds = ['apps'];
 
             dataApps.forEach(app => {
-                if (excludeIds.includes(app.id)) return; // optionally exclude system applets
+                if (excludeIds.includes(app.id)) return;
 
-                const a = document.createElement('a');
-                a.className = 'app';
-                a.href = app.url;
-                a.tabIndex = 0;
-                a.setAttribute('aria-label', app.name);
+                const card = document.createElement('div');
+                card.className = 'app';
+                card.tabIndex = 0;
+                card.setAttribute('aria-label', app.name);
 
                 const nameDiv = document.createElement('div');
                 nameDiv.className = 'app-name';
                 nameDiv.textContent = app.name;
 
-                a.appendChild(nameDiv);
-                grid.appendChild(a);
+                const aboutDiv = document.createElement('div');
+                aboutDiv.className = 'app-about';
+                aboutDiv.textContent = app.about || "";
 
-                a.addEventListener('click', (e) => {
-                    e.preventDefault();
+                const isDownloaded = downloadedIds.includes(app.id);
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'download-btn';
+                downloadBtn.textContent = 'Download';
+
+                card.appendChild(nameDiv);
+                card.appendChild(aboutDiv);
+
+                // Only show download button if not installed
+                if (!isDownloaded) {
+                    card.appendChild(downloadBtn);
+                }
+
+                grid.appendChild(card);
+
+                const launch = (e) => {
+                    // Only launch if it's already downloaded
+                    if (!downloadedIds.includes(app.id)) {
+                        downloadApp();
+                        return;
+                    }
+
                     if (app.fade && app.fade !== 'theme') {
                         document.body.style.backgroundColor = app.fade;
                     }
-                    a.style.transition = 'all 0.5s ease';
-                    a.style.transform = 'scale(2.5)';
-                    a.style.opacity = '0';
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.transform = 'scale(2.5)';
+                    card.style.opacity = '0';
                     setTimeout(() => {
                         window.location.href = app.url;
                     }, 400);
+                };
+
+                const downloadApp = () => {
+                    if (downloadedIds.includes(app.id)) return;
+                    downloadBtn.textContent = 'Downloading...';
+                    downloadBtn.disabled = true;
+
+                    setTimeout(() => {
+                        downloadedIds.push(app.id);
+                        localStorage.setItem('launcher-downloaded-ids', JSON.stringify(downloadedIds));
+                        downloadBtn.textContent = 'Downloaded';
+
+                        // Also update the full app cache for rearrange.html to see it
+                        localStorage.setItem('launcher-apps-cache', JSON.stringify(dataApps));
+                    }, 800);
+                };
+
+                card.addEventListener('click', launch);
+                downloadBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    downloadApp();
                 });
             });
         }
@@ -233,7 +337,7 @@
         window.addEventListener('popstate', (e) => {
             if (e.state && e.state.page === 'applet') {
                 document.body.classList.add('fade-out');
-                setTimeout(() => { window.location.href = 'launcher toonis.html'; }, 400);
+                setTimeout(() => { window.location.href = 'index.html'; }, 400);
             }
         });
 
