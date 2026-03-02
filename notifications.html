@@ -261,8 +261,12 @@
 
 <body>
     <script>
-        document.documentElement.style.setProperty('--bg-color', localStorage.getItem('launcher-bg') || '#000');
-        document.documentElement.style.setProperty('--accent-color', localStorage.getItem('launcher-accent') || '#fff');
+        (function () {
+            const bg = localStorage.getItem('launcher-bg') || '#000000';
+            const accent = localStorage.getItem('launcher-accent') || '#ffffff';
+            document.documentElement.style.setProperty('--bg-color', bg);
+            document.documentElement.style.setProperty('--accent-color', accent);
+        })();
     </script>
     <div class="header">
         <h1>Notifications</h1>

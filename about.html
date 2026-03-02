@@ -121,10 +121,12 @@
 
 <body>
     <script>
-        const bg = localStorage.getItem('launcher-bg') || '#000';
-        const accent = localStorage.getItem('launcher-accent') || '#fff';
-        document.documentElement.style.setProperty('--bg-color', bg);
-        document.documentElement.style.setProperty('--accent-color', accent);
+        (function () {
+            const bg = localStorage.getItem('launcher-bg') || '#000000';
+            const accent = localStorage.getItem('launcher-accent') || '#ffffff';
+            document.documentElement.style.setProperty('--bg-color', bg);
+            document.documentElement.style.setProperty('--accent-color', accent);
+        })();
     </script>
     <a href="index.html" class="close-btn">Back</a>
     <div class="card">

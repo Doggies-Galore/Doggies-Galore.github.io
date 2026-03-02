@@ -16,24 +16,36 @@ class NotificationService {
         this.connect();
         // Listen for setting changes
         window.addEventListener('storage', (e) => {
-            if (e.key === 'launcher-dnd') {
+            const key = e ? e.key : null;
+            if (!key) {
+                // Bulk check on manual dispatch
+                this.isDND = localStorage.getItem('launcher-dnd') === 'true';
+                this.isSilent = localStorage.getItem('launcher-silent') === 'true';
+                this.updateStatusIcons();
+                this.pushSync('launcher-grid');
+                this.pushSync('launcher-bg');
+                this.pushSync('launcher-accent');
+                return;
+            }
+
+            if (key === 'launcher-dnd') {
                 this.isDND = localStorage.getItem('launcher-dnd') === 'true';
                 this.updateStatusIcons();
             }
-            if (e.key === 'launcher-silent') {
+            if (key === 'launcher-silent') {
                 this.isSilent = localStorage.getItem('launcher-silent') === 'true';
                 if (this.isSilent) this.disconnect();
                 else this.connect();
                 this.updateStatusIcons();
             }
-            if (e.key === 'launcher-ws-address' || e.key === 'launcher-ws-token' || e.key === 'launcher-ws-username') {
+            if (key === 'launcher-ws-address' || key === 'launcher-ws-token' || key === 'launcher-ws-username') {
                 this.disconnect();
                 this.connect();
             }
 
             // PUSH SYNC on local changes
-            if (e.key === 'launcher-grid' || e.key === 'launcher-bg' || e.key === 'launcher-accent') {
-                this.pushSync(e.key);
+            if (key === 'launcher-grid' || key === 'launcher-bg' || key === 'launcher-accent') {
+                this.pushSync(key);
             }
         });
     }
@@ -257,7 +269,7 @@ class NotificationService {
                         console.log("[Notif] Auth successful.");
                     } else if (data.type === 'sync') {
                         this.handleSync(data);
-                    } else if (data.type === 'discord' || data.type === 'test') {
+                    } else if (data.type === 'discord' || data.type === 'test' || data.type === 'tumblr') {
                         this.handleIncoming(data);
                     }
                 } catch (err) { console.error(err); }

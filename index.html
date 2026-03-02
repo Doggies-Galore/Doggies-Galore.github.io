@@ -6,17 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Launcher</title>
     <script>
-        // Prevent flashing the grid before zoom-out animation plays
-        if (sessionStorage.getItem('lastAppIndex') !== null) {
-            document.documentElement.classList.add('navigating-back');
-            const fade = sessionStorage.getItem('lastFadeColor');
-            if (fade && fade !== 'theme') {
-                const style = document.createElement('style');
-                style.id = 'temp-fade-style';
-                style.textContent = 'body { background-color: ' + fade + ' !important; transition: none !important; }';
-                document.documentElement.appendChild(style);
+        (function () {
+            const bg = localStorage.getItem('launcher-bg') || '#000000';
+            const accent = localStorage.getItem('launcher-accent') || '#ffffff';
+            document.documentElement.style.setProperty('--bg-color', bg);
+            document.documentElement.style.setProperty('--accent-color', accent);
+
+            if (sessionStorage.getItem('lastAppIndex') !== null) {
+                document.documentElement.classList.add('navigating-back');
+                const fade = sessionStorage.getItem('lastFadeColor');
+                if (fade && fade !== 'theme') {
+                    const style = document.createElement('style');
+                    style.id = 'temp-fade-style';
+                    style.textContent = 'body { background-color: ' + fade + ' !important; transition: none !important; }';
+                    document.documentElement.appendChild(style);
+                }
             }
-        }
+        })();
     </script>
     <style>
         :root {
@@ -37,6 +43,9 @@
             width: 100vw;
             height: 100vh;
             cursor: default;
+        }
+
+        html.ready body {
             transition: background-color 0.75s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
@@ -312,7 +321,16 @@
                     return;
                 }
 
+                const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications"]');
+                const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications"];
+
                 if (typeof item === 'object' && item.type === 'folder') {
+                    // Filter out uninstalled apps in this view too
+                    const folderApps = item.apps.map(id => {
+                        if (id && !downloadedIds.includes(id) && !systemIds.includes(id)) return null;
+                        return id;
+                    });
+
                     const div = document.createElement('div');
                     div.className = 'app folder-app';
                     div.tabIndex = 0;
@@ -328,13 +346,24 @@
                     gridEl.appendChild(div);
 
                     const currentIndex = appIndex++;
-                    div.addEventListener('click', () => launchFolder(div, item, currentIndex));
+                    div.addEventListener('click', () => {
+                        const updatedFolder = { ...item, apps: folderApps };
+                        launchFolder(div, updatedFolder, currentIndex);
+                    });
                     div.addEventListener('keydown', (e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
-                            launchFolder(div, item, currentIndex);
+                            const updatedFolder = { ...item, apps: folderApps };
+                            launchFolder(div, updatedFolder, currentIndex);
                         }
                     });
+                    return;
+                }
+
+                if (item && !downloadedIds.includes(item) && !systemIds.includes(item)) {
+                    // skip uninstalled app
+                    const placeholder = document.createElement('div');
+                    gridEl.appendChild(placeholder);
                     return;
                 }
 
@@ -368,14 +397,25 @@
             apps = document.querySelectorAll('.app');
         }
 
-        function preloadApps(appsData) {
-            const head = document.head;
-            appsData.forEach(a => {
-                if (a.url && !a.url.endsWith('.html') && a.url !== '#') {
+        function preloadDownloadedApps(appsData) {
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '[]');
+            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications"];
+
+            // Also preload images if any (future-proofing)
+            appsData.forEach(app => {
+                if (downloadedIds.includes(app.id) && !systemIds.includes(app.id)) {
+                    // background fetch contents to browser cache
+                    if (app.url && app.url !== '#') {
+                        fetch(app.url, { mode: 'no-cors' }).catch(() => { });
+                    }
+                }
+
+                // Prefetch via link as well for better browser support
+                if (app.url && !app.url.endsWith('.html') && app.url !== '#') {
                     const link = document.createElement('link');
                     link.rel = 'prefetch';
-                    link.href = a.url;
-                    head.appendChild(link);
+                    link.href = app.url;
+                    document.head.appendChild(link);
                 }
             });
         }
