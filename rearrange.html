@@ -304,6 +304,46 @@
             pointer-events: none;
         }
 
+        .draggable-app.kbd-selected {
+            border-color: #ffeb3b !important;
+            box-shadow: 0 0 15px #ffeb3b;
+            transform: scale(1.05);
+            z-index: 1001;
+            animation: pulse-border 1s infinite alternate;
+        }
+
+        @keyframes pulse-border {
+            from {
+                border-color: #ffeb3b;
+            }
+
+            to {
+                border-color: var(--accent-color);
+            }
+        }
+
+        .touch-ghost {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.8;
+            transform: scale(0.9);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Screen Reader instruction */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+
         /* Modal Styles */
         .modal-overlay {
             position: fixed;
@@ -429,8 +469,11 @@
                 <div class="grid-slot" data-index="8"></div>
             </div>
 
-            <div id="delete-zone">Drag here to remove from grid</div>
+            <div id="delete-zone" role="button" aria-label="Remove item from grid" tabIndex="0">Drag here or press Space
+                to remove</div>
         </div>
+        <div id="aria-status" class="sr-only" aria-live="polite"></div>
+
 
         <div class="drawer-container">
             <div class="drawer-header">
@@ -463,6 +506,14 @@
         let configApps = [];
         let userGrid = [];
         let currentFolder = null;
+        let kbdSelectedId = null;
+        let kbdSource = null; // 'grid' or 'drawer'
+        let kbdSourceIndex = -1;
+        let kbdIsFolder = false;
+
+        function announce(msg) {
+            document.getElementById('aria-status').textContent = msg;
+        }
 
         function init() {
             let allApps = [];
@@ -623,6 +674,7 @@
             div.textContent = app.name;
             div.tabIndex = 0;
             div.setAttribute('role', 'button');
+            div.setAttribute('aria-label', (inGrid ? 'Grid slot ' + (index + 1) + ': ' : 'Add ') + app.name);
 
             div.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('source', inGrid ? 'grid' : 'drawer');
@@ -634,6 +686,38 @@
                 setTimeout(() => div.style.opacity = '0.5', 0);
             });
             div.addEventListener('dragend', () => div.style.opacity = '1');
+
+            // Keyboard/A11y logic
+            div.addEventListener('keydown', (e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    if (kbdSelectedId && kbdSelectedId === app.id && kbdSource === (inGrid ? 'grid' : 'drawer')) {
+                        // Deselect
+                        kbdSelectedId = null;
+                        renderGrid();
+                        renderDrawer();
+                        announce("De-selected " + app.name);
+                    } else {
+                        kbdSelectedId = app.id;
+                        kbdSource = inGrid ? 'grid' : 'drawer';
+                        kbdSourceIndex = inGrid ? index : -1;
+                        kbdIsFolder = false;
+                        renderGrid();
+                        renderDrawer();
+                        announce(app.name + " selected for moving. Tab to a grid slot or remove zone and press Space.");
+                    }
+                }
+            });
+
+            // Touch logic
+            setupTouchEvents(div, app.id, inGrid, index, false);
+
+            if (kbdSelectedId === app.id && kbdSource === (inGrid ? 'grid' : 'drawer')) {
+                if (!inGrid || index === kbdSourceIndex) {
+                    div.classList.add('kbd-selected');
+                }
+            }
+
             return div;
         }
 
@@ -642,6 +726,8 @@
             div.className = 'draggable-app draggable-folder' + (inGrid ? ' in-grid' : '');
             div.draggable = true;
             div.tabIndex = 0;
+            div.setAttribute('role', 'button');
+            div.setAttribute('aria-label', (inGrid ? 'Grid slot ' + (index + 1) + ': ' : 'Add ') + 'Folder ' + folder.name);
 
             div.innerHTML = `
                 <svg class="folder-svg" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 2vw; height: 2vw; margin-bottom: 5px;">
@@ -658,18 +744,132 @@
             });
             div.addEventListener('dragend', () => div.style.opacity = '1');
 
-            div.addEventListener('click', () => {
-                openFolder(folder);
+            // Open folder
+            div.addEventListener('click', (e) => {
+                // If keyboard mode is active, maybe we don't open? 
+                // Actually we can open if double clicked or if it's not selected.
+                if (!kbdSelectedId) openFolder(folder);
             });
+
             div.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+                if (e.key === ' ' || e.key === 'Enter') {
                     e.preventDefault();
-                    openFolder(folder);
+                    if (kbdSelectedId === folder.id) {
+                        kbdSelectedId = null;
+                        renderGrid();
+                        announce("De-selected folder.");
+                    } else if (e.altKey || e.ctrlKey) {
+                        openFolder(folder);
+                    } else {
+                        kbdSelectedId = folder.id;
+                        kbdSource = 'grid';
+                        kbdSourceIndex = index;
+                        kbdIsFolder = true;
+                        renderGrid();
+                        announce("Folder " + folder.name + " selected for moving.");
+                    }
                 }
             });
 
+            setupTouchEvents(div, folder.id, inGrid, index, true);
+
+            if (kbdSelectedId === folder.id) {
+                div.classList.add('kbd-selected');
+            }
+
             return div;
         }
+
+        let ghost = null;
+        let touchData = null;
+
+        function setupTouchEvents(el, id, inGrid, index, isFolder) {
+            el.addEventListener('touchstart', (e) => {
+                if (e.touches.length > 1) return;
+                const touch = e.touches[0];
+                touchData = {
+                    id, inGrid, index, isFolder,
+                    startX: touch.clientX,
+                    startY: touch.clientY,
+                    startTime: Date.now()
+                };
+
+                // Create ghost
+                ghost = el.cloneNode(true);
+                ghost.classList.add('touch-ghost');
+                ghost.style.width = el.offsetWidth + 'px';
+                ghost.style.height = el.offsetHeight + 'px';
+                ghost.style.left = (touch.clientX - (el.offsetWidth / 2)) + 'px';
+                ghost.style.top = (touch.clientY - (el.offsetHeight / 2)) + 'px';
+                document.body.appendChild(ghost);
+            }, { passive: false });
+
+            el.addEventListener('touchmove', (e) => {
+                if (!ghost || !touchData) return;
+                e.preventDefault();
+                const touch = e.touches[0];
+                ghost.style.left = (touch.clientX - (ghost.offsetWidth / 2)) + 'px';
+                ghost.style.top = (touch.clientY - (ghost.offsetHeight / 2)) + 'px';
+            }, { passive: false });
+
+            el.addEventListener('touchend', (e) => {
+                if (!ghost) return;
+                const touch = e.changedTouches[0];
+                const targetEl = document.elementFromPoint(touch.clientX, touch.clientY);
+                document.body.removeChild(ghost);
+                ghost = null;
+
+                // Handle tap vs drag
+                if (Date.now() - touchData.startTime < 200 &&
+                    Math.abs(touch.clientX - touchData.startX) < 10 &&
+                    Math.abs(touch.clientY - touchData.startY) < 10) {
+                    // Tap action
+                    if (isFolder) openFolder(configApps.find(a => a.id === id) || { id });
+                    touchData = null;
+                    return;
+                }
+
+                // Find slot
+                const slot = targetEl?.closest('.grid-slot');
+                if (slot) {
+                    dropIntoSlot(parseInt(slot.dataset.index), touchData);
+                }
+
+                const del = targetEl?.closest('#delete-zone');
+                if (del) {
+                    removeFromGrid(touchData.index);
+                }
+
+                touchData = null;
+            });
+        }
+
+        function dropIntoSlot(targetIndex, data) {
+            const grid = activeGrid();
+            if (data.inGrid) {
+                const temp = grid[targetIndex];
+                grid[targetIndex] = grid[data.index];
+                grid[data.index] = temp;
+            } else {
+                if (currentFolder && data.id === 're-arrange') return;
+                if (!currentFolder && grid[targetIndex] === 're-arrange') {
+                    if (grid.filter(id => id === 're-arrange').length <= 1) return;
+                }
+                grid[targetIndex] = data.id;
+            }
+            renderGrid();
+        }
+
+        function removeFromGrid(idx) {
+            if (idx === -1) return;
+            const grid = activeGrid();
+            if (!currentFolder && grid[idx] === 're-arrange') {
+                if (grid.filter(id => id === 're-arrange').length <= 1) return;
+            }
+            grid[idx] = null;
+            renderGrid();
+        }
+
 
         function openFolder(folder) {
             const gridEl = document.getElementById('launcher-grid');
@@ -727,6 +927,9 @@
         function setupDragAndDrop() {
             const slots = document.querySelectorAll('.grid-slot');
             slots.forEach(slot => {
+                slot.tabIndex = 0;
+                slot.setAttribute('aria-label', "Grid slot " + (parseInt(slot.dataset.index) + 1));
+
                 slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('drag-over'); });
                 slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
                 slot.addEventListener('drop', e => {
@@ -734,35 +937,45 @@
                     slot.classList.remove('drag-over');
                     const source = e.dataTransfer.getData('source');
                     const targetIndex = parseInt(slot.dataset.index);
-                    const grid = activeGrid();
+                    const isFolder = e.dataTransfer.getData('isFolder') === 'true';
+                    const payload = {
+                        inGrid: source === 'grid',
+                        index: parseInt(e.dataTransfer.getData('sourceIndex')),
+                        id: e.dataTransfer.getData('appId'),
+                        isFolder: isFolder
+                    };
+                    dropIntoSlot(targetIndex, payload);
+                });
 
-                    if (source === 'grid') {
-                        const sourceIndex = parseInt(e.dataTransfer.getData('sourceIndex'));
-                        const isFolder = e.dataTransfer.getData('isFolder') === 'true';
-
-                        // Prevent moving folder into itself or if we are currently inside it conceptually
-                        // (Though we hide folder tools, meaning if you are in a folder, you can't have a folder inside it since there's no way to drag a folder into it)
-                        const temp = grid[targetIndex];
-                        grid[targetIndex] = grid[sourceIndex];
-                        grid[sourceIndex] = temp;
-                    } else if (source === 'drawer') {
-                        const appId = e.dataTransfer.getData('appId');
-                        // Prevent placing "re-arrange" inside a folder
-                        if (currentFolder && appId === 're-arrange') return;
-
-                        // If overwriting a "re-arrange" on the home screen, ensure at least one remains
-                        if (!currentFolder && grid[targetIndex] === 're-arrange') {
-                            const count = grid.filter(id => id === 're-arrange').length;
-                            if (count <= 1) return;
-                        }
-
-                        grid[targetIndex] = appId;
+                slot.addEventListener('keydown', (e) => {
+                    if ((e.key === ' ' || e.key === 'Enter') && kbdSelectedId) {
+                        e.preventDefault();
+                        const targetIndex = parseInt(slot.dataset.index);
+                        const payload = {
+                            inGrid: kbdSource === 'grid',
+                            index: kbdSourceIndex,
+                            id: kbdSelectedId,
+                            isFolder: kbdIsFolder
+                        };
+                        dropIntoSlot(targetIndex, payload);
+                        kbdSelectedId = null;
+                        renderGrid();
+                        announce("Item placed at slot " + (targetIndex + 1));
                     }
-                    renderGrid();
                 });
             });
 
             const delZone = document.getElementById('delete-zone');
+            delZone.addEventListener('keydown', (e) => {
+                if ((e.key === ' ' || e.key === 'Enter') && kbdSelectedId && kbdSource === 'grid') {
+                    e.preventDefault();
+                    removeFromGrid(kbdSourceIndex);
+                    kbdSelectedId = null;
+                    renderGrid();
+                    announce("Item removed from grid");
+                }
+            });
+
             delZone.addEventListener('dragover', e => { e.preventDefault(); delZone.classList.add('drag-over'); });
             delZone.addEventListener('dragleave', () => delZone.classList.remove('drag-over'));
             delZone.addEventListener('drop', e => {
