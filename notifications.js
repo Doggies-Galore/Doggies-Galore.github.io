@@ -53,6 +53,12 @@ class NotificationService {
     pushSync(key) {
         if (!this.ws || this.status !== 'connected') return;
         const val = localStorage.getItem(key);
+        // Only send if it's actually a known sync key
+        if (!['launcher-grid', 'launcher-bg', 'launcher-accent'].includes(key)) return;
+
+        // Prevent echoing back what we just received
+        if (this._lastSyncValues && this._lastSyncValues[key] === val) return;
+
         this.ws.send(JSON.stringify({
             type: 'sync',
             key: key,
@@ -297,13 +303,20 @@ class NotificationService {
     }
 
     handleSync(data) {
-        // Only apply if it's not from us (though server should handle broadcast filtering)
-        if (data.key && data.value) {
-            console.log(`[Sync] Applying ${data.key}`);
+        if (data.key && data.value !== undefined) {
+            const current = localStorage.getItem(data.key);
+            if (current === data.value) return; // Already in sync
+
+            console.log(`[Sync] Applying remote change for ${data.key}`);
+            if (!this._lastSyncValues) this._lastSyncValues = {};
+            this._lastSyncValues[data.key] = data.value;
+
             localStorage.setItem(data.key, data.value);
-            // Refresh visuals if it's a theme change
+
+            // Refresh visuals immediately if it's a theme change
             if (data.key === 'launcher-bg') document.documentElement.style.setProperty('--bg-color', data.value);
             if (data.key === 'launcher-accent') document.documentElement.style.setProperty('--accent-color', data.value);
+
             // Re-render grid if it's a layout change and we're on the main page
             if (data.key === 'launcher-grid' && typeof renderGridContents === 'function') {
                 renderGridContents(JSON.parse(data.value));
