@@ -131,7 +131,7 @@
 
         .theme-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
         }
 
@@ -230,6 +230,96 @@
             filter: brightness(1.2);
             transform: scale(1.05);
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: var(--bg-color);
+            border: 4px solid var(--accent-color);
+            border-radius: 30px;
+            padding: 40px;
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 25px;
+            font-size: 2rem;
+            border-bottom: 2px solid var(--accent-color);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .modal-field {
+            width: 100%;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .modal-field span {
+            display: block;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 5px;
+            margin-left: 10px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            color: var(--accent-color);
+            font-size: 1.1rem;
+            outline: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal-save-btn {
+            flex: 2;
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .modal-cancel-btn {
+            flex: 1;
+            opacity: 0.7;
+        }
     </style>
 </head>
 
@@ -254,19 +344,56 @@
         </div>
     </div>
 
-    <!-- App Management -->
     <div class="section" style="text-align: center;">
-        <h2 class="section-title">App Management</h2>
-        <div id="installed-apps-list" class="app-list">
-            <!-- Apps will be listed here -->
+        <h2 class="section-title">Notification & Sync Settings</h2>
+        <div id="sync-status" style="margin-bottom: 20px; font-weight: bold; opacity: 0.8;">Status: Loading...</div>
+        <div
+            style="display: flex; flex-direction: column; gap: 20px; align-items: center; max-width: 500px; margin: 0 auto;">
+            <button id="config-btn" class="btn"
+                style="width: 100%; background: var(--accent-color); color: var(--bg-color);">Configure Sync &
+                Notifications...</button>
+            <div class="row" style="margin-top: 10px;">
+                <label><input type="checkbox" id="check-dnd"> Do Not Disturb</label>
+                <label style="margin-left: 30px;"><input type="checkbox" id="check-silent"> Do Not Receive</label>
+            </div>
         </div>
     </div>
+
+    <!-- Sync Modal -->
+    <div class="modal-overlay" id="sync-modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Sign In</h3>
+            <div id="modal-mode-toggle" style="margin-bottom: 25px;">
+                <button class="btn" id="mode-login"
+                    style="padding: 10px 20px; font-size: 1rem; border-color: var(--accent-color); background: var(--accent-color); color: var(--bg-color);">Login</button>
+                <button class="btn" id="mode-register"
+                    style="padding: 10px 20px; font-size: 1rem; opacity: 0.6;">Register</button>
+            </div>
+            <div class="modal-field">
+                <span>WebSocket Address</span>
+                <input type="text" id="modal-ws-address" class="modal-input" placeholder="ws://localhost:8080">
+            </div>
+            <div class="modal-field">
+                <span>Username</span>
+                <input type="text" id="modal-ws-user" class="modal-input" placeholder="User123">
+            </div>
+            <div class="modal-field">
+                <span>Auth Token / Password</span>
+                <input type="password" id="modal-ws-token" class="modal-input" placeholder="••••••••">
+            </div>
+            <div class="modal-actions">
+                <button class="btn modal-cancel-btn" id="modal-cancel" style="border: none;">Cancel</button>
+                <button class="btn modal-save-btn" id="modal-save">Connect</button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Presets -->
     <div class="section" style="text-align: center;">
         <h2 class="section-title">Theme Presets</h2>
         <div class="theme-grid">
-            <button class="btn" onclick="setTheme('#000000', '#ffffff')">OLED Black</button>
+            <button class="btn" onclick="setTheme('#000000', '#ffffff')">IAmAnOLED</button>
             <button class="btn" onclick="setTheme('#1a1a1a', '#ffffff')">Dark Gray</button>
             <button class="btn" onclick="setTheme('#ffffff', '#000000')">Light Mode</button>
             <button class="btn" onclick="setTheme('#001524', '#ffecd1')">Midnight</button>
@@ -279,7 +406,8 @@
             <button class="btn" onclick="setTheme('#0d1117', '#00ff00')">Hacker</button>
             <button class="btn" onclick="setTheme('#2d0c18', '#ffcc80')">Sunset</button>
             <button class="btn" onclick="setTheme('#000000', '#0000ff')">Rainyware</button>
-            <button class="btn" onclick="setTheme('#00ff00', '#006600')">GREEN!</button>
+            <button class="btn" onclick="setTheme('#00ff00', '#006600')">TIME FOR GREEN!!!!!</button>
+            <button class="btn" onclick="setTheme('#000000', '#ff0000')">HellofaBluelightFilter</button>
         </div>
     </div>
 
@@ -298,6 +426,14 @@
         </div>
     </div>
 
+    <!-- App Management -->
+    <div class="section" style="text-align: center;">
+        <h2 class="section-title">App Management</h2>
+        <div id="installed-apps-list" class="app-list">
+            <!-- Apps will be listed here -->
+        </div>
+    </div>
+
     <script>
         const check24hr = document.getElementById('check-24hr');
         const checkSeconds = document.getElementById('check-seconds');
@@ -312,6 +448,154 @@
             localStorage.setItem('launcher-seconds', e.target.checked);
         });
 
+        // Notification & Sync Logic
+        const configBtn = document.getElementById('config-btn');
+        const syncStatus = document.getElementById('sync-status');
+        const checkDND = document.getElementById('check-dnd');
+        const checkSilent = document.getElementById('check-silent');
+
+        checkDND.checked = localStorage.getItem('launcher-dnd') === 'true';
+        checkSilent.checked = localStorage.getItem('launcher-silent') === 'true';
+
+        function updateSyncUI(status) {
+            const colors = {
+                connected: '#00ff00',
+                connecting: '#ffff00',
+                disconnected: '#ff9900',
+                error: '#ff0000',
+                unconfigured: '#888',
+                silent: '#444'
+            };
+            syncStatus.style.color = colors[status] || '#fff';
+            syncStatus.textContent = 'Status: ' + status.charAt(0).toUpperCase() + status.slice(1);
+        }
+
+        if (window.launcherNotifications) {
+            updateSyncUI(window.launcherNotifications.status);
+        }
+
+        window.addEventListener('sync-status-change', (e) => {
+            updateSyncUI(e.detail);
+        });
+
+        // Modal Elements
+        const modal = document.getElementById('sync-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalInputAddress = document.getElementById('modal-ws-address');
+        const modalInputUser = document.getElementById('modal-ws-user');
+        const modalInputToken = document.getElementById('modal-ws-token');
+        const modalSaveBtn = document.getElementById('modal-save');
+        const modalCancelBtn = document.getElementById('modal-cancel');
+        const modeLogin = document.getElementById('mode-login');
+        const modeRegister = document.getElementById('mode-register');
+
+        let currentMode = 'login'; // 'login' or 'register'
+
+        function setMode(mode) {
+            currentMode = mode;
+            if (mode === 'login') {
+                modalTitle.textContent = 'Sign In';
+                modalSaveBtn.textContent = 'Connect';
+                modeLogin.style.background = 'var(--accent-color)';
+                modeLogin.style.color = 'var(--bg-color)';
+                modeLogin.style.opacity = '1';
+                modeRegister.style.background = 'transparent';
+                modeRegister.style.color = 'var(--accent-color)';
+                modeRegister.style.opacity = '0.6';
+            } else {
+                modalTitle.textContent = 'Create Account';
+                modalSaveBtn.textContent = 'Register & Connect';
+                modeRegister.style.background = 'var(--accent-color)';
+                modeRegister.style.color = 'var(--bg-color)';
+                modeRegister.style.opacity = '1';
+                modeLogin.style.background = 'transparent';
+                modeLogin.style.color = 'var(--accent-color)';
+                modeLogin.style.opacity = '0.6';
+            }
+        }
+
+        if (modeLogin) modeLogin.addEventListener('click', () => setMode('login'));
+        if (modeRegister) modeRegister.addEventListener('click', () => setMode('register'));
+
+        configBtn.addEventListener('click', () => {
+            modalInputAddress.value = localStorage.getItem('launcher-ws-address') || "";
+            modalInputUser.value = localStorage.getItem('launcher-ws-username') || "";
+            modalInputToken.value = localStorage.getItem('launcher-ws-token') || "";
+            setMode('login');
+            modal.classList.add('active');
+        });
+
+        modalCancelBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        modalSaveBtn.addEventListener('click', async () => {
+            const address = modalInputAddress.value.trim();
+            const username = modalInputUser.value.trim();
+            const token = modalInputToken.value.trim();
+
+            if (!address || !username || !token) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            modalSaveBtn.disabled = true;
+            modalSaveBtn.textContent = "Connecting...";
+
+            try {
+                const ws = new WebSocket(address);
+                const timeout = setTimeout(() => ws.close(), 7000);
+
+                ws.onopen = () => {
+                    clearTimeout(timeout);
+                    ws.send(JSON.stringify({ type: currentMode, username, token }));
+                };
+
+                ws.onmessage = (e) => {
+                    const data = JSON.parse(e.data);
+                    if (data.type === 'auth' || data.type === 'register') {
+                        if (data.message === 'ok') {
+                            localStorage.setItem('launcher-ws-address', address);
+                            localStorage.setItem('launcher-ws-username', username);
+                            localStorage.setItem('launcher-ws-token', token);
+                            modal.classList.remove('active');
+                            window.dispatchEvent(new Event('storage'));
+                        } else {
+                            alert("Error: " + data.message);
+                        }
+                    } else if (data.type === 'error') {
+                        alert("Error: " + data.message);
+                    }
+                    ws.close();
+                };
+
+                ws.onerror = (err) => {
+                    alert("WebSocket connection failed. Check address.");
+                    ws.close();
+                };
+
+                ws.onclose = () => {
+                    modalSaveBtn.disabled = false;
+                    modalSaveBtn.textContent = currentMode === 'login' ? 'Connect' : 'Register & Connect';
+                };
+
+            } catch (err) {
+                alert("Invalid WebSocket address.");
+                modalSaveBtn.disabled = false;
+            }
+        });
+
+        // Close on overlay click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
+
+        [checkDND, checkSilent].forEach(el => el.addEventListener('change', () => {
+            localStorage.setItem('launcher-dnd', checkDND.checked);
+            localStorage.setItem('launcher-silent', checkSilent.checked);
+            window.dispatchEvent(new Event('storage'));
+        }));
+
         // App Management Logic
         async function loadInstalledApps() {
             const listEl = document.getElementById('installed-apps-list');
@@ -321,9 +605,9 @@
             const cached = localStorage.getItem('launcher-store-cache');
             if (cached) { allApps = JSON.parse(cached); }
 
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange"]');
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications"]');
             const appSizes = JSON.parse(localStorage.getItem('launcher-app-sizes') || '{}');
-            const systemIds = ["launcher-settings", "apps", "about", "re-arrange"];
+            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications"];
 
             const installed = allApps.filter(app => downloadedIds.includes(app.id) && !systemIds.includes(app.id));
 
@@ -420,6 +704,7 @@
             });
         });
     </script>
+    <script src="notifications.js"></script>
 </body>
 
 </html>

@@ -72,6 +72,10 @@
             background: transparent;
         }
 
+        .app.folder-app {
+            flex-direction: column;
+        }
+
         .app:hover {
             transform: scale(1.015);
         }
@@ -143,6 +147,17 @@
             border: 2px solid var(--accent-color);
             z-index: 100;
         }
+
+        #folder-back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 15px;
+            transition: background 0.2s;
+        }
+
+        #folder-back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
     </style>
 </head>
 
@@ -158,6 +173,11 @@
 
     <div id="header">
         <div id="date" class="header-item"></div>
+        <div id="back-btn-container" class="header-item" style="display: none; cursor: pointer; pointer-events: auto;">
+            <span id="folder-back-btn">&larr; Back</span>
+            <span id="header-folder-title" style="margin-left: 15px;"></span>
+        </div>
+
         <div style="display: flex; align-items: center;" class="header-item">
             <svg id="offline-icon" style="display: none; width: 3vw; height: 3vw; margin-right: 15px;"
                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -209,6 +229,11 @@
 
         let animating = false;
         let apps = [];
+        let userGrid = [];
+        let appMap = {};
+        let currentFolder = null;
+
+        document.getElementById('folder-back-btn').addEventListener('click', closeFolder);
 
         async function initLauncher() {
             let configApps = [];
@@ -230,20 +255,17 @@
                 }
             }
 
-            const gridEl = document.getElementById('grid');
-            gridEl.innerHTML = '';
-
             const fallbackApps = {
                 "launcher-settings": { name: "Settings", url: "settings.html", fade: "theme" },
                 "apps": { name: "Apps", url: "apps.html", fade: "theme" },
                 "about": { name: "About", url: "about.html", fade: "theme" },
-                "re-arrange": { name: "Arrange", url: "rearrange.html", fade: "theme" }
+                "re-arrange": { name: "Arrange", url: "rearrange.html", fade: "theme" },
+                "notifications": { name: "Notifications", url: "notifications.html", fade: "theme" }
             };
 
-            const appMap = { ...fallbackApps };
+            appMap = { ...fallbackApps };
             configApps.forEach(app => appMap[app.id] = app);
 
-            let userGrid;
             try {
                 const saved = localStorage.getItem('launcher-grid');
                 if (saved) userGrid = JSON.parse(saved);
@@ -257,15 +279,66 @@
                 ];
             }
 
+            const openFolderId = sessionStorage.getItem('openFolderId');
+            if (openFolderId) {
+                const folder = userGrid.find(x => x && typeof x === 'object' && x.id === openFolderId);
+                if (folder) {
+                    currentFolder = folder;
+                    document.getElementById('date').style.display = 'none';
+                    const bbc = document.getElementById('back-btn-container');
+                    bbc.style.display = 'flex';
+                    document.getElementById('header-folder-title').textContent = folder.name;
+                    renderGridContents(folder.apps);
+                } else {
+                    renderGridContents(userGrid);
+                }
+            } else {
+                renderGridContents(userGrid);
+            }
+
+            resetAnimations();
+            preloadApps(configApps);
+        }
+
+        function renderGridContents(gridArray) {
+            const gridEl = document.getElementById('grid');
+            gridEl.innerHTML = '';
+
             let appIndex = 0;
-            userGrid.forEach((id) => {
-                if (!id) {
+            gridArray.forEach((item) => {
+                if (!item) {
                     const placeholder = document.createElement('div');
                     gridEl.appendChild(placeholder);
                     return;
                 }
 
-                const appData = appMap[id] || { name: 'Unknown', url: '#', fade: '#000000' };
+                if (typeof item === 'object' && item.type === 'folder') {
+                    const div = document.createElement('div');
+                    div.className = 'app folder-app';
+                    div.tabIndex = 0;
+                    div.setAttribute('role', 'button');
+                    div.setAttribute('aria-label', item.name);
+
+                    div.innerHTML = `
+                        <svg class="folder-svg" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 4vw; height: 4vw; margin-bottom: 5px;">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <div class="app-name">${item.name}</div>
+                    `;
+                    gridEl.appendChild(div);
+
+                    const currentIndex = appIndex++;
+                    div.addEventListener('click', () => launchFolder(div, item, currentIndex));
+                    div.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            launchFolder(div, item, currentIndex);
+                        }
+                    });
+                    return;
+                }
+
+                const appData = appMap[item] || { name: 'Unknown', url: '#', fade: '#000000' };
 
                 const div = document.createElement('div');
                 div.className = 'app';
@@ -293,8 +366,6 @@
             });
 
             apps = document.querySelectorAll('.app');
-            resetAnimations();
-            preloadApps(configApps);
         }
 
         function preloadApps(appsData) {
@@ -371,16 +442,130 @@
             } else {
                 sessionStorage.removeItem('lastFadeColor');
             }
+            if (currentFolder) {
+                sessionStorage.setItem('openFolderId', currentFolder.id);
+            } else {
+                sessionStorage.removeItem('openFolderId');
+            }
 
             setTimeout(() => {
                 window.location.href = url;
             }, 750);
         }
 
-        function resetAnimations() {
-            const lastIndex = sessionStorage.getItem('lastAppIndex');
+        function launchFolder(appDiv, folderObj, index) {
+            if (animating) return;
+            animating = true;
 
-            if (lastIndex === null || apps.length === 0) {
+            const transitionStyle = 'all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1)';
+            const transitionData = getAppTransitionData(index);
+
+            document.getElementById('header').style.transition = 'opacity 0.2s';
+            document.getElementById('header').style.opacity = '0';
+
+            apps.forEach((a, i) => {
+                a.style.transition = transitionStyle;
+                a.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
+                a.style.opacity = '0';
+                a.style.pointerEvents = 'none';
+            });
+
+            setTimeout(() => {
+                currentFolder = folderObj;
+                document.getElementById('date').style.display = 'none';
+                const bbc = document.getElementById('back-btn-container');
+                bbc.style.display = 'flex';
+                document.getElementById('header-folder-title').textContent = folderObj.name;
+
+                renderGridContents(folderObj.apps);
+
+                apps.forEach((a) => {
+                    a.style.transition = 'none';
+                    a.style.transform = 'scale(0.8)';
+                    a.style.opacity = '0';
+                    a.style.pointerEvents = 'none';
+                });
+
+                void document.body.offsetHeight; // force reflow
+
+                document.getElementById('header').style.transition = 'opacity 0.4s ease';
+                document.getElementById('header').style.opacity = '1';
+
+                apps.forEach((a) => {
+                    a.style.transition = 'all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                    a.style.transform = 'scale(1)';
+                    a.style.opacity = '1';
+                    a.style.pointerEvents = 'auto';
+                });
+
+                setTimeout(() => {
+                    animating = false;
+                }, 400);
+
+            }, 500);
+        }
+
+        function closeFolder() {
+            if (animating) return;
+            animating = true;
+
+            const bbc = document.getElementById('back-btn-container');
+
+            document.getElementById('header').style.transition = 'opacity 0.2s';
+            document.getElementById('header').style.opacity = '0';
+
+            apps.forEach(a => {
+                a.style.transition = 'all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                a.style.transform = 'scale(0.8)';
+                a.style.opacity = '0';
+                a.style.pointerEvents = 'none';
+            });
+
+            setTimeout(() => {
+                bbc.style.display = 'none';
+                document.getElementById('date').style.display = 'block';
+
+                const copyFolder = currentFolder;
+                currentFolder = null;
+
+                // Which index in root grid was this folder?
+                const folderIndexInGrid = userGrid.findIndex(x => x === copyFolder);
+                const actualAppIndex = userGrid.slice(0, folderIndexInGrid).filter(x => x).length;
+
+                renderGridContents(userGrid);
+
+                const transitionData = getAppTransitionData(actualAppIndex);
+
+                apps.forEach((a, i) => {
+                    a.style.transition = 'none';
+                    a.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
+                    a.style.opacity = '0';
+                    a.style.pointerEvents = 'none';
+                });
+
+                void document.body.offsetHeight;
+
+                document.getElementById('header').style.transition = 'opacity 0.4s ease';
+                document.getElementById('header').style.opacity = '1';
+
+                apps.forEach((a) => {
+                    a.style.transition = 'all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                    a.style.transform = 'translate(0px, 0px) scale(1)';
+                    a.style.opacity = '1';
+                    a.style.pointerEvents = 'auto';
+                });
+
+                setTimeout(() => {
+                    animating = false;
+                }, 500);
+
+            }, 400);
+        }
+
+        function resetAnimations() {
+            const lastIndexStr = sessionStorage.getItem('lastAppIndex');
+
+            if (lastIndexStr === null || apps.length === 0) {
                 document.body.style.backgroundColor = '';
                 document.documentElement.classList.remove('navigating-back');
                 apps.forEach(a => {
@@ -395,23 +580,33 @@
             }
 
             animating = true;
-            const index = parseInt(lastIndex);
-
-            if (index >= apps.length) {
-                sessionStorage.removeItem('lastAppIndex');
-                animating = false;
-                return resetAnimations();
-            }
-
-            const transitionData = getAppTransitionData(index);
+            let index = parseInt(lastIndexStr);
+            let transitionData;
             const transitionStyle = 'all 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
 
-            apps.forEach((a, i) => {
-                a.style.transition = 'none';
-                a.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
-                a.style.opacity = '0';
-                a.style.pointerEvents = 'none';
-            });
+            if (index === 999) {
+                // Return from system app (center fade-in)
+                apps.forEach((a) => {
+                    a.style.transition = 'none';
+                    a.style.transform = 'scale(0.8)';
+                    a.style.opacity = '0';
+                    a.style.pointerEvents = 'none';
+                });
+            } else {
+                if (index >= apps.length) {
+                    sessionStorage.removeItem('lastAppIndex');
+                    animating = false;
+                    return resetAnimations();
+                }
+                transitionData = getAppTransitionData(index);
+                apps.forEach((a, i) => {
+                    a.style.transition = 'none';
+                    a.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
+                    a.style.opacity = '0';
+                    a.style.pointerEvents = 'none';
+                });
+            }
+
             document.getElementById('header').style.opacity = '0';
             document.getElementById('header').style.transition = 'none';
 
@@ -443,9 +638,10 @@
                     setTimeout(() => {
                         animating = false;
                         apps.forEach(a => a.style.transition = '');
-                        document.getElementById('header').style.transition = 'opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)'; // Restore CSS transition definition instead of none
+                        document.getElementById('header').style.transition = 'opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
                         sessionStorage.removeItem('lastAppIndex');
                         sessionStorage.removeItem('lastFadeColor');
+                        // Do not clear openFolderId here, it's used to remember where we are.
                     }, 800);
                 }, 50);
             });
@@ -453,7 +649,7 @@
 
         window.addEventListener('pageshow', (event) => {
             if (apps.length === 0 && !animating) {
-                initLauncher();
+                // If it's already loaded, initLauncher won't be called here, but initLauncher is called at DOMContentLoaded
             } else if (event.persisted || performance.navigation.type === 2) {
                 resetAnimations();
             }
@@ -480,6 +676,7 @@
             }
         });
     </script>
+    <script src="notifications.js"></script>
 </body>
 
 </html>

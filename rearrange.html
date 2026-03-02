@@ -71,7 +71,7 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }
 
         .close-btn,
@@ -128,12 +128,37 @@
 
         .grid-container {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grid-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            transition: opacity 0.3s ease;
+        }
+
+        #btn-back {
+            position: absolute;
+            left: 0;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 5px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            display: none;
         }
 
         h2 {
             text-align: center;
-            margin-bottom: 15px;
             font-size: 2vw;
+            margin: 0;
         }
 
         .grid-3x3 {
@@ -145,6 +170,7 @@
             padding: 20px;
             border-radius: 20px;
             border: 2px dashed var(--accent-color);
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
         .grid-slot {
@@ -171,12 +197,42 @@
             flex-direction: column;
         }
 
+        .drawer-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+            transition: opacity 0.3s ease;
+        }
+
+        .folder-tools {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .folder-tools button,
+        .folder-tools select {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 5px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1vw;
+            cursor: pointer;
+        }
+
         .app-drawer {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 15px;
             overflow-y: auto;
             max-height: 50vh;
+            padding-right: 5px;
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
         .draggable-app {
@@ -193,6 +249,12 @@
             align-items: center;
             justify-content: center;
             min-height: 80px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .draggable-folder {
+            flex-direction: column;
         }
 
         .draggable-app:active {
@@ -212,8 +274,6 @@
             bottom: 0;
             margin: auto;
             border-color: #4CAF50;
-            width: 100%;
-            height: 100%;
         }
 
         #delete-zone {
@@ -237,6 +297,106 @@
         #delete-zone.drag-over {
             background: rgba(255, 76, 76, 0.2);
         }
+
+        .view-transitioning {
+            opacity: 0 !important;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: var(--bg-color);
+            border: 3px solid var(--accent-color);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            background: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            border-radius: 10px;
+            color: var(--bg-color);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .modal-input::placeholder {
+            color: var(--bg-color);
+            opacity: 0.6;
+            font-weight: normal;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            filter: brightness(0.9);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .modal-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--accent-color);
+        }
     </style>
 </head>
 
@@ -253,7 +413,10 @@
 
     <div class="container">
         <div class="grid-container">
-            <h2>Launcher Grid</h2>
+            <div class="grid-header">
+                <button id="btn-back" aria-label="Back to root grid">&larr; Back</button>
+                <h2 id="grid-title">Launcher Grid</h2>
+            </div>
             <div class="grid-3x3" id="launcher-grid">
                 <div class="grid-slot" data-index="0"></div>
                 <div class="grid-slot" data-index="1"></div>
@@ -270,8 +433,28 @@
         </div>
 
         <div class="drawer-container">
-            <h2>Downloaded Apps</h2>
+            <div class="drawer-header">
+                <h2>Downloaded Apps</h2>
+                <div class="folder-tools" id="folder-tools">
+                    <button id="btn-custom-folder">+ New Folder</button>
+                    <select id="sel-category-folder">
+                        <option value="">+ Category Folder</option>
+                    </select>
+                </div>
+            </div>
             <div class="app-drawer" id="app-drawer">
+            </div>
+        </div>
+    </div>
+
+    <!-- Folder Name Modal -->
+    <div class="modal-overlay" id="folder-modal">
+        <div class="modal-content">
+            <h3>Name Your Folder</h3>
+            <input type="text" id="folder-name-input" class="modal-input" placeholder="e.g. Games" autocomplete="off" />
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="folder-modal-cancel">Cancel</button>
+                <button class="modal-btn" id="folder-modal-create">Create</button>
             </div>
         </div>
     </div>
@@ -279,6 +462,7 @@
     <script>
         let configApps = [];
         let userGrid = [];
+        let currentFolder = null;
 
         function init() {
             let allApps = [];
@@ -287,22 +471,31 @@
                 try { allApps = JSON.parse(cached); } catch (e) { }
             }
 
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange"]');
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications"]');
 
-            // System applets that should always be in the drawer
-            const systemIds = ["launcher-settings", "apps", "about", "re-arrange"];
+            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications"];
 
             if (!allApps || allApps.length === 0) {
                 allApps = [
-                    { id: "launcher-settings", name: "Settings" },
-                    { id: "apps", name: "Apps" },
-                    { id: "about", name: "About" },
-                    { id: "re-arrange", name: "Arrange" }
+                    { id: "launcher-settings", name: "Settings", category: "System" },
+                    { id: "apps", name: "Apps", category: "System" },
+                    { id: "about", name: "About", category: "System" },
+                    { id: "re-arrange", name: "Arrange", category: "System" },
+                    { id: "notifications", name: "Notifications", category: "System" }
                 ];
             }
 
-            // Filter to only show downloaded apps or system apps
             configApps = allApps.filter(app => downloadedIds.includes(app.id) || systemIds.includes(app.id));
+
+            // Populate categories
+            const cats = new Set(configApps.map(a => a.category).filter(c => c));
+            const selCategory = document.getElementById('sel-category-folder');
+            Array.from(cats).sort().forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                selCategory.appendChild(opt);
+            });
 
             try {
                 const saved = localStorage.getItem('launcher-grid');
@@ -313,12 +506,116 @@
                 userGrid = [null, null, null, null, null, null, "launcher-settings", "apps", "re-arrange"];
             }
 
+            // Convert old style nested data or validate
+            for (let i = 0; i < userGrid.length; i++) {
+                if (userGrid[i] && typeof userGrid[i] === 'object' && userGrid[i].type !== 'folder') {
+                    userGrid[i] = null; // invalid object
+                }
+            }
+
+            setupFolderUI();
             renderDrawer();
             renderGrid();
             setupDragAndDrop();
         }
 
-        function createAppNode(app, inGrid = false) {
+        function activeGrid() {
+            return currentFolder ? currentFolder.apps : userGrid;
+        }
+
+        function setupFolderUI() {
+            document.getElementById('btn-back').addEventListener('click', () => {
+                const gridEl = document.getElementById('launcher-grid');
+                const drawerEl = document.getElementById('app-drawer');
+                const titleEl = document.getElementById('grid-title');
+                const toolsEl = document.getElementById('folder-tools');
+
+                gridEl.classList.add('view-transitioning');
+                drawerEl.classList.add('view-transitioning');
+                titleEl.style.opacity = '0';
+                toolsEl.style.opacity = '0';
+
+                setTimeout(() => {
+                    currentFolder = null;
+                    document.getElementById('grid-title').textContent = 'Launcher Grid';
+                    document.getElementById('btn-back').style.display = 'none';
+                    toolsEl.style.display = 'flex';
+                    renderGrid();
+
+                    // Force reflow
+                    void gridEl.offsetWidth;
+
+                    gridEl.classList.remove('view-transitioning');
+                    drawerEl.classList.remove('view-transitioning');
+                    titleEl.style.opacity = '1';
+                    toolsEl.style.opacity = '1';
+                }, 300);
+            });
+
+            const modalInfo = {
+                overlay: document.getElementById('folder-modal'),
+                input: document.getElementById('folder-name-input'),
+                btnCreate: document.getElementById('folder-modal-create'),
+                btnCancel: document.getElementById('folder-modal-cancel')
+            };
+
+            const closeModal = () => {
+                modalInfo.overlay.classList.remove('active');
+                modalInfo.input.value = '';
+            };
+
+            const confirmModal = () => {
+                const name = modalInfo.input.value.trim();
+                if (name) {
+                    createFolder(name, []);
+                    closeModal();
+                }
+            };
+
+            document.getElementById('btn-custom-folder').addEventListener('click', () => {
+                modalInfo.overlay.classList.add('active');
+                modalInfo.input.focus();
+            });
+
+            modalInfo.btnCancel.addEventListener('click', closeModal);
+            modalInfo.btnCreate.addEventListener('click', confirmModal);
+            modalInfo.input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') confirmModal();
+                if (e.key === 'Escape') closeModal();
+            });
+
+            document.getElementById('sel-category-folder').addEventListener('change', (e) => {
+                const cat = e.target.value;
+                if (!cat) return;
+                e.target.value = '';
+
+                // Get all apps in this category
+                const appsInCat = configApps.filter(a => a.category === cat).map(a => a.id);
+                createFolder(cat, appsInCat);
+            });
+        }
+
+        function createFolder(name, appIds) {
+            const f = {
+                type: 'folder',
+                id: 'f_' + Date.now() + Math.floor(Math.random() * 1000),
+                name: name,
+                apps: Array(9).fill(null)
+            };
+
+            appIds.slice(0, 9).forEach((id, i) => f.apps[i] = id);
+
+            const grid = activeGrid();
+            const emptyIndex = grid.findIndex(x => !x);
+            if (emptyIndex !== -1) {
+                grid[emptyIndex] = f;
+            } else {
+                alert("No empty space in the current grid for a new folder.");
+            }
+            renderGrid();
+        }
+
+        function createAppNode(app, inGrid = false, index = -1) {
             const div = document.createElement('div');
             div.className = 'draggable-app' + (inGrid ? ' in-grid' : '');
             div.draggable = true;
@@ -326,18 +623,80 @@
             div.textContent = app.name;
             div.tabIndex = 0;
             div.setAttribute('role', 'button');
-            div.setAttribute('aria-grabbed', 'false');
 
             div.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', app.id);
                 e.dataTransfer.setData('source', inGrid ? 'grid' : 'drawer');
                 if (inGrid) {
                     e.dataTransfer.setData('sourceIndex', div.parentElement.dataset.index);
+                } else {
+                    e.dataTransfer.setData('appId', app.id);
                 }
                 setTimeout(() => div.style.opacity = '0.5', 0);
             });
             div.addEventListener('dragend', () => div.style.opacity = '1');
             return div;
+        }
+
+        function createFolderNode(folder, inGrid, index) {
+            const div = document.createElement('div');
+            div.className = 'draggable-app draggable-folder' + (inGrid ? ' in-grid' : '');
+            div.draggable = true;
+            div.tabIndex = 0;
+
+            div.innerHTML = `
+                <svg class="folder-svg" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 2vw; height: 2vw; margin-bottom: 5px;">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <div>${folder.name}</div>
+            `;
+
+            div.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('source', 'grid');
+                e.dataTransfer.setData('sourceIndex', div.parentElement.dataset.index);
+                e.dataTransfer.setData('isFolder', 'true');
+                setTimeout(() => div.style.opacity = '0.5', 0);
+            });
+            div.addEventListener('dragend', () => div.style.opacity = '1');
+
+            div.addEventListener('click', () => {
+                openFolder(folder);
+            });
+            div.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openFolder(folder);
+                }
+            });
+
+            return div;
+        }
+
+        function openFolder(folder) {
+            const gridEl = document.getElementById('launcher-grid');
+            const drawerEl = document.getElementById('app-drawer');
+            const titleEl = document.getElementById('grid-title');
+            const toolsEl = document.getElementById('folder-tools');
+
+            gridEl.classList.add('view-transitioning');
+            drawerEl.classList.add('view-transitioning');
+            titleEl.style.opacity = '0';
+            toolsEl.style.opacity = '0';
+
+            setTimeout(() => {
+                currentFolder = folder;
+                document.getElementById('grid-title').textContent = 'Folder: ' + folder.name;
+                document.getElementById('btn-back').style.display = 'block';
+                toolsEl.style.display = 'none';
+                renderGrid();
+
+                // Force reflow
+                void gridEl.offsetWidth;
+
+                gridEl.classList.remove('view-transitioning');
+                drawerEl.classList.remove('view-transitioning');
+                titleEl.style.opacity = '1';
+                toolsEl.style.opacity = '1';
+            }, 300);
         }
 
         function renderDrawer() {
@@ -350,12 +709,17 @@
 
         function renderGrid() {
             const slots = document.querySelectorAll('.grid-slot');
+            const grid = activeGrid();
             slots.forEach((slot, idx) => {
                 slot.innerHTML = '';
-                const appId = userGrid[idx];
-                if (appId) {
-                    const app = configApps.find(a => a.id === appId) || { id: appId, name: appId };
-                    slot.appendChild(createAppNode(app, true));
+                const item = grid[idx];
+                if (item) {
+                    if (typeof item === 'object' && item.type === 'folder') {
+                        slot.appendChild(createFolderNode(item, true, idx));
+                    } else {
+                        const app = configApps.find(a => a.id === item) || { id: item, name: item };
+                        slot.appendChild(createAppNode(app, true, idx));
+                    }
                 }
             });
         }
@@ -368,20 +732,31 @@
                 slot.addEventListener('drop', e => {
                     e.preventDefault();
                     slot.classList.remove('drag-over');
-                    const appId = e.dataTransfer.getData('text/plain');
                     const source = e.dataTransfer.getData('source');
                     const targetIndex = parseInt(slot.dataset.index);
+                    const grid = activeGrid();
 
                     if (source === 'grid') {
                         const sourceIndex = parseInt(e.dataTransfer.getData('sourceIndex'));
-                        const temp = userGrid[targetIndex];
-                        userGrid[targetIndex] = userGrid[sourceIndex];
-                        userGrid[sourceIndex] = temp;
-                    } else {
-                        if (userGrid[targetIndex] === 're-arrange') {
-                            return;
+                        const isFolder = e.dataTransfer.getData('isFolder') === 'true';
+
+                        // Prevent moving folder into itself or if we are currently inside it conceptually
+                        // (Though we hide folder tools, meaning if you are in a folder, you can't have a folder inside it since there's no way to drag a folder into it)
+                        const temp = grid[targetIndex];
+                        grid[targetIndex] = grid[sourceIndex];
+                        grid[sourceIndex] = temp;
+                    } else if (source === 'drawer') {
+                        const appId = e.dataTransfer.getData('appId');
+                        // Prevent placing "re-arrange" inside a folder
+                        if (currentFolder && appId === 're-arrange') return;
+
+                        // If overwriting a "re-arrange" on the home screen, ensure at least one remains
+                        if (!currentFolder && grid[targetIndex] === 're-arrange') {
+                            const count = grid.filter(id => id === 're-arrange').length;
+                            if (count <= 1) return;
                         }
-                        userGrid[targetIndex] = appId;
+
+                        grid[targetIndex] = appId;
                     }
                     renderGrid();
                 });
@@ -396,10 +771,12 @@
                 const source = e.dataTransfer.getData('source');
                 if (source === 'grid') {
                     const sourceIndex = parseInt(e.dataTransfer.getData('sourceIndex'));
-                    if (userGrid[sourceIndex] === 're-arrange') {
-                        return;
+                    const grid = activeGrid();
+                    if (!currentFolder && grid[sourceIndex] === 're-arrange') {
+                        const count = grid.filter(id => id === 're-arrange').length;
+                        if (count <= 1) return; // Protect the last re-arrange from deletion
                     }
-                    userGrid[sourceIndex] = null;
+                    grid[sourceIndex] = null;
                     renderGrid();
                 }
             });
@@ -436,6 +813,7 @@
             });
         });
     </script>
+    <script src="notifications.js"></script>
 </body>
 
 </html>

@@ -5,161 +5,192 @@
             "name": "Remote OSX",
             "url": "https://app.jumpdesktop.com/jump#authCreds=true&neuronid=CD-01GC8ZEZNY21WKT06QCZNG4PXA",
             "fade": "#f0f0f0",
-            "about": "Remote desktop access to macOS."
+            "about": "Remote desktop access to macOS.",
+            "category": "Remote"
         },
         {
             "id": "remote-browser",
             "name": "Remote Browser",
             "url": "https://mediastation.tail76b4d2.ts.net/vnc.html?autoconnect=1",
             "fade": "#111111",
-            "about": "Cloud-hosted web browser."
+            "about": "Cloud-hosted web browser.",
+            "category": "Remote"
         },
         {
             "id": "remote-linux",
             "name": "Remote Linux",
             "url": "https://connect.raspberrypi.com/devices/2ae11a69-25e3-4c13-93a2-86a3955d5003/screen-sharing-session",
             "fade": "#111111",
-            "about": "Remote access to Linux through a Raspberry Pi."
+            "about": "Remote access to Linux through a Raspberry Pi.",
+            "category": "Remote"
         },
         {
             "id": "launcher-settings",
             "name": "Settings",
             "url": "settings.html",
             "fade": "theme",
-            "about": "Configure your launcher themes and display."
+            "about": "Configure your launcher themes and display.",
+            "category": "System"
         },
         {
             "id": "about",
             "name": "About",
             "url": "about.html",
             "fade": "theme",
-            "about": "Information about the Launcher."
+            "about": "Information about the Launcher.",
+            "category": "System"
         },
         {
             "id": "printing",
             "name": "Printing",
             "url": "https://papercut.jeffco.k12.co.us:9192/client",
             "fade": "#f0f0f0",
-            "about": "Manage your printing jobs."
+            "about": "Manage your printing jobs.",
+            "category": "Productivity"
         },
         {
             "id": "classroom",
             "name": "Classroom",
             "url": "https://classroom.google.com/h",
             "fade": "#ffffff",
-            "about": "Access Google Classroom."
+            "about": "Access Google Classroom.",
+            "category": "Education"
         },
         {
             "id": "apps",
             "name": "Apps",
             "url": "apps.html",
             "fade": "theme",
-            "about": "View and download applets."
+            "about": "View and download applets.",
+            "category": "System"
         },
         {
             "id": "re-arrange",
             "name": "Arrange",
             "url": "rearrange.html",
             "fade": "theme",
-            "about": "Rearrange your apps on the launcher."
+            "about": "Rearrange your apps on the launcher.",
+            "category": "System"
         },
         {
             "id": "rainyware",
             "name": "Rainyware",
             "url": "https://rainyware.rainsounds2.com",
             "fade": "#0000ff",
-            "about": "Where things are done the rainy way."
+            "about": "Where things are done the rainy way.",
+            "category": "Entertainment"
         },
         {
             "id": "parsec",
             "name": "Parsec",
             "url": "https://web.parsec.app",
             "fade": "#000000",
-            "about": "High-performance remote desktop tool."
+            "about": "High-performance remote desktop tool.",
+            "category": "Remote"
         },
         {
             "id": "spotify",
             "name": "Spotify",
             "url": "https://spotify.com",
             "fade": "#333333",
-            "about": "Listen to music online (but it's green)."
+            "about": "Listen to music online (but it's green).",
+            "category": "Entertainment"
         },
         {
             "id": "apple-music",
             "name": "Apple Music",
             "url": "https://music.apple.com",
             "fade": "#ffffff",
-            "about": "Listen to music online (but it's hot-pink)."
+            "about": "Listen to music online (but it's hot-pink).",
+            "category": "Entertainment"
         },
         {
             "id": "matlab",
             "name": "MATLAB",
             "url": "https://matlab.mathworks.com",
             "fade": "#e16a2b",
-            "about": "MATLAB Online for web-based technical computing."
+            "about": "MATLAB Online for web-based technical computing.",
+            "category": "Education"
         },
         {
             "id": "youtube",
             "name": "YouTube",
             "url": "https://youtube.com",
             "fade": "#ff0000",
-            "about": "Watch and share videos."
+            "about": "Watch and share videos.",
+            "category": "Entertainment"
         },
         {
             "id": "youtube-music",
             "name": "YouTube Music",
             "url": "https://music.youtube.com",
             "fade": "#ff0000",
-            "about": "Stream music from YouTube."
+            "about": "Stream music from YouTube.",
+            "category": "Entertainment"
         },
         {
             "id": "vscode",
             "name": "VS Code",
             "url": "https://vscode.dev",
             "fade": "#333333",
-            "about": "Visual Studio Code for the Web."
+            "about": "Visual Studio Code for the Web.",
+            "category": "Productivity"
         },
         {
             "id": "gmail",
             "name": "GMail",
             "url": "https://mail.google.com",
             "fade": "#ffffff",
-            "about": "Google's email service."
+            "about": "Google's email service.",
+            "category": "Productivity"
         },
         {
             "id": "google-earth",
             "name": "Google Earth",
             "url": "https://earth.google.com",
             "fade": "#ffffff",
-            "about": "Explore the world from your browser."
+            "about": "Explore the world from your browser.",
+            "category": "Education"
         },
         {
             "id": "google-drive",
             "name": "Google Drive",
             "url": "https://drive.google.com",
             "fade": "#ffffff",
-            "about": "Store and share files in the cloud."
+            "about": "Store and share files in the cloud.",
+            "category": "Productivity"
         },
         {
             "id": "google-docs",
             "name": "Google Docs",
             "url": "https://docs.google.com",
             "fade": "#ffffff",
-            "about": "Create and edit documents online."
+            "about": "Create and edit documents online.",
+            "category": "Productivity"
         },
         {
             "id": "outlook",
             "name": "Outlook",
             "url": "https://outlook.live.com",
             "fade": "#0078d4",
-            "about": "Microsoft's email and calendar service."
+            "about": "Microsoft's email and calendar service.",
+            "category": "Productivity"
         },
         {
             "id": "icloud",
             "name": "iCloud",
             "url": "https://icloud.com",
             "fade": "#00a2e8",
-            "about": "Apple's cloud services platform."
+            "about": "Apple's cloud services platform.",
+            "category": "Productivity"
+        },
+        {
+            "id": "notifications",
+            "name": "Notifications",
+            "url": "notifications.html",
+            "fade": "theme",
+            "about": "View your notification history.",
+            "category": "System"
         }
     ]
 }

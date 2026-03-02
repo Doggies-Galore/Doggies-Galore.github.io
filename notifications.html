@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <style>
+        :root {
+            --bg-color: #000;
+            --accent-color: #fff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            background-color: var(--bg-color);
+            transition: background-color 0.75s ease;
+        }
+
+        body {
+            background-color: transparent;
+            color: var(--accent-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            overflow-y: auto;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            transition: background-color 0.75s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.4s cubic-bezier(0.4, 0.0, 0.2, 1) forwards !important;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+            font-size: 2vw;
+            cursor: pointer;
+            border: 3px solid var(--accent-color);
+            padding: 10px 25px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        h1 {
+            font-size: 4vw;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 15px;
+        }
+
+        .section {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--accent-color);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        #notif-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .notif-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .notif-item.clearing {
+            animation: slideOut 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            pointer-events: none;
+        }
+
+        @keyframes slideOut {
+            0% {
+                opacity: 1;
+                transform: translateX(0) rotate(0deg) scale(1);
+                max-height: 200px;
+            }
+
+            30% {
+                transform: translateX(-10px) rotate(-1deg) scale(1.02);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateX(150px) rotate(8deg) scale(0.8);
+                max-height: 0;
+                margin-top: 0;
+                margin-bottom: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                border: 0;
+                overflow: hidden;
+            }
+        }
+
+        .notif-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            opacity: 0.7;
+        }
+
+        .notif-author {
+            font-weight: bold;
+            color: var(--accent-color);
+            opacity: 1;
+        }
+
+        .notif-body {
+            font-size: 1.4rem;
+            line-height: 1.5;
+            margin-top: 5px;
+        }
+
+        .empty-msg {
+            text-align: center;
+            opacity: 0;
+            font-size: 1.5rem;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-origin: top;
+            animation: stretchIn 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        @keyframes stretchIn {
+            0% {
+                opacity: 0;
+                max-height: 0;
+                padding: 0 40px;
+                transform: scaleY(0.5);
+            }
+
+            100% {
+                opacity: 0.4;
+                max-height: 300px;
+                padding: 60px 40px;
+                transform: scaleY(1);
+            }
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            padding: 15px 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        input[type="checkbox"] {
+            width: 25px;
+            height: 25px;
+            accent-color: var(--accent-color);
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        document.documentElement.style.setProperty('--bg-color', localStorage.getItem('launcher-bg') || '#000');
+        document.documentElement.style.setProperty('--accent-color', localStorage.getItem('launcher-accent') || '#fff');
+    </script>
+    <div class="header">
+        <h1>Notifications</h1>
+        <a href="index.html" class="close-btn">Back</a>
+    </div>
+
+    <div class="controls">
+        <label><input type="checkbox" id="page-dnd"> Do Not Disturb</label>
+        <label><input type="checkbox" id="page-silent"> Do Not Receive</label>
+        <button class="btn" id="clear-btn">Clear History</button>
+    </div>
+
+    <div class="section">
+        <div id="notif-list">
+            <!-- Notifications will appear here -->
+        </div>
+    </div>
+
+    <script>
+        const listEl = document.getElementById('notif-list');
+        const clearBtn = document.getElementById('clear-btn');
+        const dndCheck = document.getElementById('page-dnd');
+        const silentCheck = document.getElementById('page-silent');
+
+        function render() {
+            const history = JSON.parse(localStorage.getItem('launcher-notif-history') || '[]');
+            listEl.innerHTML = '';
+
+            if (history.length === 0) {
+                listEl.innerHTML = '<div class="empty-msg">No notifications.</div>';
+                return;
+            }
+
+            history.forEach(n => {
+                const item = document.createElement('div');
+                item.className = 'notif-item';
+                let parsedDate = new Date(n.time);
+                if (isNaN(parsedDate.getTime())) parsedDate = new Date();
+                const dateStr = parsedDate.toLocaleString();
+                item.innerHTML = `
+                    <div class="notif-meta">
+                        <span class="notif-author">${n.author}</span>
+                        <span>${dateStr}</span>
+                    </div>
+                    <div class="notif-body">${n.content}</div>
+                `;
+                listEl.appendChild(item);
+            });
+        }
+
+        clearBtn.onclick = async () => {
+            const items = listEl.querySelectorAll('.notif-item');
+            if (items.length === 0) return;
+
+            // Lock container height to prevent snapping
+            const initialHeight = listEl.offsetHeight;
+            listEl.style.height = initialHeight + 'px';
+            listEl.style.overflow = 'hidden';
+
+            // Staggered dismissal
+            items.forEach((item, i) => {
+                setTimeout(() => {
+                    item.classList.add('clearing');
+                }, i * 100);
+            });
+
+            // Wait for animations to complete
+            await new Promise(r => setTimeout(r, 600 + (items.length * 100)));
+
+            localStorage.setItem('launcher-notif-history', '[]');
+            window.dispatchEvent(new Event('storage'));
+
+            // Swap content and animate height transition
+            render();
+
+            listEl.style.transition = 'height 0.8s cubic-bezier(0.23, 1, 0.32, 1)';
+            listEl.style.height = '180px'; // Target height for the empty-msg
+
+            setTimeout(() => {
+                listEl.style.transition = '';
+                listEl.style.height = '';
+                listEl.style.overflow = '';
+            }, 800);
+        };
+
+        dndCheck.checked = localStorage.getItem('launcher-dnd') === 'true';
+        silentCheck.checked = localStorage.getItem('launcher-silent') === 'true';
+
+        [dndCheck, silentCheck].forEach(el => el.onchange = () => {
+            localStorage.setItem('launcher-dnd', dndCheck.checked);
+            localStorage.setItem('launcher-silent', silentCheck.checked);
+            window.dispatchEvent(new Event('storage'));
+        });
+
+        window.addEventListener('storage', render);
+        render();
+
+        // Standard back button logic
+        history.replaceState({ page: 'applet' }, '');
+        history.pushState({ page: 'applet-active' }, '');
+        window.addEventListener('popstate', (e) => {
+            if (e.state && e.state.page === 'applet') {
+                document.body.classList.add('fade-out');
+                setTimeout(() => { window.location.href = 'index.html'; }, 400);
+            }
+        });
+
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                e.preventDefault();
+                document.body.classList.add('fade-out');
+                setTimeout(() => { window.location.href = btn.href; }, 400);
+            };
+        });
+    </script>
+    <script src="notifications.js"></script>
+</body>
+
+</html>

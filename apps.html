@@ -33,8 +33,14 @@
             margin: 0;
             min-height: 100vh;
             overflow-y: auto;
-            transition: background-color 0.75s ease, opacity 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            overflow-x: hidden;
+            transition: background-color 0.75s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
             animation: fadeIn 0.5s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+        }
+
+        html.navigating-back body {
+            opacity: 0 !important;
+            transition: none !important;
         }
 
         @keyframes fadeIn {
@@ -71,7 +77,8 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
+            transition: opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
         .close-btn {
@@ -107,12 +114,31 @@
             margin: 0;
         }
 
+        #categories-container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .category-section {
+            margin-bottom: 40px;
+            transition: opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1), transform 0.75s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .category-title {
+            font-size: 2vw;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            border-bottom: 2px dashed rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+            padding-left: 10px;
+            transition: opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1), transform 0.75s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
         .app-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 20px;
             width: 100%;
-            max-width: 1200px;
         }
 
         .app {
@@ -128,6 +154,7 @@
             text-decoration: none;
             background: rgba(255, 255, 255, 0.02);
             padding: 20px;
+            position: relative;
         }
 
         .app:hover {
@@ -183,6 +210,8 @@
             cursor: pointer;
             transition: all 0.2s;
             width: 100%;
+            position: relative;
+            z-index: 2;
         }
 
         .download-btn:hover:not(:disabled) {
@@ -216,8 +245,20 @@
     <script>
         document.documentElement.style.setProperty('--bg-color', localStorage.getItem('launcher-bg') || '#000');
         document.documentElement.style.setProperty('--accent-color', localStorage.getItem('launcher-accent') || '#fff');
+
+        // Match index.html logic
+        if (sessionStorage.getItem('lastAppStoreIndex') !== null) {
+            document.documentElement.classList.add('navigating-back');
+            const fade = sessionStorage.getItem('lastFadeColor');
+            if (fade && fade !== 'theme') {
+                const style = document.createElement('style');
+                style.id = 'temp-fade-style';
+                style.textContent = 'body { background-color: ' + fade + ' !important; transition: none !important; }';
+                document.documentElement.appendChild(style);
+            }
+        }
     </script>
-    <div class="header">
+    <div class="header" id="header">
         <h1>All Apps</h1>
         <a href="index.html" class="close-btn">Back</a>
     </div>
@@ -226,11 +267,15 @@
         No Internet Connection. Displaying offline apps only.
     </div>
 
-    <div class="app-grid" id="app-grid">
-        <!-- Apps will be injected here -->
+    <div id="categories-container">
+        <!-- Categories will be injected here -->
     </div>
 
     <script>
+        let animating = false;
+        let appsElements = [];
+        let allAnimatableElements = [];
+
         async function loadApps() {
             let dataApps = [];
             let isOffline = false;
@@ -250,111 +295,326 @@
                 }
                 if (!dataApps || dataApps.length === 0) {
                     dataApps = [
-                        { id: "launcher-settings", name: "Settings", url: "settings.html", about: "Configure your launcher." },
-                        { id: "about", name: "About", url: "about.html", about: "Learn more about this project." },
-                        { id: "re-arrange", name: "Arrange", url: "rearrange.html", about: "Organize your apps." }
+                        { id: "launcher-settings", name: "Settings", url: "settings.html", about: "Configure your launcher.", category: "System" },
+                        { id: "about", name: "About", url: "about.html", about: "Learn more about this project.", category: "System" },
+                        { id: "re-arrange", name: "Arrange", url: "rearrange.html", about: "Organize your apps.", category: "System" },
+                        { id: "notifications", name: "Notifications", url: "notifications.html", about: "View your notification history.", category: "System" }
                     ];
                 }
             }
 
-            const grid = document.getElementById('app-grid');
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "about", "re-arrange"]');
+            const container = document.getElementById('categories-container');
+            container.innerHTML = '';
+
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "about", "re-arrange", "notifications"]');
             const appSizes = JSON.parse(localStorage.getItem('launcher-app-sizes') || '{}');
 
             const excludeIds = ['apps'];
 
+            // Group apps by category
+            const categoriesMap = {};
             dataApps.forEach(app => {
                 if (excludeIds.includes(app.id)) return;
+                const cat = app.category || "Other";
+                if (!categoriesMap[cat]) categoriesMap[cat] = [];
+                categoriesMap[cat].push(app);
+            });
 
-                const card = document.createElement('div');
-                card.className = 'app';
-                card.tabIndex = 0;
-                card.setAttribute('aria-label', app.name);
+            // Sort category names alphabetically (maybe "System" at the end)
+            const sortedCategories = Object.keys(categoriesMap).sort((a, b) => {
+                if (a === "System") return 1;
+                if (b === "System") return -1;
+                return a.localeCompare(b);
+            });
 
-                const nameDiv = document.createElement('div');
-                nameDiv.className = 'app-name';
-                nameDiv.textContent = app.name;
+            let globalAppIndex = 0;
+            appsElements = [];
+            allAnimatableElements = [];
 
-                const aboutDiv = document.createElement('div');
-                aboutDiv.className = 'app-about';
-                aboutDiv.textContent = app.about || "";
+            sortedCategories.forEach(cat => {
+                const catSection = document.createElement('div');
+                catSection.className = 'category-section';
 
-                const isDownloaded = downloadedIds.includes(app.id);
+                const catTitle = document.createElement('h2');
+                catTitle.className = 'category-title';
+                catTitle.textContent = cat;
+                allAnimatableElements.push(catTitle);
+                catSection.appendChild(catTitle);
 
-                const sizeDiv = document.createElement('div');
-                sizeDiv.className = 'app-size';
-                if (isDownloaded) {
-                    sizeDiv.textContent = appSizes[app.id] || (app.url.endsWith('.html') ? '45 KB' : '124 MB');
-                } else {
-                    sizeDiv.textContent = '';
-                }
+                const grid = document.createElement('div');
+                grid.className = 'app-grid';
 
-                const downloadBtn = document.createElement('button');
-                downloadBtn.className = 'download-btn';
-                downloadBtn.textContent = 'Download';
+                categoriesMap[cat].forEach(app => {
+                    const card = document.createElement('div');
+                    card.className = 'app';
+                    card.tabIndex = 0;
+                    card.setAttribute('aria-label', app.name);
 
-                card.appendChild(nameDiv);
-                card.appendChild(aboutDiv);
-                card.appendChild(sizeDiv);
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'app-name';
+                    nameDiv.textContent = app.name;
 
-                // Only show download button if not installed
-                if (!isDownloaded) {
-                    card.appendChild(downloadBtn);
-                }
+                    const aboutDiv = document.createElement('div');
+                    aboutDiv.className = 'app-about';
+                    aboutDiv.textContent = app.about || "";
 
-                grid.appendChild(card);
+                    const isDownloaded = downloadedIds.includes(app.id);
 
-                const launch = (e) => {
-                    // Only launch if it's already downloaded
-                    if (!downloadedIds.includes(app.id)) {
+                    const sizeDiv = document.createElement('div');
+                    sizeDiv.className = 'app-size';
+                    if (isDownloaded) {
+                        sizeDiv.textContent = appSizes[app.id] || (app.url.endsWith('.html') ? '45 KB' : '124 MB');
+                    } else {
+                        sizeDiv.textContent = '';
+                    }
+
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.className = 'download-btn';
+                    downloadBtn.textContent = 'Download';
+
+                    card.appendChild(nameDiv);
+                    card.appendChild(aboutDiv);
+                    card.appendChild(sizeDiv);
+
+                    if (!isDownloaded) {
+                        card.appendChild(downloadBtn);
+                    }
+
+                    grid.appendChild(card);
+
+                    const currentIndex = globalAppIndex++;
+                    appsElements.push(card);
+                    allAnimatableElements.push(card);
+
+                    const downloadApp = async () => {
+                        if (downloadedIds.includes(app.id)) return;
+                        downloadBtn.textContent = 'Pre-caching...';
+                        downloadBtn.disabled = true;
+
+                        let calculatedSize = "Unknown";
+                        try {
+                            const res = await fetch(app.url, { method: 'HEAD' });
+                            let bytes = 0;
+                            if (res.ok && res.headers.has('content-length')) {
+                                bytes = parseInt(res.headers.get('content-length'), 10);
+                            } else {
+                                const getRes = await fetch(app.url);
+                                const blob = await getRes.blob();
+                                bytes = blob.size;
+                            }
+                            if (bytes < 1024) calculatedSize = bytes + ' B';
+                            else if (bytes < 1024 * 1024) calculatedSize = (bytes / 1024).toFixed(1) + ' KB';
+                            else calculatedSize = (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+                        } catch (e) {
+                            // Fallback if CORS or network error blocks fetching size
+                            calculatedSize = "Unknown";
+                        }
+
+                        // Add a minimum visual delay if the fetch was too fast
+                        setTimeout(() => {
+                            downloadedIds.push(app.id);
+                            localStorage.setItem('launcher-downloaded-ids', JSON.stringify(downloadedIds));
+
+                            const currentSizes = JSON.parse(localStorage.getItem('launcher-app-sizes') || '{}');
+                            currentSizes[app.id] = calculatedSize;
+                            localStorage.setItem('launcher-app-sizes', JSON.stringify(currentSizes));
+
+                            downloadBtn.remove();
+                            sizeDiv.textContent = calculatedSize;
+
+                            localStorage.setItem('launcher-apps-cache', JSON.stringify(dataApps));
+                        }, 500);
+                    };
+
+                    card.addEventListener('click', (e) => {
+                        if (e.target === downloadBtn) return;
+                        launchApp(card, app, currentIndex);
+                    });
+                    card.addEventListener('keydown', (e) => {
+                        if (e.target === downloadBtn) return;
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            launchApp(card, app, currentIndex);
+                        }
+                    });
+
+                    downloadBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
                         downloadApp();
-                        return;
-                    }
-
-                    if (app.fade && app.fade !== 'theme') {
-                        document.body.style.backgroundColor = app.fade;
-                    }
-                    card.style.transition = 'all 0.5s ease';
-                    card.style.transform = 'scale(2.5)';
-                    card.style.opacity = '0';
-                    setTimeout(() => {
-                        window.location.href = app.url;
-                    }, 400);
-                };
-
-                const downloadApp = () => {
-                    if (downloadedIds.includes(app.id)) return;
-                    downloadBtn.textContent = 'Pre-caching...';
-                    downloadBtn.disabled = true;
-
-                    setTimeout(() => {
-                        downloadedIds.push(app.id);
-                        localStorage.setItem('launcher-downloaded-ids', JSON.stringify(downloadedIds));
-
-                        // Generate a size
-                        const size = app.url.endsWith('.html') ?
-                            (Math.floor(Math.random() * 50) + 10) + ' KB' :
-                            (Math.floor(Math.random() * 100) + 50) + ' MB';
-
-                        const currentSizes = JSON.parse(localStorage.getItem('launcher-app-sizes') || '{}');
-                        currentSizes[app.id] = size;
-                        localStorage.setItem('launcher-app-sizes', JSON.stringify(currentSizes));
-
-                        downloadBtn.remove();
-                        sizeDiv.textContent = size;
-
-                        // Also update the full app cache for rearrange.html to see it
-                        localStorage.setItem('launcher-apps-cache', JSON.stringify(dataApps));
-                    }, 1200);
-                };
-
-                card.addEventListener('click', launch);
-                downloadBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    downloadApp();
+                    });
                 });
+
+                catSection.appendChild(grid);
+                container.appendChild(catSection);
+            });
+
+            resetAnimations();
+        }
+
+        function getAppTransitionData(targetElement) {
+            const originalTransforms = [];
+            allAnimatableElements.forEach(el => {
+                originalTransforms.push(el.style.transform);
+                el.style.transform = 'none';
+            });
+
+            const rect = targetElement.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            const data = allAnimatableElements.map(el => {
+                const elRect = el.getBoundingClientRect();
+                const elCenterX = elRect.left + elRect.width / 2;
+                const elCenterY = elRect.top + elRect.height / 2;
+                // Don't fade out the target itself in this map (handled separately)
+                if (el === targetElement) return { dx: 0, dy: 0 };
+
+                return {
+                    dx: (elCenterX - centerX) * 4,
+                    dy: (elCenterY - centerY) * 4
+                };
+            });
+
+            allAnimatableElements.forEach((el, i) => {
+                el.style.transform = originalTransforms[i];
+            });
+
+            return data;
+        }
+
+        function launchApp(card, appData, index) {
+            if (animating) return;
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '[]');
+            if (!downloadedIds.includes(appData.id)) {
+                // If clicked but not downloaded, trigger download via the button
+                const btn = card.querySelector('.download-btn');
+                if (btn) btn.click();
+                return;
+            }
+
+            animating = true;
+            const fadeColor = appData.fade;
+            const transitionStyle = 'all 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
+
+            const transitionData = getAppTransitionData(card);
+
+            if (fadeColor && fadeColor !== 'theme') {
+                document.body.style.backgroundColor = fadeColor;
+            }
+
+            document.getElementById('header').style.opacity = '0';
+
+            allAnimatableElements.forEach((el, i) => {
+                el.style.transition = transitionStyle;
+                if (el === card) {
+                    el.style.transform = 'scale(4.5)';
+                    el.style.opacity = '0';
+                } else {
+                    el.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
+                    el.style.opacity = '0';
+                }
+                el.style.pointerEvents = 'none';
+            });
+
+            sessionStorage.setItem('lastAppStoreIndex', index);
+            if (fadeColor) {
+                sessionStorage.setItem('lastFadeColor', fadeColor);
+            } else {
+                sessionStorage.removeItem('lastFadeColor');
+            }
+
+            setTimeout(() => {
+                window.location.href = appData.url;
+            }, 750);
+        }
+
+        function resetAnimations() {
+            const lastIndexStr = sessionStorage.getItem('lastAppStoreIndex');
+
+            if (lastIndexStr === null || appsElements.length === 0) {
+                document.body.style.backgroundColor = '';
+                document.documentElement.classList.remove('navigating-back');
+                allAnimatableElements.forEach(el => {
+                    el.style.transition = 'all 0.6s ease-out';
+                    el.style.transform = 'translate(0, 0) scale(1)';
+                    el.style.opacity = '1';
+                    el.style.pointerEvents = 'auto';
+                });
+                document.getElementById('header').style.opacity = '1';
+                animating = false;
+                return;
+            }
+
+            animating = true;
+            const index = parseInt(lastIndexStr);
+
+            if (index >= appsElements.length) {
+                sessionStorage.removeItem('lastAppStoreIndex');
+                animating = false;
+                return resetAnimations();
+            }
+
+            const targetCard = appsElements[index];
+            const transitionData = getAppTransitionData(targetCard);
+            const transitionStyle = 'all 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
+
+            allAnimatableElements.forEach((el, i) => {
+                el.style.transition = 'none';
+                if (el === targetCard) {
+                    el.style.transform = 'scale(4.5)';
+                } else {
+                    el.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
+                }
+                el.style.opacity = '0';
+                el.style.pointerEvents = 'none';
+            });
+            document.getElementById('header').style.opacity = '0';
+            document.getElementById('header').style.transition = 'none';
+
+            const fade = sessionStorage.getItem('lastFadeColor');
+            if (fade && fade !== 'theme') {
+                document.body.style.backgroundColor = fade;
+            }
+
+            const tempStyle = document.getElementById('temp-fade-style');
+            if (tempStyle) tempStyle.remove();
+
+            document.documentElement.classList.remove('navigating-back');
+            void document.body.offsetHeight; // Force layout
+
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    document.body.style.backgroundColor = '';
+
+                    allAnimatableElements.forEach((el, i) => {
+                        el.style.transition = transitionStyle;
+                        el.style.transform = 'translate(0, 0) scale(1)';
+                        el.style.opacity = '1';
+                        el.style.pointerEvents = 'auto';
+                    });
+
+                    document.getElementById('header').style.transition = 'opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                    document.getElementById('header').style.opacity = '1';
+
+                    setTimeout(() => {
+                        animating = false;
+                        allAnimatableElements.forEach(el => el.style.transition = '');
+                        document.getElementById('header').style.transition = 'opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                        sessionStorage.removeItem('lastAppStoreIndex');
+                        sessionStorage.removeItem('lastFadeColor');
+                    }, 800);
+                }, 50);
             });
         }
+
+        window.addEventListener('pageshow', (event) => {
+            if (appsElements.length === 0 && !animating) {
+                // If it's already loaded, loadApps won't be called here, but loadApps is called at start
+            } else if (event.persisted || performance.navigation.type === 2) {
+                resetAnimations();
+            }
+        });
+
         loadApps();
         const triggerFullscreen = () => { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(() => { }); } };
         document.addEventListener('DOMContentLoaded', triggerFullscreen);
@@ -378,6 +638,7 @@
             });
         });
     </script>
+    <script src="notifications.js"></script>
 </body>
 
 </html>
