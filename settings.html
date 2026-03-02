@@ -322,6 +322,7 @@
             if (cached) { allApps = JSON.parse(cached); }
 
             const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange"]');
+            const appSizes = JSON.parse(localStorage.getItem('launcher-app-sizes') || '{}');
             const systemIds = ["launcher-settings", "apps", "about", "re-arrange"];
 
             const installed = allApps.filter(app => downloadedIds.includes(app.id) && !systemIds.includes(app.id));
@@ -337,7 +338,8 @@
 
                 const info = document.createElement('div');
                 info.className = 'app-info';
-                info.innerHTML = `<span class="app-name-label">${app.name}</span><span style="opacity: 0.6; font-size: 0.9rem;">${app.id}</span>`;
+                const size = appSizes[app.id] || "124 MB";
+                info.innerHTML = `<span class="app-name-label">${app.name} <span style="font-size: 0.9rem; opacity: 0.5; margin-left: 10px;">${size}</span></span><span style="opacity: 0.6; font-size: 0.9rem;">${app.id}</span>`;
 
                 const delBtn = document.createElement('button');
                 delBtn.className = 'delete-btn';
@@ -357,6 +359,11 @@
             let downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '[]');
             downloadedIds = downloadedIds.filter(id => id !== appId);
             localStorage.setItem('launcher-downloaded-ids', JSON.stringify(downloadedIds));
+
+            // Remove size
+            let appSizes = JSON.parse(localStorage.getItem('launcher-app-sizes') || '{}');
+            delete appSizes[appId];
+            localStorage.setItem('launcher-app-sizes', JSON.stringify(appSizes));
 
             // Remove from grid
             let grid = JSON.parse(localStorage.getItem('launcher-grid') || '[]');

@@ -73,7 +73,7 @@
         {
             "id": "parsec",
             "name": "Parsec",
-            "url": "https://web.parsec.com",
+            "url": "https://web.parsec.app",
             "fade": "#000000",
             "about": "High-performance remote desktop tool."
         },
@@ -81,14 +81,14 @@
             "id": "spotify",
             "name": "Spotify",
             "url": "https://spotify.com",
-            "fade": "#1db954",
+            "fade": "#333333",
             "about": "Listen to music online (but it's green)."
         },
         {
             "id": "apple-music",
             "name": "Apple Music",
             "url": "https://music.apple.com",
-            "fade": "#fa243c",
+            "fade": "#ffffff",
             "about": "Listen to music online (but it's hot-pink)."
         },
         {
@@ -116,35 +116,35 @@
             "id": "vscode",
             "name": "VS Code",
             "url": "https://vscode.dev",
-            "fade": "#007acc",
+            "fade": "#333333",
             "about": "Visual Studio Code for the Web."
         },
         {
             "id": "gmail",
             "name": "GMail",
             "url": "https://mail.google.com",
-            "fade": "#ea4335",
+            "fade": "#ffffff",
             "about": "Google's email service."
         },
         {
             "id": "google-earth",
             "name": "Google Earth",
             "url": "https://earth.google.com",
-            "fade": "#4285f4",
+            "fade": "#ffffff",
             "about": "Explore the world from your browser."
         },
         {
             "id": "google-drive",
             "name": "Google Drive",
             "url": "https://drive.google.com",
-            "fade": "#4285f4",
+            "fade": "#ffffff",
             "about": "Store and share files in the cloud."
         },
         {
             "id": "google-docs",
             "name": "Google Docs",
             "url": "https://docs.google.com",
-            "fade": "#4285f4",
+            "fade": "#ffffff",
             "about": "Create and edit documents online."
         },
         {
