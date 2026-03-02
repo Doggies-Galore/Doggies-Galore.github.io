@@ -29,18 +29,26 @@
             background-color: transparent;
             color: var(--accent-color);
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            overflow-y: auto;
             width: 100vw;
             height: 100vh;
+            overflow: hidden;
+            /* Lock body, wrapper will scroll */
+        }
+
+        .page-wrapper {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px;
             opacity: 0;
             transform: scale(0.9);
+            -webkit-overflow-scrolling: touch;
         }
 
-        body.ready {
+        .page-wrapper.ready {
             transition: background-color 0.75s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
             opacity: 1;
             transform: scale(1);
@@ -340,6 +348,46 @@
             flex: 1;
             opacity: 0.7;
         }
+
+        select.settings-select {
+            appearance: none;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 10px 18px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        select.settings-select:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        select.settings-select:disabled {
+            opacity: 0.35;
+            cursor: default;
+        }
+
+        .tz-offset-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tz-label {
+            font-size: 1.3rem;
+            min-width: 110px;
+            text-align: center;
+            font-weight: bold;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
     </style>
 </head>
 
@@ -354,46 +402,127 @@
             window.addEventListener('DOMContentLoaded', () => {
                 requestAnimationFrame(() => {
                     document.documentElement.classList.add('ready');
-                    document.body.classList.add('ready');
+                    document.querySelector('.page-wrapper').classList.add('ready');
                 });
             });
         })();
     </script>
-    <div class="header">
-        <h1>Settings</h1>
-        <a href="index.html" class="close-btn">Back</a>
-    </div>
-
-    <!-- Clock Settings -->
-    <div class="section" style="text-align: center;">
-        <h2 class="section-title">Clock Preferences</h2>
-        <div class="row">
-            <label><input type="checkbox" id="check-24hr"> 24-Hour Mode</label>
-            <label style="margin-left: 30px;"><input type="checkbox" id="check-seconds"> Show Seconds</label>
+    <div class="page-wrapper">
+        <div class="header">
+            <h1>Settings</h1>
+            <a href="index.html" class="close-btn">Back</a>
         </div>
-    </div>
 
-    <div class="section" style="text-align: center;">
-        <h2 class="section-title">Notification & Sync Settings</h2>
-        <div id="sync-status" style="margin-bottom: 20px; font-weight: bold; opacity: 0.8;">Status: Loading...</div>
-        <div
-            style="display: flex; flex-direction: column; gap: 20px; align-items: center; max-width: 500px; margin: 0 auto;">
-            <button id="config-btn" class="btn"
-                style="width: 100%; background: var(--accent-color); color: var(--bg-color);">Configure Sync &
-                Notifications...</button>
+        <!-- Clock Settings -->
+        <div class="section" style="text-align: center;">
+            <h2 class="section-title">Clock Preferences</h2>
+            <div class="row">
+                <label><input type="checkbox" id="check-24hr"> 24-Hour Mode</label>
+                <label style="margin-left: 30px;"><input type="checkbox" id="check-seconds"> Show Seconds</label>
+            </div>
+        </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
-                <button id="backup-btn" class="btn" style="font-size: 0.9rem; padding: 10px;">File Backup</button>
-                <button id="restore-btn" class="btn" style="font-size: 0.9rem; padding: 10px;">File Restore</button>
-                <button id="cloud-backup-btn" class="btn" style="font-size: 0.9rem; padding: 10px;">Cloud
-                    Backup</button>
-                <button id="cloud-restore-btn" class="btn" style="font-size: 0.9rem; padding: 10px;">Cloud
-                    Restore</button>
+        <!-- Date & Time Preferences -->
+        <div class="section" style="text-align: center;">
+            <h2 class="section-title">Date &amp; Time Preferences</h2>
+
+            <!-- Date Format -->
+            <div style="margin-bottom: 25px;">
+                <div style="font-size: 1.2rem; opacity: 0.7; margin-bottom: 12px;">Date Format</div>
+                <select class="settings-select" id="sel-date-format">
+                    <option value="short">Short &mdash; Mon 3/2</option>
+                    <option value="medium">Medium &mdash; Mon, Mar 2</option>
+                    <option value="long">Long &mdash; Monday, March 2, 2026</option>
+                    <option value="numeric">Numeric &mdash; 03/02/2026</option>
+                    <option value="iso">ISO &mdash; 2026-03-02</option>
+                </select>
             </div>
 
-            <div class="row" style="margin-top: 10px;">
-                <label><input type="checkbox" id="check-dnd"> Do Not Disturb</label>
-                <label style="margin-left: 30px;"><input type="checkbox" id="check-silent"> Do Not Receive</label>
+            <!-- Manual Timezone -->
+            <div style="margin-bottom: 18px;">
+                <label style="font-size: 1.3rem;">
+                    <input type="checkbox" id="check-tz-manual">
+                    Manual UTC Offset
+                </label>
+                <div style="font-size: 0.95rem; opacity: 0.5; margin-top: 6px;">
+                    Override the system timezone with a custom UTC offset.
+                </div>
+            </div>
+            <div class="tz-offset-wrap">
+                <input type="range" id="tz-offset-slider" min="-840" max="840" step="30" value="0"
+                    style="width: 260px; accent-color: var(--accent-color); cursor: pointer;">
+                <span class="tz-label" id="tz-offset-label">UTC±0:00</span>
+            </div>
+        </div>
+
+        <div class="section" style="text-align: center;">
+            <h2 class="section-title">Cloud Sync & Notifications</h2>
+            <div id="sync-status" style="margin-bottom: 20px; font-weight: bold; opacity: 0.8;">Status: Loading...</div>
+            <div
+                style="display: flex; flex-direction: column; gap: 20px; align-items: center; max-width: 500px; margin: 0 auto;">
+                <button id="config-btn" class="btn"
+                    style="width: 100%; background: var(--accent-color); color: var(--bg-color);">Configure Sync &
+                    Notifications...</button>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
+                    <button id="cloud-backup-btn" class="btn" style="font-size: 0.9rem; padding: 10px;">Cloud
+                        Backup</button>
+                    <button id="cloud-restore-btn" class="btn" style="font-size: 0.9rem; padding: 10px;">Cloud
+                        Restore</button>
+                </div>
+
+                <div class="row" style="margin-top: 10px;">
+                    <label><input type="checkbox" id="check-dnd"> Do Not Disturb</label>
+                    <label style="margin-left: 30px;"><input type="checkbox" id="check-silent"> Do Not Receive</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Presets -->
+        <div class="section" style="text-align: center;">
+            <h2 class="section-title">Theme Presets</h2>
+            <div class="theme-grid">
+                <button class="btn" onclick="setTheme('#000000', '#ffffff')">IAmAnOLED</button>
+                <button class="btn" onclick="setTheme('#1a1a1a', '#ffffff')">Dark Gray</button>
+                <button class="btn" onclick="setTheme('#ffffff', '#000000')">Light Mode</button>
+                <button class="btn" onclick="setTheme('#001524', '#ffecd1')">Midnight</button>
+                <button class="btn" onclick="setTheme('#2d1b4e', '#d4b8ff')">Purple</button>
+                <button class="btn" onclick="setTheme('#4a1528', '#ffb3c6')">Pink</button>
+                <button class="btn" onclick="setTheme('#3d1c00', '#ffb067')">Orange</button>
+                <button class="btn" onclick="setTheme('#0b2b1d', '#a3ffcc')">Forest</button>
+                <button class="btn" onclick="setTheme('#001f3f', '#80c4ff')">Ocean</button>
+                <button class="btn" onclick="setTheme('#330000', '#ff9999')">Crimson</button>
+                <button class="btn" onclick="setTheme('#0d1117', '#00ff00')">Hacker</button>
+                <button class="btn" onclick="setTheme('#2d0c18', '#ffcc80')">Sunset</button>
+                <button class="btn" onclick="setTheme('#000000', '#0000ff')">Rainyware</button>
+                <button class="btn" onclick="setTheme('#00ff00', '#006600')">TIME FOR GREEN!!!!!</button>
+                <button class="btn" onclick="setTheme('#000000', '#ff0000')">HellofaBluelightFilter</button>
+                <button class="btn" onclick="setTheme('#1a0d0b', '#d4a373')">Coffiest</button>
+                <button class="btn" onclick="setTheme('#000000', '#f39c12')">Tux</button>
+                <button class="btn" onclick="setTheme('#4b2e2a', '#fff3e0')">Cuddlebug</button>
+            </div>
+        </div>
+
+        <!-- Custom Theme -->
+        <div class="section" style="text-align: center;">
+            <h2 class="section-title">Custom Theme</h2>
+            <div class="row">
+                <div class="color-picker-wrap">
+                    <span>Background</span>
+                    <input type="color" id="bgcolorpicker">
+                </div>
+                <div class="color-picker-wrap" style="margin-left: 50px;">
+                    <span>Accent</span>
+                    <input type="color" id="accolorpicker">
+                </div>
+            </div>
+        </div>
+
+        <!-- App Management -->
+        <div class="section" style="text-align: center;">
+            <h2 class="section-title">App Management</h2>
+            <div id="installed-apps-list" class="app-list">
+                <!-- Apps will be listed here -->
             </div>
         </div>
     </div>
@@ -420,6 +549,28 @@
                 <span>Auth Token / Password</span>
                 <input type="password" id="modal-ws-token" class="modal-input" placeholder="••••••••">
             </div>
+
+            <!-- Registration Only Enrollment Fields -->
+            <div id="register-enrollment"
+                style="display: none; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 10px;">
+                <h4 style="margin: 0 0 15px 0; opacity: 0.8; font-size: 0.9rem;">Notification Enrollment (Optional)</h4>
+                <div class="modal-field">
+                    <span>Discord Token</span>
+                    <input type="password" id="modal-discord-token" class="modal-input"
+                        placeholder="Your Discord Token">
+                </div>
+                <div class="modal-field">
+                    <span>Tumblr API Key</span>
+                    <input type="password" id="modal-tumblr-key" class="modal-input"
+                        placeholder="Your Tumblr API Consumer Key">
+                </div>
+                <div class="modal-field">
+                    <span>Tracked Blogs (One per line)</span>
+                    <textarea id="modal-tumblr-blogs" class="modal-input"
+                        style="height: 100px; resize: none; font-family: monospace; font-size: 0.9rem;"
+                        placeholder="blog-name-1&#10;blog-name-2"></textarea>
+                </div>
+            </div>
             <div id="modal-error" class="modal-error-msg"></div>
             <div class="modal-actions">
                 <button class="btn modal-cancel-btn" id="modal-cancel" style="border: none;">Cancel</button>
@@ -428,53 +579,34 @@
         </div>
     </div>
 
-
-    <!-- Presets -->
-    <div class="section" style="text-align: center;">
-        <h2 class="section-title">Theme Presets</h2>
-        <div class="theme-grid">
-            <button class="btn" onclick="setTheme('#000000', '#ffffff')">IAmAnOLED</button>
-            <button class="btn" onclick="setTheme('#1a1a1a', '#ffffff')">Dark Gray</button>
-            <button class="btn" onclick="setTheme('#ffffff', '#000000')">Light Mode</button>
-            <button class="btn" onclick="setTheme('#001524', '#ffecd1')">Midnight</button>
-            <button class="btn" onclick="setTheme('#2d1b4e', '#d4b8ff')">Purple</button>
-            <button class="btn" onclick="setTheme('#4a1528', '#ffb3c6')">Pink</button>
-            <button class="btn" onclick="setTheme('#3d1c00', '#ffb067')">Orange</button>
-            <button class="btn" onclick="setTheme('#0b2b1d', '#a3ffcc')">Forest</button>
-            <button class="btn" onclick="setTheme('#001f3f', '#80c4ff')">Ocean</button>
-            <button class="btn" onclick="setTheme('#330000', '#ff9999')">Crimson</button>
-            <button class="btn" onclick="setTheme('#0d1117', '#00ff00')">Hacker</button>
-            <button class="btn" onclick="setTheme('#2d0c18', '#ffcc80')">Sunset</button>
-            <button class="btn" onclick="setTheme('#000000', '#0000ff')">Rainyware</button>
-            <button class="btn" onclick="setTheme('#00ff00', '#006600')">TIME FOR GREEN!!!!!</button>
-            <button class="btn" onclick="setTheme('#000000', '#ff0000')">HellofaBluelightFilter</button>
-        </div>
-    </div>
-
-    <!-- Custom Theme -->
-    <div class="section" style="text-align: center;">
-        <h2 class="section-title">Custom Theme</h2>
-        <div class="row">
-            <div class="color-picker-wrap">
-                <span>Background</span>
-                <input type="color" id="bgcolorpicker">
+    <!-- Unified Prompt Modal (replaces alert/confirm) -->
+    <div class="modal-overlay" id="prompt-modal">
+        <div class="modal-content">
+            <h3 id="prompt-title">Heads Up</h3>
+            <p id="prompt-message" style="font-size: 1.2rem; margin-bottom: 30px; line-height: 1.5; opacity: 0.9;"></p>
+            <div class="modal-actions">
+                <button class="btn modal-cancel-btn" id="prompt-cancel-btn" style="border: none;">Cancel</button>
+                <button class="btn modal-save-btn" id="prompt-ok-btn">OK</button>
             </div>
-            <div class="color-picker-wrap" style="margin-left: 50px;">
-                <span>Accent</span>
-                <input type="color" id="accolorpicker">
-            </div>
-        </div>
-    </div>
-
-    <!-- App Management -->
-    <div class="section" style="text-align: center;">
-        <h2 class="section-title">App Management</h2>
-        <div id="installed-apps-list" class="app-list">
-            <!-- Apps will be listed here -->
         </div>
     </div>
 
     <script>
+        (function () {
+            const bg = localStorage.getItem('launcher-bg') || '#000000';
+            const accent = localStorage.getItem('launcher-accent') || '#ffffff';
+            document.documentElement.style.setProperty('--bg-color', bg);
+            document.documentElement.style.setProperty('--accent-color', accent);
+
+            window.addEventListener('DOMContentLoaded', () => {
+                requestAnimationFrame(() => {
+                    document.documentElement.classList.add('ready');
+                    document.querySelector('.page-wrapper').classList.add('ready');
+                });
+            });
+
+        })();
+
         const check24hr = document.getElementById('check-24hr');
         const checkSeconds = document.getElementById('check-seconds');
 
@@ -488,11 +620,66 @@
             localStorage.setItem('launcher-seconds', e.target.checked);
         });
 
+        // ── Date format ──────────────────────────────────────────────────────
+        const selDateFormat = document.getElementById('sel-date-format');
+        selDateFormat.value = localStorage.getItem('launcher-date-format') || 'short';
+        selDateFormat.addEventListener('change', () => {
+            localStorage.setItem('launcher-date-format', selDateFormat.value);
+            window.dispatchEvent(new StorageEvent('storage', { key: 'launcher-date-format', newValue: selDateFormat.value }));
+        });
+
+        // ── Timezone offset ──────────────────────────────────────────────────
+        const checkTZManual = document.getElementById('check-tz-manual');
+        const tzSlider = document.getElementById('tz-offset-slider');
+        const tzLabel = document.getElementById('tz-offset-label');
+
+        function minutesToLabel(min) {
+            const sign = min >= 0 ? '+' : '−';
+            const abs = Math.abs(min);
+            const h = Math.floor(abs / 60);
+            const m = abs % 60;
+            return 'UTC' + sign + h + ':' + String(m).padStart(2, '0');
+        }
+
+        function applyTZState() {
+            const manual = checkTZManual.checked;
+            tzSlider.disabled = !manual;
+            tzLabel.style.opacity = manual ? '1' : '0.4';
+            tzLabel.textContent = manual ? minutesToLabel(parseInt(tzSlider.value)) : '(system)';
+        }
+
+        // Load saved state
+        checkTZManual.checked = localStorage.getItem('launcher-tz-manual') === 'true';
+        tzSlider.value = parseInt(localStorage.getItem('launcher-tz-offset') || '0');
+        applyTZState();
+
+        checkTZManual.addEventListener('change', () => {
+            localStorage.setItem('launcher-tz-manual', checkTZManual.checked);
+            applyTZState();
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: 'launcher-tz-manual', newValue:
+                    String(checkTZManual.checked)
+            }));
+        });
+
+        tzSlider.addEventListener('input', () => {
+            tzLabel.textContent = minutesToLabel(parseInt(tzSlider.value));
+        });
+        tzSlider.addEventListener('change', () => {
+            localStorage.setItem('launcher-tz-offset', tzSlider.value);
+            window.dispatchEvent(new StorageEvent('storage', { key: 'launcher-tz-offset', newValue: tzSlider.value }));
+        });
+
         // Notification & Sync Logic
         const configBtn = document.getElementById('config-btn');
         const syncStatus = document.getElementById('sync-status');
         const checkDND = document.getElementById('check-dnd');
         const checkSilent = document.getElementById('check-silent');
+        const pageWrapper = document.querySelector('.page-wrapper');
+
+        function toggleScroll(lock) {
+            pageWrapper.style.overflowY = lock ? 'hidden' : 'auto';
+        }
 
         checkDND.checked = localStorage.getItem('launcher-dnd') === 'true';
         checkSilent.checked = localStorage.getItem('launcher-silent') === 'true';
@@ -500,7 +687,7 @@
         function updateSyncUI(status) {
             const colors = {
                 connected: '#00ff00',
-                connecting: '#ffff00',
+                connecting: '#ffcc00',
                 disconnected: '#ff9900',
                 error: '#ff0000',
                 unconfigured: '#888',
@@ -533,6 +720,7 @@
 
         function setMode(mode) {
             currentMode = mode;
+            const enrollment = document.getElementById('register-enrollment');
             if (mode === 'login') {
                 modalTitle.textContent = 'Sign In';
                 modalSaveBtn.textContent = 'Connect';
@@ -542,6 +730,7 @@
                 modeRegister.style.background = 'transparent';
                 modeRegister.style.color = 'var(--accent-color)';
                 modeRegister.style.opacity = '0.6';
+                if (enrollment) enrollment.style.display = 'none';
             } else {
                 modalTitle.textContent = 'Create Account';
                 modalSaveBtn.textContent = 'Register & Connect';
@@ -551,6 +740,7 @@
                 modeLogin.style.background = 'transparent';
                 modeLogin.style.color = 'var(--accent-color)';
                 modeLogin.style.opacity = '0.6';
+                if (enrollment) enrollment.style.display = 'block';
             }
         }
 
@@ -563,10 +753,12 @@
             modalInputToken.value = localStorage.getItem('launcher-ws-token') || "";
             setMode('login');
             modal.classList.add('active');
+            toggleScroll(true);
         });
 
         modalCancelBtn.addEventListener('click', () => {
             modal.classList.remove('active');
+            toggleScroll(false);
         });
 
         const modalError = document.getElementById('modal-error');
@@ -602,7 +794,19 @@
 
                 ws.onopen = () => {
                     clearTimeout(timeout);
-                    ws.send(JSON.stringify({ type: currentMode, username, token }));
+                    const blogs = document.getElementById('modal-tumblr-blogs').value.split('\n').map(s => s.trim()).filter(s => s);
+                    const discord_token = document.getElementById('modal-discord-token').value.trim();
+                    const tumblr_key = document.getElementById('modal-tumblr-key').value.trim();
+
+                    const payload = {
+                        type: currentMode,
+                        username,
+                        token,
+                        discord_token: discord_token || null,
+                        tumblr_key: tumblr_key || null,
+                        tumblr_blogs: blogs.length ? blogs : []
+                    };
+                    ws.send(JSON.stringify(payload));
                 };
 
                 ws.onmessage = (e) => {
@@ -640,9 +844,47 @@
             }
         });
 
+        // ── Custom Prompt System ──────────────────────────────────────────────
+        const promptModal = document.getElementById('prompt-modal');
+        const promptTitle = document.getElementById('prompt-title');
+        const promptMessage = document.getElementById('prompt-message');
+        const promptOkBtn = document.getElementById('prompt-ok-btn');
+        const promptCancelBtn = document.getElementById('prompt-cancel-btn');
+
+        async function showPrompt(title, message, isConfirm = false) {
+            return new Promise((resolve) => {
+                promptTitle.textContent = title;
+                promptMessage.textContent = message;
+                promptCancelBtn.style.display = isConfirm ? 'block' : 'none';
+                promptOkBtn.textContent = isConfirm ? 'Continue' : 'OK';
+
+                const close = (result) => {
+                    promptModal.classList.remove('active');
+                    toggleScroll(false);
+                    promptOkBtn.onclick = null;
+                    promptCancelBtn.onclick = null;
+                    resolve(result);
+                };
+
+                promptOkBtn.onclick = () => close(true);
+                promptCancelBtn.onclick = () => close(false);
+                promptModal.classList.add('active');
+                toggleScroll(true);
+            });
+        }
+
         // Close on overlay click
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) modal.classList.remove('active');
+            if (e.target === modal) {
+                modal.classList.remove('active');
+                toggleScroll(false);
+            }
+        });
+        promptModal.addEventListener('click', (e) => {
+            if (e.target === promptModal) {
+                promptModal.classList.remove('active');
+                toggleScroll(false);
+            }
         });
 
         [checkDND, checkSilent].forEach(el => el.addEventListener('change', () => {
@@ -651,47 +893,11 @@
             window.dispatchEvent(new Event('storage'));
         }));
 
-        // Backup & Restore Logic
+        // Remove File Backup/Restore JS as the buttons are removed
+        /*
         const backupBtn = document.getElementById('backup-btn');
-        const restoreBtn = document.getElementById('restore-btn');
-
-        backupBtn.addEventListener('click', () => {
-            const data = JSON.stringify(localStorage);
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `launcher-backup-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        });
-
-        restoreBtn.addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'application/json';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (re) => {
-                    try {
-                        const data = JSON.parse(re.target.result);
-                        if (confirm("This will overwrite your current settings and layout. Continue?")) {
-                            localStorage.clear();
-                            for (const key in data) {
-                                localStorage.setItem(key, data[key]);
-                            }
-                            window.location.reload();
-                        }
-                    } catch (err) {
-                        alert("Invalid backup file.");
-                    }
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-        });
+        ...
+        */
 
         // Cloud Backup/Restore
         const cloudBackupBtn = document.getElementById('cloud-backup-btn');
@@ -703,7 +909,7 @@
             const token = localStorage.getItem('launcher-ws-token');
 
             if (!address || !username || !token) {
-                alert("Please configure Sync (WebSocket) first.");
+                showPrompt("Sync Required", "Please configure Sync (WebSocket) first.");
                 return;
             }
 
@@ -740,9 +946,9 @@
             try {
                 const data = { ...localStorage };
                 await sendCloudCommand('backup', { data });
-                alert("Cloud backup successful!");
+                showPrompt("Cloud Backup", "Cloud backup successful!");
             } catch (err) {
-                alert("Cloud backup failed: " + err);
+                showPrompt("Cloud Backup Error", "Cloud backup failed: " + err);
             } finally {
                 cloudBackupBtn.textContent = "Cloud Backup";
                 cloudBackupBtn.disabled = false;
@@ -750,7 +956,7 @@
         });
 
         cloudRestoreBtn.addEventListener('click', async () => {
-            if (!confirm("This will overwrite local data with cloud data. Continue?")) return;
+            if (!(await showPrompt("Cloud Restore", "This will overwrite local data with cloud data. Continue?", true))) return;
             cloudRestoreBtn.textContent = "Restoring...";
             cloudRestoreBtn.disabled = true;
             try {
@@ -762,10 +968,10 @@
                     }
                     window.location.reload();
                 } else {
-                    alert("No cloud backup found.");
+                    showPrompt("Cloud Restore", "No cloud backup found.");
                 }
             } catch (err) {
-                alert("Cloud restore failed: " + err);
+                showPrompt("Cloud Restore Error", "Cloud restore failed: " + err);
             } finally {
                 cloudRestoreBtn.textContent = "Cloud Restore";
                 cloudRestoreBtn.disabled = false;
@@ -809,7 +1015,9 @@
                     }
                 }
 
-                info.innerHTML = `<span class="app-name-label">${app.name} <span style="font-size: 0.9rem; opacity: 0.5; margin-left: 10px;">${size}</span></span><span style="opacity: 0.6; font-size: 0.9rem;">${app.id}</span>`;
+                info.innerHTML = `<span class="app-name-label">${app.name} <span
+            style="font-size: 0.9rem; opacity: 0.5; margin-left: 10px;">${size}</span></span><span
+        style="opacity: 0.6; font-size: 0.9rem;">${app.id}</span>`;
 
                 const delBtn = document.createElement('button');
                 delBtn.className = 'delete-btn';
@@ -877,13 +1085,19 @@
             ctx.fillStyle = colorStr;
             return ctx.fillStyle;
         }
-        bgPicker.value = RgbToHex(getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim() || '#000000');
-        acPicker.value = RgbToHex(getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#ffffff');
+        bgPicker.value = RgbToHex(getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim() ||
+            '#000000');
+        acPicker.value = RgbToHex(getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() ||
+            '#ffffff');
 
         bgPicker.addEventListener('input', (e) => setTheme(e.target.value, localStorage.getItem('launcher-accent')));
         acPicker.addEventListener('input', (e) => setTheme(localStorage.getItem('launcher-bg'), e.target.value));
 
-        const triggerFullscreen = () => { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(() => { }); } };
+        const triggerFullscreen = () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => { });
+            }
+        };
         document.addEventListener('DOMContentLoaded', triggerFullscreen);
         document.body.addEventListener('click', triggerFullscreen, { once: true });
 

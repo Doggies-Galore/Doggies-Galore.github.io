@@ -795,20 +795,27 @@
             el.addEventListener('touchstart', (e) => {
                 if (e.touches.length > 1) return;
                 const touch = e.touches[0];
+                const rect = el.getBoundingClientRect();
+                // Record where exactly in the element the finger landed
+                const grabOffsetX = touch.clientX - rect.left;
+                const grabOffsetY = touch.clientY - rect.top;
+
                 touchData = {
                     id, inGrid, index, isFolder,
                     startX: touch.clientX,
                     startY: touch.clientY,
-                    startTime: Date.now()
+                    startTime: Date.now(),
+                    grabOffsetX,
+                    grabOffsetY
                 };
 
-                // Create ghost
+                // Create ghost using element's actual rendered size
                 ghost = el.cloneNode(true);
                 ghost.classList.add('touch-ghost');
-                ghost.style.width = el.offsetWidth + 'px';
-                ghost.style.height = el.offsetHeight + 'px';
-                ghost.style.left = (touch.clientX - (el.offsetWidth / 2)) + 'px';
-                ghost.style.top = (touch.clientY - (el.offsetHeight / 2)) + 'px';
+                ghost.style.width = rect.width + 'px';
+                ghost.style.height = rect.height + 'px';
+                ghost.style.left = (touch.clientX - grabOffsetX) + 'px';
+                ghost.style.top = (touch.clientY - grabOffsetY) + 'px';
                 document.body.appendChild(ghost);
             }, { passive: false });
 
@@ -816,8 +823,9 @@
                 if (!ghost || !touchData) return;
                 e.preventDefault();
                 const touch = e.touches[0];
-                ghost.style.left = (touch.clientX - (ghost.offsetWidth / 2)) + 'px';
-                ghost.style.top = (touch.clientY - (ghost.offsetHeight / 2)) + 'px';
+                // Follow the finger at the grab point (not centered)
+                ghost.style.left = (touch.clientX - (touchData.grabOffsetX || ghost.offsetWidth / 2)) + 'px';
+                ghost.style.top = (touch.clientY - (touchData.grabOffsetY || ghost.offsetHeight / 2)) + 'px';
             }, { passive: false });
 
             el.addEventListener('touchend', (e) => {
@@ -852,17 +860,51 @@
             });
         }
 
+        // Returns true if 're-arrange' is reachable anywhere in userGrid:
+        // directly in a slot OR inside any folder's apps array.
+        // Uses a temporary-null trick so you can test "after removing slot X".
+        function reArrangeExistsAnywhere() {
+            for (const item of userGrid) {
+                if (!item) continue;
+                if (item === 're-arrange') return true;
+                if (typeof item === 'object' && item.type === 'folder' && Array.isArray(item.apps)) {
+                    if (item.apps.includes('re-arrange')) return true;
+                }
+            }
+            return false;
+        }
+
+        // Returns false if removing/replacing grid[idx] would make re-arrange unreachable.
+        // Protects both direct re-arrange slots AND folders that are the last home of re-arrange.
+        // Because currentFolder.apps is a live reference inside userGrid, temporarily
+        // nulling the slot covers both root and folder cases identically.
+        function canReplaceAt(grid, idx) {
+            const item = grid[idx];
+            // Quick pass: only bother with the temp-null test if the slot could be
+            // sheltering the last re-arrange (either directly or inside a folder).
+            const holdsReArrange =
+                item === 're-arrange' ||
+                (typeof item === 'object' && item?.type === 'folder' &&
+                    Array.isArray(item.apps) && item.apps.includes('re-arrange'));
+            if (!holdsReArrange) return true;
+
+            // Temporarily remove this slot and see if re-arrange is still reachable.
+            grid[idx] = null;
+            const ok = reArrangeExistsAnywhere();
+            grid[idx] = item;
+            return ok;
+        }
+
         function dropIntoSlot(targetIndex, data) {
             const grid = activeGrid();
             if (data.inGrid) {
+                // Swap: re-arrange stays in the grid, just changes position — always allowed
                 const temp = grid[targetIndex];
                 grid[targetIndex] = grid[data.index];
                 grid[data.index] = temp;
             } else {
-                if (currentFolder && data.id === 're-arrange') return;
-                if (!currentFolder && grid[targetIndex] === 're-arrange') {
-                    if (grid.filter(id => id === 're-arrange').length <= 1) return;
-                }
+                // Overwrite: protect re-arrange if it would become unreachable
+                if (!canReplaceAt(grid, targetIndex)) return;
                 grid[targetIndex] = data.id;
             }
             renderGrid();
@@ -871,9 +913,7 @@
         function removeFromGrid(idx) {
             if (idx === -1) return;
             const grid = activeGrid();
-            if (!currentFolder && grid[idx] === 're-arrange') {
-                if (grid.filter(id => id === 're-arrange').length <= 1) return;
-            }
+            if (!canReplaceAt(grid, idx)) return;
             grid[idx] = null;
             renderGrid();
         }
@@ -1005,10 +1045,7 @@
                 if (source === 'grid') {
                     const sourceIndex = parseInt(e.dataTransfer.getData('sourceIndex'));
                     const grid = activeGrid();
-                    if (!currentFolder && grid[sourceIndex] === 're-arrange') {
-                        const count = grid.filter(id => id === 're-arrange').length;
-                        if (count <= 1) return; // Protect the last re-arrange from deletion
-                    }
+                    if (!canReplaceAt(grid, sourceIndex)) return;
                     grid[sourceIndex] = null;
                     renderGrid();
                 }

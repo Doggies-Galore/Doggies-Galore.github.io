@@ -211,11 +211,17 @@
         const timeEl = document.getElementById('time');
         let use24hr = localStorage.getItem('launcher-24hr') === 'true';
         let showSeconds = localStorage.getItem('launcher-seconds') !== 'false';
+        let dateFormat = localStorage.getItem('launcher-date-format') || 'short';
+        let tzManual = localStorage.getItem('launcher-tz-manual') === 'true';
+        let tzOffset = parseInt(localStorage.getItem('launcher-tz-offset') || '0'); // minutes
 
         // Listen for storage changes in case settings applet updates them
         window.addEventListener('storage', (e) => {
             if (e.key === 'launcher-24hr') use24hr = e.newValue === 'true';
             if (e.key === 'launcher-seconds') showSeconds = e.newValue !== 'false';
+            if (e.key === 'launcher-date-format') dateFormat = e.newValue || 'short';
+            if (e.key === 'launcher-tz-manual') tzManual = e.newValue === 'true';
+            if (e.key === 'launcher-tz-offset') tzOffset = parseInt(e.newValue || '0');
             if (e.key === 'launcher-bg') {
                 document.documentElement.style.setProperty('--bg-color', e.newValue);
                 if (!document.documentElement.classList.contains('navigating-back') && !animating) {
@@ -228,10 +234,41 @@
 
         function updateDateTime() {
             const now = new Date();
-            dateEl.textContent = now.toLocaleDateString(undefined, { weekday: 'short', month: 'numeric', day: 'numeric' });
-            const options = { hour: 'numeric', minute: '2-digit', hour12: !use24hr };
-            if (showSeconds) options.second = '2-digit';
-            timeEl.textContent = now.toLocaleTimeString([], options);
+
+            // Determine the display time: shift to manual offset if enabled
+            let displayDate;
+            if (tzManual) {
+                // Convert now to UTC, then add desired offset
+                const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+                displayDate = new Date(utcMs + tzOffset * 60000);
+            } else {
+                displayDate = now;
+            }
+
+            // Format date according to preference
+            let dateStr;
+            if (dateFormat === 'iso') {
+                const y = displayDate.getFullYear();
+                const mo = String(displayDate.getMonth() + 1).padStart(2, '0');
+                const d = String(displayDate.getDate()).padStart(2, '0');
+                dateStr = y + '-' + mo + '-' + d;
+            } else if (dateFormat === 'numeric') {
+                dateStr = displayDate.toLocaleDateString(undefined, { month: '2-digit', day: '2-digit', year: 'numeric' });
+            } else if (dateFormat === 'long') {
+                dateStr = displayDate.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            } else if (dateFormat === 'medium') {
+                dateStr = displayDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+            } else {
+                // short (default)
+                dateStr = displayDate.toLocaleDateString(undefined, { weekday: 'short', month: 'numeric', day: 'numeric' });
+            }
+            dateEl.textContent = dateStr;
+
+            // Format time (always base on the shifted displayDate hours/minutes)
+            const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: !use24hr };
+            if (showSeconds) timeOptions.second = '2-digit';
+            // Use a fixed locale time string from displayDate
+            timeEl.textContent = displayDate.toLocaleTimeString([], timeOptions);
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
@@ -471,7 +508,11 @@
 
             apps.forEach((a, i) => {
                 a.style.transition = transitionStyle;
-                a.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
+                if (transitionData[i]) {
+                    a.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
+                } else {
+                    a.style.transform = 'scale(4.5)';
+                }
                 a.style.opacity = '0';
                 a.style.pointerEvents = 'none';
             });
@@ -505,10 +546,17 @@
 
             apps.forEach((a, i) => {
                 a.style.transition = transitionStyle;
-                a.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
+                if (transitionData[i]) {
+                    a.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
+                } else {
+                    a.style.transform = 'scale(4.5)';
+                }
                 a.style.opacity = '0';
                 a.style.pointerEvents = 'none';
             });
+
+            // Store folder index for return animation
+            sessionStorage.setItem('openFolderIndex', index);
 
             setTimeout(() => {
                 currentFolder = folderObj;
@@ -567,18 +615,47 @@
 
                 const copyFolder = currentFolder;
                 currentFolder = null;
+                sessionStorage.removeItem('openFolderId');
 
-                // Which index in root grid was this folder?
-                const folderIndexInGrid = userGrid.findIndex(x => x === copyFolder);
-                const actualAppIndex = userGrid.slice(0, folderIndexInGrid).filter(x => x).length;
+                // Try to identify which index to return to
+                let safeIndex = 0;
+                let found = false;
+
+                if (copyFolder) {
+                    const idx = userGrid.findIndex(x => x && typeof x === 'object' && (x.id === copyFolder.id || x.name === copyFolder.name));
+                    if (idx >= 0) {
+                        safeIndex = idx;
+                        found = true;
+                    }
+                }
+
+                // Fallback to stored index if search fails
+                if (!found) {
+                    const storedIdx = sessionStorage.getItem('openFolderIndex');
+                    if (storedIdx !== null) safeIndex = parseInt(storedIdx);
+                }
+
+                const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications"]');
+                const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications"];
+                const actualAppIndex = userGrid.slice(0, safeIndex).filter(item => {
+                    if (!item) return false;
+                    if (typeof item === 'object') return true;
+                    return downloadedIds.includes(item) || systemIds.includes(item);
+                }).length;
 
                 renderGridContents(userGrid);
+                void document.body.offsetHeight; // Force layout before computing rects
 
                 const transitionData = getAppTransitionData(actualAppIndex);
+                const hasData = transitionData && transitionData.length === apps.length;
 
                 apps.forEach((a, i) => {
                     a.style.transition = 'none';
-                    a.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
+                    if (hasData) {
+                        a.style.transform = `translate(${transitionData[i].dx}px, ${transitionData[i].dy}px) scale(4.5)`;
+                    } else {
+                        a.style.transform = 'scale(4.5)';
+                    }
                     a.style.opacity = '0';
                     a.style.pointerEvents = 'none';
                 });
@@ -594,6 +671,8 @@
                     a.style.opacity = '1';
                     a.style.pointerEvents = 'auto';
                 });
+
+                sessionStorage.removeItem('openFolderIndex');
 
                 setTimeout(() => {
                     animating = false;

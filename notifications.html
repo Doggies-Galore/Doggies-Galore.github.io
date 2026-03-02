@@ -192,29 +192,24 @@
 
         .empty-msg {
             text-align: center;
-            opacity: 0;
             font-size: 1.5rem;
-            overflow: hidden;
+            padding: 60px 40px;
+            opacity: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            transform-origin: top;
-            animation: stretchIn 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+            animation: emptyFadeIn 0.5s 0.1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
         }
 
-        @keyframes stretchIn {
-            0% {
+        @keyframes emptyFadeIn {
+            from {
                 opacity: 0;
-                max-height: 0;
-                padding: 0 40px;
-                transform: scaleY(0.5);
+                transform: scale(0.95);
             }
 
-            100% {
+            to {
                 opacity: 0.4;
-                max-height: 300px;
-                padding: 60px 40px;
-                transform: scaleY(1);
+                transform: scale(1);
             }
         }
 
@@ -321,35 +316,43 @@
             const items = listEl.querySelectorAll('.notif-item');
             if (items.length === 0) return;
 
-            // Lock container height to prevent snapping
+            // Lock container height to prevent snapping during slide-out
             const initialHeight = listEl.offsetHeight;
             listEl.style.height = initialHeight + 'px';
             listEl.style.overflow = 'hidden';
 
             // Staggered dismissal
             items.forEach((item, i) => {
-                setTimeout(() => {
-                    item.classList.add('clearing');
-                }, i * 100);
+                setTimeout(() => item.classList.add('clearing'), i * 100);
             });
 
-            // Wait for animations to complete
-            await new Promise(r => setTimeout(r, 600 + (items.length * 100)));
+            // Wait for all slide-out animations to finish
+            await new Promise(r => setTimeout(r, 600 + items.length * 100));
 
             localStorage.setItem('launcher-notif-history', '[]');
             window.dispatchEvent(new Event('storage'));
 
-            // Swap content and animate height transition
+            // Measure the natural height of the empty state BEFORE animating.
+            // We do this by briefly rendering it off-screen without its fade animation.
+            const probe = document.createElement('div');
+            probe.className = 'empty-msg';
+            probe.style.cssText = 'animation:none;opacity:1;position:fixed;visibility:hidden;pointer-events:none;top:-9999px';
+            probe.textContent = 'No notifications.';
+            document.body.appendChild(probe);
+            const targetHeight = probe.offsetHeight;
+            document.body.removeChild(probe);
+
+            // Swap in the real empty state, then animate the container to match
             render();
 
-            listEl.style.transition = 'height 0.8s cubic-bezier(0.23, 1, 0.32, 1)';
-            listEl.style.height = '180px'; // Target height for the empty-msg
+            listEl.style.transition = 'height 0.55s cubic-bezier(0.23, 1, 0.32, 1)';
+            listEl.style.height = targetHeight + 'px';
 
             setTimeout(() => {
                 listEl.style.transition = '';
                 listEl.style.height = '';
                 listEl.style.overflow = '';
-            }, 800);
+            }, 600);
         };
 
         dndCheck.checked = localStorage.getItem('launcher-dnd') === 'true';

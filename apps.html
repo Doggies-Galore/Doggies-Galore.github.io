@@ -392,7 +392,7 @@
 
                     const downloadApp = async () => {
                         if (downloadedIds.includes(app.id)) return;
-                        downloadBtn.textContent = 'Pre-caching...';
+                        downloadBtn.textContent = 'Measuring...';
                         downloadBtn.disabled = true;
 
                         function formatSize(bytes) {
@@ -401,38 +401,78 @@
                             return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
                         }
 
-                        let calculatedSize = "Unknown";
+                        // Walk the full dependency tree: HTML + all local sub-resources
+                        async function measureFullSize(appUrl) {
+                            const fetched = new Set();
+                            let totalBytes = 0;
+                            const appBase = new URL(appUrl, window.location.href).href;
+
+                            async function measureOne(url) {
+                                const canonical = url.split('?')[0].split('#')[0];
+                                if (fetched.has(canonical)) return;
+                                fetched.add(canonical);
+                                try {
+                                    const res = await fetch(canonical, { cache: 'reload' });
+                                    if (!res.ok) return;
+                                    const blob = await res.blob();
+                                    totalBytes += blob.size;
+                                    // Live counter on the button
+                                    downloadBtn.textContent = 'Measuring... ' + formatSize(totalBytes);
+
+                                    // If HTML, parse and queue its local sub-resources
+                                    if (/\.html?$/i.test(canonical)) {
+                                        const text = await blob.text();
+                                        const re = /(?:src|href)\s*=\s*["']([^"']+)["']/gi;
+                                        let m;
+                                        const tasks = [];
+                                        while ((m = re.exec(text)) !== null) {
+                                            const raw = m[1].trim();
+                                            if (!raw) continue;
+                                            if (/^https?:\/\//i.test(raw)) continue;  // skip external
+                                            if (raw.startsWith('//') || raw.startsWith('data:') || raw.startsWith('#')) continue;
+                                            if (/\.html?(?:[?#]|$)/i.test(raw)) continue; // skip nested HTML
+                                            try {
+                                                tasks.push(measureOne(new URL(raw, canonical).href));
+                                            } catch (_) { }
+                                        }
+                                        await Promise.all(tasks); // parallel for speed
+                                    }
+                                } catch (_) { }
+                            }
+
+                            await measureOne(appBase);
+                            return totalBytes;
+                        }
+
+                        let calculatedSize = 'Unknown';
                         try {
                             if (!app.url.startsWith('http')) {
-                                // Relative/Local
-                                const res = await fetch(app.url);
-                                const blob = await res.blob();
-                                calculatedSize = formatSize(blob.size);
+                                // Local — preload and measure everything
+                                const bytes = await measureFullSize(app.url);
+                                calculatedSize = bytes > 0 ? formatSize(bytes) : '< 1 KB';
                             } else {
-                                // External - Ask the bot
+                                // External — ask the WebSocket bot if available
                                 const address = localStorage.getItem('launcher-ws-address');
                                 if (address) {
-                                    const ws = new WebSocket(address);
                                     calculatedSize = await new Promise((resolve) => {
-                                        const timeout = setTimeout(() => { ws.close(); resolve('2.1 MB'); }, 5000);
+                                        const ws = new WebSocket(address);
+                                        const timeout = setTimeout(() => { ws.close(); resolve('Unknown'); }, 8000);
                                         ws.onopen = () => ws.send(JSON.stringify({ type: 'get_size', url: app.url }));
                                         ws.onmessage = (e) => {
-                                            const data = JSON.parse(e.data);
-                                            if (data.type === 'get_size') {
-                                                clearTimeout(timeout);
-                                                ws.close();
-                                                resolve(formatSize(data.size));
-                                            }
+                                            try {
+                                                const data = JSON.parse(e.data);
+                                                if (data.type === 'get_size' && data.size > 0) {
+                                                    clearTimeout(timeout);
+                                                    ws.close();
+                                                    resolve(formatSize(data.size));
+                                                }
+                                            } catch (_) { clearTimeout(timeout); ws.close(); resolve('Unknown'); }
                                         };
-                                        ws.onerror = () => resolve('2.1 MB');
+                                        ws.onerror = () => { clearTimeout(timeout); resolve('Unknown'); };
                                     });
-                                } else {
-                                    calculatedSize = "2.1 MB";
                                 }
                             }
-                        } catch (e) {
-                            calculatedSize = app.url.endsWith('.html') ? '45 KB' : '2.1 MB';
-                        }
+                        } catch (_) { }
 
                         // Add a minimum visual delay if the fetch was too fast
                         setTimeout(() => {
@@ -447,7 +487,7 @@
                             sizeDiv.textContent = calculatedSize;
 
                             localStorage.setItem('launcher-apps-cache', JSON.stringify(dataApps));
-                        }, 500);
+                        }, 300);
                     };
 
                     card.addEventListener('click', (e) => {
