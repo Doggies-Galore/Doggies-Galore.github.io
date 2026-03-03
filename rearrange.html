@@ -530,9 +530,9 @@
                 try { allApps = JSON.parse(cached); } catch (e) { }
             }
 
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications"]');
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"]');
 
-            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications"];
+            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
 
             if (!allApps || allApps.length === 0) {
                 allApps = [
@@ -540,7 +540,8 @@
                     { id: "apps", name: "Apps", category: "System" },
                     { id: "about", name: "About", category: "System" },
                     { id: "re-arrange", name: "Arrange", category: "System" },
-                    { id: "notifications", name: "Notifications", category: "System" }
+                    { id: "notifications", name: "Notifications", category: "System" },
+                    { id: "shared-preferences", name: "Shared Preferences", category: "System" }
                 ];
             }
 
@@ -958,8 +959,8 @@
         function renderGrid() {
             const slots = document.querySelectorAll('.grid-slot');
             const grid = activeGrid();
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications"]');
-            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications"];
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"]');
+            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
 
             slots.forEach((slot, idx) => {
                 slot.innerHTML = '';
@@ -1055,9 +1056,8 @@
         document.getElementById('save-btn').addEventListener('click', () => {
             localStorage.setItem('launcher-grid', JSON.stringify(userGrid));
             window.dispatchEvent(new StorageEvent('storage', { key: 'launcher-grid', newValue: JSON.stringify(userGrid) }));
-            const btn = document.querySelector('.close-btn');
             document.body.classList.add('fade-out');
-            setTimeout(() => { window.location.href = btn.href; }, 400);
+            setTimeout(() => { window.location.href = getBackUrl(); }, 400);
         });
 
         init();
@@ -1066,13 +1066,17 @@
         document.addEventListener('DOMContentLoaded', triggerFullscreen);
         document.body.addEventListener('click', triggerFullscreen, { once: true });
 
+        const getBackUrl = () => {
+            return sessionStorage.getItem('launchSource') === 'apps' ? 'apps.html' : 'index.html';
+        };
+
         // History API back button interceptor
         history.replaceState({ page: 'applet' }, '');
         history.pushState({ page: 'applet-active' }, '');
         window.addEventListener('popstate', (e) => {
             if (e.state && e.state.page === 'applet') {
                 document.body.classList.add('fade-out');
-                setTimeout(() => { window.location.href = 'index.html'; }, 400);
+                setTimeout(() => { window.location.href = getBackUrl(); }, 400);
             }
         });
 
@@ -1080,7 +1084,7 @@
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 document.body.classList.add('fade-out');
-                setTimeout(() => { window.location.href = btn.href; }, 400);
+                setTimeout(() => { window.location.href = getBackUrl(); }, 400);
             });
         });
     </script>

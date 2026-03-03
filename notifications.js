@@ -34,8 +34,6 @@ class NotificationService {
             }
             if (key === 'launcher-silent') {
                 this.isSilent = localStorage.getItem('launcher-silent') === 'true';
-                if (this.isSilent) this.disconnect();
-                else this.connect();
                 this.updateStatusIcons();
             }
             if (key === 'launcher-ws-address' || key === 'launcher-ws-token' || key === 'launcher-ws-username') {
@@ -246,10 +244,6 @@ class NotificationService {
     }
 
     connect() {
-        if (this.isSilent) {
-            this.updateStatus('silent');
-            return;
-        }
         const address = localStorage.getItem('launcher-ws-address');
         const token = localStorage.getItem('launcher-ws-token');
         const username = localStorage.getItem('launcher-ws-username');
@@ -347,6 +341,7 @@ class NotificationService {
     }
 
     handleIncoming(data) {
+        if (this.isSilent) return;
         const notif = {
             id: Date.now(),
             type: data.type,

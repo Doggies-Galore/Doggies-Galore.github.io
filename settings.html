@@ -990,9 +990,9 @@
             const cached = localStorage.getItem('launcher-store-cache');
             if (cached) { allApps = JSON.parse(cached); }
 
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications"]');
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"]');
             const appSizes = JSON.parse(localStorage.getItem('launcher-app-sizes') || '{}');
-            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications"];
+            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
 
             const installed = allApps.filter(app => downloadedIds.includes(app.id) && !systemIds.includes(app.id));
 
@@ -1072,7 +1072,7 @@
             const btn = document.getElementById('recalc-sizes-btn');
             const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '[]');
             const cache = JSON.parse(localStorage.getItem('launcher-store-cache') || '[]');
-            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications"];
+            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
 
             const installed = cache.filter(app => downloadedIds.includes(app.id) && !systemIds.includes(app.id));
             if (!installed.length) return;
@@ -1089,6 +1089,10 @@
             const appSizes = JSON.parse(localStorage.getItem('launcher-app-sizes') || '{}');
 
             for (const app of installed) {
+                if (!app.url.startsWith('http')) {
+                    continue; // Skip local apps, let apps.html handle them on download
+                }
+
                 btn.textContent = `Scanning ${app.name}...`;
                 try {
                     const result = await new Promise((resolve) => {
@@ -1100,12 +1104,19 @@
 
                         ws.onopen = () => ws.send(JSON.stringify({ type: 'get_size', url: app.url }));
                         ws.onmessage = (e) => {
-                            const data = JSON.parse(e.data);
-                            if (data.type === 'get_size') {
-                                clearTimeout(timeout);
-                                ws.close();
-                                resolve(data.size > 0 ? formatSize(data.size) : 'Unknown');
-                            }
+                            try {
+                                const data = JSON.parse(e.data);
+                                if (data.type === 'get_size') {
+                                    clearTimeout(timeout);
+                                    ws.close();
+                                    resolve(data.size > 0 ? formatSize(data.size) : 'Unknown');
+                                } else if (data.type === 'error') {
+                                    console.error("Scanner error:", data.message);
+                                    clearTimeout(timeout);
+                                    ws.close();
+                                    resolve('Unknown');
+                                }
+                            } catch (_) { clearTimeout(timeout); ws.close(); resolve('Unknown'); }
                         };
                         ws.onerror = () => { clearTimeout(timeout); resolve('Unknown'); };
                     });
@@ -1159,13 +1170,17 @@
         document.addEventListener('DOMContentLoaded', triggerFullscreen);
         document.body.addEventListener('click', triggerFullscreen, { once: true });
 
+        const getBackUrl = () => {
+            return sessionStorage.getItem('launchSource') === 'apps' ? 'apps.html' : 'index.html';
+        };
+
         // History API back button interceptor
         history.replaceState({ page: 'applet' }, '');
         history.pushState({ page: 'applet-active' }, '');
         window.addEventListener('popstate', (e) => {
             if (e.state && e.state.page === 'applet') {
                 document.body.classList.add('fade-out');
-                setTimeout(() => { window.location.href = 'index.html'; }, 400);
+                setTimeout(() => { window.location.href = getBackUrl(); }, 400);
             }
         });
 
@@ -1173,7 +1188,7 @@
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 document.body.classList.add('fade-out');
-                setTimeout(() => { window.location.href = btn.href; }, 400);
+                setTimeout(() => { window.location.href = getBackUrl(); }, 400);
             });
         });
     </script>

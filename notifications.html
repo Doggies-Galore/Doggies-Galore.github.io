@@ -367,13 +367,17 @@
         window.addEventListener('storage', render);
         render();
 
+        const getBackUrl = () => {
+            return sessionStorage.getItem('launchSource') === 'apps' ? 'apps.html' : 'index.html';
+        };
+
         // Standard back button logic
         history.replaceState({ page: 'applet' }, '');
         history.pushState({ page: 'applet-active' }, '');
         window.addEventListener('popstate', (e) => {
             if (e.state && e.state.page === 'applet') {
                 document.body.classList.add('fade-out');
-                setTimeout(() => { window.location.href = 'index.html'; }, 400);
+                setTimeout(() => { window.location.href = getBackUrl(); }, 400);
             }
         });
 
@@ -381,7 +385,7 @@
             btn.onclick = (e) => {
                 e.preventDefault();
                 document.body.classList.add('fade-out');
-                setTimeout(() => { window.location.href = btn.href; }, 400);
+                setTimeout(() => { window.location.href = getBackUrl(); }, 400);
             };
         });
     </script>

@@ -302,7 +302,8 @@
                         { id: "launcher-settings", name: "Settings", url: "settings.html", about: "Configure your launcher.", category: "System" },
                         { id: "about", name: "About", url: "about.html", about: "Learn more about this project.", category: "System" },
                         { id: "re-arrange", name: "Arrange", url: "rearrange.html", about: "Organize your apps.", category: "System" },
-                        { id: "notifications", name: "Notifications", url: "notifications.html", about: "View your notification history.", category: "System" }
+                        { id: "notifications", name: "Notifications", url: "notifications.html", about: "View your notification history.", category: "System" },
+                        { id: "shared-preferences", name: "Shared Preferences", url: "preferences.html", about: "Manage your Discord token, Tumblr API key, and followed blogs.", category: "System" }
                     ];
                 }
             }
@@ -310,7 +311,7 @@
             const container = document.getElementById('categories-container');
             container.innerHTML = '';
 
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "about", "re-arrange", "notifications"]');
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "about", "re-arrange", "notifications", "shared-preferences"]');
             const appSizes = JSON.parse(localStorage.getItem('launcher-app-sizes') || '{}');
 
             const excludeIds = ['apps'];
@@ -469,6 +470,10 @@
                                                     clearTimeout(timeout);
                                                     ws.close();
                                                     resolve(data.size > 0 ? formatSize(data.size) : 'Unknown');
+                                                } else if (data.type === 'error') {
+                                                    clearTimeout(timeout);
+                                                    ws.close();
+                                                    resolve('Unknown');
                                                 }
                                             } catch (_) { clearTimeout(timeout); ws.close(); resolve('Unknown'); }
                                         };
@@ -585,6 +590,7 @@
             });
 
             sessionStorage.setItem('lastAppStoreIndex', index);
+            sessionStorage.setItem('launchSource', 'apps');
             if (fadeColor) {
                 sessionStorage.setItem('lastFadeColor', fadeColor);
             } else {

@@ -188,6 +188,25 @@
         </div>
 
         <div style="display: flex; align-items: center;" class="header-item">
+            <svg id="sync-success-icon" style="display: none; width: 3vw; height: 3vw; margin-right: 15px;"
+                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-label="Sync Success">
+                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" opacity="0.4"></path>
+                <polyline points="9 11 12 14 22 4" transform="translate(2, 2) scale(0.7)"></polyline>
+            </svg>
+            <svg id="sync-error-icon" style="display: none; width: 3vw; height: 3vw; margin-right: 15px;"
+                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-label="Sync Error">
+                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" opacity="0.4"></path>
+                <line x1="11" y1="13" x2="17" y2="19"></line>
+                <line x1="17" y1="13" x2="11" y2="19"></line>
+            </svg>
+            <svg id="sync-unconfigured-icon" style="display: none; width: 3vw; height: 3vw; margin-right: 15px;"
+                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-label="Sync Unconfigured">
+                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" opacity="0.4"></path>
+                <line x1="7" y1="7" x2="17" y2="17"></line>
+            </svg>
             <svg id="offline-icon" style="display: none; width: 3vw; height: 3vw; margin-right: 15px;"
                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Offline">
@@ -306,11 +325,26 @@
                 "apps": { name: "Apps", url: "apps.html", fade: "theme" },
                 "about": { name: "About", url: "about.html", fade: "theme" },
                 "re-arrange": { name: "Arrange", url: "rearrange.html", fade: "theme" },
-                "notifications": { name: "Notifications", url: "notifications.html", fade: "theme" }
+                "notifications": { name: "Notifications", url: "notifications.html", fade: "theme" },
+                "shared-preferences": { name: "Shared Preferences", url: "preferences.html", fade: "theme" }
             };
 
             appMap = { ...fallbackApps };
             configApps.forEach(app => appMap[app.id] = app);
+
+            // ── Migration: ensure system applets are always in downloaded IDs ──
+            const requiredSystemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
+            let downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '[]');
+            let idsChanged = false;
+            requiredSystemIds.forEach(id => {
+                if (!downloadedIds.includes(id)) {
+                    downloadedIds.push(id);
+                    idsChanged = true;
+                }
+            });
+            if (idsChanged) {
+                localStorage.setItem('launcher-downloaded-ids', JSON.stringify(downloadedIds));
+            }
 
             try {
                 const saved = localStorage.getItem('launcher-grid');
@@ -320,7 +354,7 @@
             if (!userGrid || !Array.isArray(userGrid) || userGrid.length !== 9) {
                 userGrid = [
                     null, null, null,
-                    null, null, null,
+                    null, null, "shared-preferences",
                     "launcher-settings", "apps", "re-arrange"
                 ];
             }
@@ -358,8 +392,8 @@
                     return;
                 }
 
-                const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications"]');
-                const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications"];
+                const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"]');
+                const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
 
                 if (typeof item === 'object' && item.type === 'folder') {
                     // Filter out uninstalled apps in this view too
@@ -436,7 +470,7 @@
 
         function preloadDownloadedApps(appsData) {
             const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '[]');
-            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications"];
+            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
 
             // Also preload images if any (future-proofing)
             appsData.forEach(app => {
@@ -518,6 +552,7 @@
             });
 
             sessionStorage.setItem('lastAppIndex', index);
+            sessionStorage.setItem('launchSource', 'launcher');
             if (fadeColor) {
                 sessionStorage.setItem('lastFadeColor', fadeColor);
             } else {
@@ -557,6 +592,7 @@
 
             // Store folder index for return animation
             sessionStorage.setItem('openFolderIndex', index);
+            sessionStorage.setItem('launchSource', 'launcher');
 
             setTimeout(() => {
                 currentFolder = folderObj;
@@ -635,8 +671,8 @@
                     if (storedIdx !== null) safeIndex = parseInt(storedIdx);
                 }
 
-                const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications"]');
-                const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications"];
+                const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"]');
+                const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
                 const actualAppIndex = userGrid.slice(0, safeIndex).filter(item => {
                     if (!item) return false;
                     if (typeof item === 'object') return true;
@@ -796,6 +832,38 @@
         });
     </script>
     <script src="notifications.js"></script>
+    <script>
+        // Sync Status Icons Handler
+        (function () {
+            function updateSyncIcons(status) {
+                const success = document.getElementById('sync-success-icon');
+                const error = document.getElementById('sync-error-icon');
+                const unconfigured = document.getElementById('sync-unconfigured-icon');
+                if (!success || !error || !unconfigured) return;
+
+                success.style.display = 'none';
+                error.style.display = 'none';
+                unconfigured.style.display = 'none';
+
+                if (status === 'connected') {
+                    success.style.display = 'block';
+                } else if (status === 'error' || status === 'disconnected') {
+                    error.style.display = 'block';
+                } else if (status === 'unconfigured') {
+                    unconfigured.style.display = 'block';
+                }
+            }
+
+            window.addEventListener('sync-status-change', (e) => {
+                updateSyncIcons(e.detail);
+            });
+
+            // Initial check
+            if (window.launcherNotifications && window.launcherNotifications.status) {
+                updateSyncIcons(window.launcherNotifications.status);
+            }
+        })();
+    </script>
 </body>
 
 </html>

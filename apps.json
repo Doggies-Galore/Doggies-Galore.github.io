@@ -191,6 +191,14 @@
             "fade": "theme",
             "about": "View your notification history.",
             "category": "System"
+        },
+        {
+            "id": "shared-preferences",
+            "name": "Shared Preferences",
+            "url": "preferences.html",
+            "fade": "theme",
+            "about": "Manage your Discord token, Tumblr API key, and followed blogs.",
+            "category": "System"
         }
     ]
 }

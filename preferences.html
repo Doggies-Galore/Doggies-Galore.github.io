@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Preferences</title>
+    <style>
+        :root {
+            --bg-color: #000;
+            --accent-color: #fff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            background-color: var(--bg-color);
+        }
+
+        html.ready {
+            transition: background-color 0.75s ease;
+        }
+
+        body {
+            background-color: transparent;
+            color: var(--accent-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .page-wrapper {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0.9);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .page-wrapper.ready {
+            transition: background-color 0.75s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.4s cubic-bezier(0.4, 0.0, 0.2, 1) forwards !important;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+            font-size: 2vw;
+            cursor: pointer;
+            border: 3px solid var(--accent-color);
+            padding: 10px 25px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        h1 {
+            font-size: 4vw;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 15px;
+        }
+
+        .section {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--accent-color);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 2vw;
+            margin-bottom: 25px;
+            opacity: 0.9;
+            border-bottom: 2px solid var(--accent-color);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .field {
+            width: 100%;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 1rem;
+            opacity: 0.7;
+            margin-bottom: 8px;
+            margin-left: 10px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .field-hint {
+            display: block;
+            font-size: 0.8rem;
+            opacity: 0.4;
+            margin-bottom: 8px;
+            margin-left: 10px;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--accent-color);
+            border-radius: 15px;
+            color: var(--accent-color);
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .field-input:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .field-input::placeholder {
+            color: var(--accent-color);
+            opacity: 0.25;
+        }
+
+        textarea.field-input {
+            resize: none;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            height: 180px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            border-radius: 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            background: transparent;
+            transition: all 0.2s;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            transform: scale(1.02);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: default;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            filter: brightness(0.85);
+            transform: scale(1.02);
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .status-banner {
+            width: 100%;
+            max-width: 800px;
+            padding: 15px 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .status-banner.loading {
+            background: rgba(255, 204, 0, 0.15);
+            border: 2px solid #ffcc00;
+            color: #ffcc00;
+        }
+
+        .status-banner.success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid #00ff88;
+            color: #00ff88;
+        }
+
+        .status-banner.error {
+            background: rgba(255, 76, 76, 0.15);
+            border: 2px solid #ff4c4c;
+            color: #ff4c4c;
+        }
+
+        .status-banner.info {
+            background: rgba(100, 160, 255, 0.1);
+            border: 2px solid #64a0ff;
+            color: #64a0ff;
+        }
+
+        .actions-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .actions-row .btn {
+            flex: 1;
+        }
+
+        .toggle-vis {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            opacity: 0.4;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: opacity 0.2s;
+            padding: 5px 10px;
+        }
+
+        .toggle-vis:hover {
+            opacity: 0.8;
+        }
+
+        .field-input-wrap {
+            position: relative;
+        }
+
+        .field-input-wrap .field-input {
+            padding-right: 70px;
+        }
+
+        .section-icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+            opacity: 0.8;
+        }
+
+        .blog-count {
+            font-size: 0.85rem;
+            opacity: 0.45;
+            margin-top: 8px;
+            margin-left: 10px;
+        }
+
+        /* Scrollbar styling */
+        .page-wrapper::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .page-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .page-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        (function () {
+            const bg = localStorage.getItem('launcher-bg') || '#000000';
+            const accent = localStorage.getItem('launcher-accent') || '#ffffff';
+            document.documentElement.style.setProperty('--bg-color', bg);
+            document.documentElement.style.setProperty('--accent-color', accent);
+
+            window.addEventListener('DOMContentLoaded', () => {
+                requestAnimationFrame(() => {
+                    document.documentElement.classList.add('ready');
+                    document.querySelector('.page-wrapper').classList.add('ready');
+                });
+            });
+        })();
+    </script>
+
+    <div class="page-wrapper">
+        <div class="header">
+            <h1>Shared Preferences</h1>
+            <a href="index.html" class="close-btn">Back</a>
+        </div>
+
+        <div id="status-banner" class="status-banner loading">Connecting...</div>
+
+        <!-- Auth Token Section -->
+        <div class="section">
+            <h2 class="section-title">
+                <span class="section-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </span>
+                Auth Token
+            </h2>
+            <div class="field">
+                <span class="field-label">WebSocket Auth Password</span>
+                <span class="field-hint">The password you use to log in to your launcher session.</span>
+                <div class="field-input-wrap">
+                    <input type="password" id="pref-auth-token" class="field-input" placeholder="Your auth password">
+                    <button class="toggle-vis" data-target="pref-auth-token">Show</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Discord Token Section -->
+        <div class="section">
+            <h2 class="section-title">
+                <span class="section-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </span>
+                Discord API Token
+            </h2>
+            <div class="field">
+                <span class="field-label">Discord Self-Bot Token</span>
+                <span class="field-hint">Used to monitor DMs and mentions. Leave blank to disable Discord
+                    notifications.</span>
+                <div class="field-input-wrap">
+                    <input type="password" id="pref-discord-token" class="field-input" placeholder="Your Discord token">
+                    <button class="toggle-vis" data-target="pref-discord-token">Show</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tumblr Section -->
+        <div class="section">
+            <h2 class="section-title">
+                <span class="section-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                </span>
+                Tumblr API
+            </h2>
+            <div class="field">
+                <span class="field-label">Tumblr API Consumer Key</span>
+                <span class="field-hint">Used for the Tumblr v2 API. Leave blank to fall back to RSS polling.</span>
+                <div class="field-input-wrap">
+                    <input type="password" id="pref-tumblr-key" class="field-input"
+                        placeholder="Your Tumblr API consumer key">
+                    <button class="toggle-vis" data-target="pref-tumblr-key">Show</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Followed Blogs Section -->
+        <div class="section">
+            <h2 class="section-title">
+                <span class="section-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </span>
+                Followed Blogs
+            </h2>
+            <div class="field">
+                <span class="field-label">Tracked Tumblr Blogs</span>
+                <span class="field-hint">One blog name per line. New posts from these blogs will trigger
+                    notifications.</span>
+                <textarea id="pref-tumblr-blogs" class="field-input"
+                    placeholder="blog-name-1&#10;blog-name-2&#10;blog-name-3"></textarea>
+                <div class="blog-count" id="blog-count">0 blogs tracked</div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="width: 100%; max-width: 800px;">
+            <div class="actions-row">
+                <button class="btn" id="btn-revert" disabled>Revert Changes</button>
+                <button class="btn btn-primary" id="btn-save" disabled>Save Preferences</button>
+            </div>
+        </div>
+
+        <div style="height: 80px;"></div>
+    </div>
+
+    <script>
+        // State
+        let originalPrefs = null;
+        let ws = null;
+        let isAuthenticated = false;
+
+        const statusBanner = document.getElementById('status-banner');
+        const authTokenInput = document.getElementById('pref-auth-token');
+        const discordTokenInput = document.getElementById('pref-discord-token');
+        const tumblrKeyInput = document.getElementById('pref-tumblr-key');
+        const tumblrBlogsInput = document.getElementById('pref-tumblr-blogs');
+        const blogCountLabel = document.getElementById('blog-count');
+        const saveBtn = document.getElementById('btn-save');
+        const revertBtn = document.getElementById('btn-revert');
+
+        // ── Status Banner ────────────────────────────────────────────
+        function setStatus(msg, type) {
+            statusBanner.className = 'status-banner ' + type;
+            statusBanner.textContent = msg;
+        }
+
+        // ── Show/Hide Toggle ─────────────────────────────────────────
+        document.querySelectorAll('.toggle-vis').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = document.getElementById(btn.dataset.target);
+                if (target.type === 'password') {
+                    target.type = 'text';
+                    btn.textContent = 'Hide';
+                } else {
+                    target.type = 'password';
+                    btn.textContent = 'Show';
+                }
+            });
+        });
+
+        // ── Blog Count ───────────────────────────────────────────────
+        function updateBlogCount() {
+            const blogs = tumblrBlogsInput.value.split('\n').map(s => s.trim()).filter(s => s);
+            blogCountLabel.textContent = blogs.length + (blogs.length === 1 ? ' blog tracked' : ' blogs tracked');
+        }
+        tumblrBlogsInput.addEventListener('input', updateBlogCount);
+
+        // ── Dirty State ──────────────────────────────────────────────
+        function getCurrentPrefs() {
+            return {
+                ws_auth_token: authTokenInput.value.trim(),
+                discord_token: discordTokenInput.value.trim(),
+                tumblr_key: tumblrKeyInput.value.trim(),
+                tumblr_blogs: tumblrBlogsInput.value.split('\n').map(s => s.trim()).filter(s => s),
+            };
+        }
+
+        function isDirty() {
+            if (!originalPrefs) return false;
+            const current = getCurrentPrefs();
+            if (current.ws_auth_token !== originalPrefs.ws_auth_token) return true;
+            if (current.discord_token !== originalPrefs.discord_token) return true;
+            if (current.tumblr_key !== originalPrefs.tumblr_key) return true;
+            if (JSON.stringify(current.tumblr_blogs) !== JSON.stringify(originalPrefs.tumblr_blogs)) return true;
+            return false;
+        }
+
+        function checkDirty() {
+            const dirty = isDirty();
+            saveBtn.disabled = !dirty;
+            revertBtn.disabled = !dirty;
+        }
+
+        [authTokenInput, discordTokenInput, tumblrKeyInput, tumblrBlogsInput].forEach(el => {
+            el.addEventListener('input', checkDirty);
+        });
+
+        // ── Populate UI ──────────────────────────────────────────────
+        function populateForm(prefs) {
+            originalPrefs = {
+                ws_auth_token: prefs.ws_auth_token || '',
+                discord_token: prefs.discord_token || '',
+                tumblr_key: prefs.tumblr_key || '',
+                tumblr_blogs: prefs.tumblr_blogs || [],
+            };
+            authTokenInput.value = originalPrefs.ws_auth_token;
+            discordTokenInput.value = originalPrefs.discord_token;
+            tumblrKeyInput.value = originalPrefs.tumblr_key;
+            tumblrBlogsInput.value = originalPrefs.tumblr_blogs.join('\n');
+            updateBlogCount();
+            checkDirty();
+        }
+
+        // ── Revert ───────────────────────────────────────────────────
+        revertBtn.addEventListener('click', () => {
+            if (originalPrefs) {
+                populateForm(originalPrefs);
+                setStatus('Changes reverted.', 'info');
+            }
+        });
+
+        // ── Save ─────────────────────────────────────────────────────
+        saveBtn.addEventListener('click', () => {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                setStatus('Not connected. Cannot save.', 'error');
+                return;
+            }
+
+            const current = getCurrentPrefs();
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+
+            ws.send(JSON.stringify({
+                type: 'update_preferences',
+                ws_auth_token: current.ws_auth_token,
+                discord_token: current.discord_token,
+                tumblr_key: current.tumblr_key,
+                tumblr_blogs: current.tumblr_blogs,
+            }));
+        });
+
+        // ── WebSocket ────────────────────────────────────────────────
+        function connectAndFetch() {
+            const address = localStorage.getItem('launcher-ws-address');
+            const username = localStorage.getItem('launcher-ws-username');
+            const token = localStorage.getItem('launcher-ws-token');
+
+            if (!address || !username || !token) {
+                setStatus('Not configured. Go to Settings → Configure Sync first.', 'error');
+                return;
+            }
+
+            setStatus('Connecting to ' + address + '...', 'loading');
+
+            try {
+                ws = new WebSocket(address);
+            } catch (e) {
+                setStatus('Invalid WebSocket address.', 'error');
+                return;
+            }
+
+            const timeout = setTimeout(() => {
+                setStatus('Connection timed out.', 'error');
+                try { ws.close(); } catch (_) { }
+            }, 8000);
+
+            ws.onopen = () => {
+                clearTimeout(timeout);
+                setStatus('Authenticating...', 'loading');
+                ws.send(JSON.stringify({ type: 'login', username, token }));
+            };
+
+            ws.onmessage = (e) => {
+                try {
+                    const data = JSON.parse(e.data);
+
+                    if (data.type === 'auth' && data.message === 'ok') {
+                        isAuthenticated = true;
+                        setStatus('Loading your preferences...', 'loading');
+                        ws.send(JSON.stringify({ type: 'get_preferences' }));
+                    } else if (data.type === 'auth' || (data.type === 'error' && !isAuthenticated)) {
+                        setStatus('Authentication failed: ' + (data.message || 'Unknown error'), 'error');
+                    } else if (data.type === 'preferences') {
+                        populateForm(data);
+                        setStatus('Connected as ' + username, 'success');
+                    } else if (data.type === 'update_preferences') {
+                        if (data.message === 'ok') {
+                            // Update the original reference so dirty detection resets
+                            originalPrefs = getCurrentPrefs();
+                            // If the auth token was changed, update localStorage too
+                            if (originalPrefs.ws_auth_token) {
+                                localStorage.setItem('launcher-ws-token', originalPrefs.ws_auth_token);
+                            }
+                            setStatus('Preferences saved successfully!', 'success');
+                            saveBtn.textContent = 'Save Preferences';
+                            checkDirty();
+                        } else {
+                            setStatus('Save failed: ' + (data.message || 'Unknown error'), 'error');
+                            saveBtn.textContent = 'Save Preferences';
+                            checkDirty();
+                        }
+                    } else if (data.type === 'error') {
+                        setStatus('Error: ' + (data.message || 'Unknown'), 'error');
+                        saveBtn.textContent = 'Save Preferences';
+                        checkDirty();
+                    }
+                } catch (err) {
+                    console.error('[Preferences] Parse error:', err);
+                }
+            };
+
+            ws.onerror = () => {
+                clearTimeout(timeout);
+                setStatus('Connection failed. Check Settings.', 'error');
+            };
+
+            ws.onclose = () => {
+                if (isAuthenticated) {
+                    setStatus('Connection lost. Refresh to reconnect.', 'error');
+                }
+                saveBtn.textContent = 'Save Preferences';
+                checkDirty();
+            };
+        }
+
+        connectAndFetch();
+
+        // ── Standard Launcher Boilerplate ─────────────────────────────
+        const triggerFullscreen = () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => { });
+            }
+        };
+        document.addEventListener('DOMContentLoaded', triggerFullscreen);
+        document.body.addEventListener('click', triggerFullscreen, { once: true });
+
+        // History API back button interceptor
+        history.replaceState({ page: 'applet' }, '');
+        history.pushState({ page: 'applet-active' }, '');
+
+        const getBackUrl = () => {
+            return sessionStorage.getItem('launchSource') === 'apps' ? 'apps.html' : 'index.html';
+        };
+
+        window.addEventListener('popstate', (e) => {
+            if (e.state && e.state.page === 'applet') {
+                document.body.classList.add('fade-out');
+                setTimeout(() => { window.location.href = getBackUrl(); }, 400);
+            }
+        });
+
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.body.classList.add('fade-out');
+                setTimeout(() => { window.location.href = getBackUrl(); }, 400);
+            });
+        });
+    </script>
+    <script src="notifications.js"></script>
+</body>
+
+</html>
