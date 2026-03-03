@@ -464,12 +464,6 @@
                     style="width: 100%; background: var(--accent-color); color: var(--bg-color);">Configure Sync &
                     Notifications...</button>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
-                    <button id="cloud-backup-btn" class="btn" style="font-size: 0.9rem; padding: 10px;">Cloud
-                        Backup</button>
-                    <button id="cloud-restore-btn" class="btn" style="font-size: 0.9rem; padding: 10px;">Cloud
-                        Restore</button>
-                </div>
 
                 <div class="row" style="margin-top: 10px;">
                     <label><input type="checkbox" id="check-dnd"> Do Not Disturb</label>
@@ -524,9 +518,13 @@
             <div id="installed-apps-list" class="app-list">
                 <!-- Apps will be listed here -->
             </div>
-            <button class="btn" id="recalc-sizes-btn"
-                style="margin-top: 25px; width: auto; padding: 12px 30px; font-size: 1rem;">Recalculate All
-                Sizes</button>
+            <div class="row" style="margin-top: 25px; gap: 15px;">
+                <button class="btn" id="recalc-sizes-btn"
+                    style="width: auto; padding: 12px 25px; font-size: 1rem;">Recalculate Sizes</button>
+                <button class="btn delete-btn" id="delete-all-btn"
+                    style="width: auto; padding: 12px 25px; font-size: 1rem; background: #ff4c4c; border: none;">Delete
+                    All Data</button>
+            </div>
         </div>
     </div>
 
@@ -820,6 +818,7 @@
                             localStorage.setItem('launcher-ws-username', username);
                             localStorage.setItem('launcher-ws-token', token);
                             modal.classList.remove('active');
+                            toggleScroll(false);
                             window.dispatchEvent(new Event('storage'));
                         } else {
                             showError(data.message);
@@ -902,84 +901,7 @@
         ...
         */
 
-        // Cloud Backup/Restore
-        const cloudBackupBtn = document.getElementById('cloud-backup-btn');
-        const cloudRestoreBtn = document.getElementById('cloud-restore-btn');
 
-        async function sendCloudCommand(type, data = {}) {
-            const address = localStorage.getItem('launcher-ws-address');
-            const username = localStorage.getItem('launcher-ws-username');
-            const token = localStorage.getItem('launcher-ws-token');
-
-            if (!address || !username || !token) {
-                showPrompt("Sync Required", "Please configure Sync (WebSocket) first.");
-                return;
-            }
-
-            return new Promise((resolve, reject) => {
-                const ws = new WebSocket(address);
-                const timeout = setTimeout(() => { ws.close(); reject("Timeout"); }, 5000);
-
-                ws.onopen = () => {
-                    ws.send(JSON.stringify({ type: 'auth', username, token }));
-                };
-
-                ws.onmessage = (e) => {
-                    const resp = JSON.parse(e.data);
-                    if (resp.type === 'auth' && resp.message === 'ok') {
-                        ws.send(JSON.stringify({ type, data }));
-                    } else if (resp.type === type) {
-                        clearTimeout(timeout);
-                        ws.close();
-                        resolve(resp);
-                    } else if (resp.type === 'error') {
-                        clearTimeout(timeout);
-                        ws.close();
-                        reject(resp.message);
-                    }
-                };
-
-                ws.onerror = () => { clearTimeout(timeout); reject("Connection failed."); };
-            });
-        }
-
-        cloudBackupBtn.addEventListener('click', async () => {
-            cloudBackupBtn.textContent = "Backing up...";
-            cloudBackupBtn.disabled = true;
-            try {
-                const data = { ...localStorage };
-                await sendCloudCommand('backup', { data });
-                showPrompt("Cloud Backup", "Cloud backup successful!");
-            } catch (err) {
-                showPrompt("Cloud Backup Error", "Cloud backup failed: " + err);
-            } finally {
-                cloudBackupBtn.textContent = "Cloud Backup";
-                cloudBackupBtn.disabled = false;
-            }
-        });
-
-        cloudRestoreBtn.addEventListener('click', async () => {
-            if (!(await showPrompt("Cloud Restore", "This will overwrite local data with cloud data. Continue?", true))) return;
-            cloudRestoreBtn.textContent = "Restoring...";
-            cloudRestoreBtn.disabled = true;
-            try {
-                const resp = await sendCloudCommand('restore');
-                if (resp.data && Object.keys(resp.data).length > 0) {
-                    localStorage.clear();
-                    for (const key in resp.data) {
-                        localStorage.setItem(key, resp.data[key]);
-                    }
-                    window.location.reload();
-                } else {
-                    showPrompt("Cloud Restore", "No cloud backup found.");
-                }
-            } catch (err) {
-                showPrompt("Cloud Restore Error", "Cloud restore failed: " + err);
-            } finally {
-                cloudRestoreBtn.textContent = "Cloud Restore";
-                cloudRestoreBtn.disabled = false;
-            }
-        });
 
         // App Management Logic
         async function loadInstalledApps() {
@@ -990,9 +912,9 @@
             const cached = localStorage.getItem('launcher-store-cache');
             if (cached) { allApps = JSON.parse(cached); }
 
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"]');
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "about", "apps", "re-arrange", "notifications", "shared-preferences", "changelog", "welcome", "sketch"]');
             const appSizes = JSON.parse(localStorage.getItem('launcher-app-sizes') || '{}');
-            const systemIds = ["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
+            const systemIds = ["launcher-settings", "about", "apps", "re-arrange", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
             const installed = allApps.filter(app => downloadedIds.includes(app.id) && !systemIds.includes(app.id));
 
             if (installed.length === 0) {
@@ -1069,9 +991,9 @@
 
         async function recalculateSizes() {
             const btn = document.getElementById('recalc-sizes-btn');
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"]');
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "about", "apps", "re-arrange", "notifications", "shared-preferences", "changelog", "welcome", "sketch"]');
             const cache = JSON.parse(localStorage.getItem('launcher-store-cache') || '[]');
-            const systemIds = ["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
+            const systemIds = ["launcher-settings", "about", "apps", "re-arrange", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
 
             const installed = cache.filter(app => downloadedIds.includes(app.id) && !systemIds.includes(app.id));
             if (!installed.length) return;
@@ -1132,6 +1054,35 @@
         }
 
         document.getElementById('recalc-sizes-btn').addEventListener('click', recalculateSizes);
+
+        document.getElementById('delete-all-btn').addEventListener('click', async () => {
+            if (await showPrompt("Delete All Apps", "This will uninstall all non-system apps and clear your app sizes. Proceed?", true)) {
+                const systemIds = ["launcher-settings", "about", "apps", "re-arrange", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
+                localStorage.setItem('launcher-downloaded-ids', JSON.stringify(systemIds));
+                localStorage.setItem('launcher-app-sizes', '{}');
+
+                // Also clean up grid
+                const gridStr = localStorage.getItem('launcher-grid');
+                if (gridStr) {
+                    try {
+                        let grid = JSON.parse(gridStr);
+                        grid = grid.map(item => {
+                            if (!item) return null;
+                            if (typeof item === 'string') return systemIds.includes(item) ? item : null;
+                            if (typeof item === 'object' && item.type === 'folder') {
+                                item.apps = (item.apps || []).map(id => systemIds.includes(id) ? id : null);
+                                return item;
+                            }
+                            return item;
+                        });
+                        localStorage.setItem('launcher-grid', JSON.stringify(grid));
+                    } catch (e) { }
+                }
+
+                loadInstalledApps();
+                window.dispatchEvent(new Event('storage'));
+            }
+        });
 
         loadInstalledApps();
 

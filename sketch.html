@@ -72,6 +72,7 @@
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
+            z-index: 100;
         }
 
         .sidebar-header {
@@ -99,6 +100,7 @@
             justify-content: space-between;
             align-items: center;
             opacity: 0.7;
+            position: relative;
         }
 
         .note-item:hover {
@@ -110,18 +112,81 @@
             background: var(--accent-color);
             color: var(--bg-color);
             opacity: 1;
+        }
+
+        .note-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
             font-weight: bold;
         }
 
-        .note-item .delete-btn {
+        .note-preview {
+            font-size: 0.8rem;
+            opacity: 0.6;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 4px;
+        }
+
+        .note-dates {
+            font-size: 0.7rem;
+            opacity: 0.4;
+            margin-top: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .folder-item {
+            padding: 10px 15px;
+            border-radius: 12px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .folder-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .folder-content {
+            margin-left: 20px;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 10px;
+            display: none;
+        }
+
+        .folder-content.open {
+            display: block;
+        }
+
+        .delete-btn {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff4747;
+            border: 1px solid #ff4747;
             opacity: 0;
             transition: opacity 0.2s;
             padding: 2px 8px;
             font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 6px;
         }
 
         .note-item:hover .delete-btn {
             opacity: 1;
+        }
+
+        .note-item.active .delete-btn {
+            background: var(--bg-color);
+            color: var(--accent-color);
+            border-color: var(--bg-color);
         }
 
         /* Main Content */
@@ -131,6 +196,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            min-width: 0;
         }
 
         #toolbar {
@@ -281,14 +347,15 @@
         }
 
         #text-editor {
-            width: 100%;
+            flex: 1;
+            width: 50%;
             height: auto;
             min-height: 100vh;
             padding: 40px;
             background: rgba(0, 0, 0, 0.4);
             color: var(--accent-color);
             border: none;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid var(--accent-color);
             outline: none;
             font-size: 1.1rem;
             line-height: 1.6;
@@ -308,34 +375,23 @@
             background: rgba(0, 0, 0, 0.6);
         }
 
-        #editor-container.split-mode #text-editor {
-            flex: 1;
-            width: 50%;
-        }
-
-        #editor-container.split-mode #markdown-preview {
-            display: block;
-            flex: 1;
-            width: 50%;
-            background: rgba(0, 0, 0, 0.2);
-        }
-
         #markdown-preview {
-            width: 100%;
+            flex: 1;
+            width: 50%;
             height: auto;
             min-height: 100vh;
             padding: 40px;
-            background: transparent;
+            background: rgba(0, 0, 0, 0.2);
             color: var(--accent-color);
             z-index: 3;
             position: relative;
             pointer-events: auto;
-            display: none;
             scrollbar-width: none;
             opacity: 0.3;
             /* visible but faint in draw mode */
             transition: opacity 0.3s;
             overflow: hidden;
+            display: block !important;
         }
 
         #markdown-preview.active {
@@ -437,6 +493,25 @@
         #markdown-preview del {
             opacity: 0.6;
         }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .checklist-cb {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-color);
+            cursor: pointer;
+        }
+
+        .checklist-text.checked {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
     </style>
 </head>
 
@@ -455,7 +530,25 @@
     <div id="sidebar">
         <div class="sidebar-header">
             <span style="font-weight: bold;">Notes</span>
-            <button class="tool-btn" id="add-note-btn">New</button>
+            <div style="display: flex; gap: 5px;">
+                <button class="tool-btn" id="add-folder-btn" title="New Folder"
+                    style="padding: 5px 8px; display: flex; align-items: center; gap: 4px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" style="width: 16px; height: 16px;">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    +
+                </button>
+                <button class="tool-btn" id="add-note-btn">New</button>
+            </div>
+        </div>
+        <div
+            style="padding: 5px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+            <select id="sort-method" class="tool-btn" style="padding: 2px 5px; font-size: 0.7rem;">
+                <option value="updated">Sorted by: Modified</option>
+                <option value="created">Sorted by: Created</option>
+                <option value="title">Sorted by: Name</option>
+            </select>
         </div>
         <div id="note-list"></div>
     </div>
@@ -472,6 +565,10 @@
             <div id="draw-tools" style="display: flex; align-items: center; gap: 10px;">
                 <button class="tool-btn active" id="pen-tool">Pen</button>
                 <button class="tool-btn" id="eraser-tool">Eraser</button>
+                <div style="display: flex; gap: 2px;">
+                    <button class="tool-btn" id="undo-btn" title="Undo" style="padding: 8px 10px;">↶</button>
+                    <button class="tool-btn" id="redo-btn" title="Redo" style="padding: 8px 10px;">↷</button>
+                </div>
                 <button class="tool-btn" id="clear-btn">Clear</button>
                 <select id="stroke-size" class="tool-btn" style="background: var(--bg-color);">
                     <option value="2">Fine</option>
@@ -494,6 +591,7 @@
                 <button class="tool-btn" data-wrap="~~">S</button>
                 <button class="tool-btn" data-prefix="# ">H1</button>
                 <button class="tool-btn" data-prefix="## ">H2</button>
+                <button class="tool-btn" data-prefix="- [ ] ">Checklist</button>
             </div>
         </div>
 
@@ -521,6 +619,20 @@
         </div>
     </div>
 
+    <!-- Input Prompt Modal -->
+    <div class="modal-overlay" id="input-modal">
+        <div class="modal-content">
+            <h3 id="input-modal-title">Name Your Folder</h3>
+            <input type="text" id="input-modal-field"
+                style="width: 100%; padding: 15px; background: var(--accent-color); border: none; border-radius: 12px; color: var(--bg-color); font-size: 1.2rem; margin-bottom: 25px; font-weight: bold; text-align: center;"
+                placeholder="e.g. Work" autocomplete="off" />
+            <div class="modal-actions">
+                <button class="modal-cancel-btn" id="input-modal-cancel">Cancel</button>
+                <button class="modal-save-btn" id="input-modal-ok">Create</button>
+            </div>
+        </div>
+    </div>
+
     <script src="notifications.js"></script>
     <script>
         // Custom prompt wrapper
@@ -530,8 +642,25 @@
             const modal = document.getElementById('prompt-modal');
             const okBtn = document.getElementById('prompt-ok-btn');
             const cancelBtn = document.getElementById('prompt-cancel-btn');
+            modal.classList.add('active');
+            const cleanup = () => {
+                modal.classList.remove('active');
+                okBtn.onclick = null;
+                cancelBtn.onclick = null;
+            };
+            okBtn.onclick = () => { cleanup(); onConfirm(); };
+            cancelBtn.onclick = cleanup;
+        }
+
+        function showInputPrompt(title, onConfirm) {
+            const modal = document.getElementById('input-modal');
+            const field = document.getElementById('input-modal-field');
+            const okBtn = document.getElementById('input-modal-ok');
+            const cancelBtn = document.getElementById('input-modal-cancel');
 
             modal.classList.add('active');
+            field.value = '';
+            setTimeout(() => field.focus(), 150);
 
             const cleanup = () => {
                 modal.classList.remove('active');
@@ -539,67 +668,221 @@
                 cancelBtn.onclick = null;
             };
 
-            okBtn.onclick = () => { cleanup(); onConfirm(); };
+            okBtn.onclick = () => {
+                const val = field.value.trim();
+                if (val) { cleanup(); onConfirm(val); }
+            };
             cancelBtn.onclick = cleanup;
+
+            field.onkeydown = (e) => {
+                if (e.key === 'Enter') okBtn.click();
+                if (e.key === 'Escape') cancelBtn.click();
+            };
         }
+
         let notes = JSON.parse(localStorage.getItem('launcher-notes') || '[]');
+        let folders = JSON.parse(localStorage.getItem('launcher-folders') || '[]');
         let activeNoteId = localStorage.getItem('launcher-active-note-id') || null;
+        let openFolders = JSON.parse(localStorage.getItem('launcher-open-folders') || '[]');
+        let sortMethod = localStorage.getItem('launcher-note-sort') || 'updated';
+
         let mode = 'draw';
         let drawColor = 'theme';
         let isDrawing = false;
         let activeTool = 'pen';
         let lastX = 0, lastY = 0;
 
+        // Undo/Redo Storage
+        let undoStack = [];
+        let redoStack = [];
+        const MAX_STACK = 50;
+
         const canvas = document.getElementById('canvas-layer');
         const ctx = canvas.getContext('2d');
         const textEditor = document.getElementById('text-editor');
         const noteList = document.getElementById('note-list');
         const titleInput = document.getElementById('note-title-input');
+        const previewEl = document.getElementById('markdown-preview');
         const ns = new NotificationService();
 
         // Initialization
         function init() {
-            if (notes.length === 0) {
-                createNewNote("Untitled Note");
+            if (notes.length === 0 && folders.length === 0) {
+                createNewNote("First Note");
             } else {
                 if (!activeNoteId || !notes.find(n => n.id === activeNoteId)) {
-                    activeNoteId = notes[0].id;
+                    activeNoteId = notes.length > 0 ? notes[0].id : null;
                 }
                 renderNoteList();
-                loadNote(activeNoteId);
+                if (activeNoteId) loadNote(activeNoteId);
             }
             resizeCanvas();
+            document.getElementById('sort-method').value = sortMethod;
+
+            // Force first render
+            renderMarkdown();
         }
 
-        function createNewNote(title = "New Note") {
+        function saveState() {
+            undoStack.push(canvas.toDataURL());
+            if (undoStack.length > MAX_STACK) undoStack.shift();
+            redoStack = []; // Clear redo on new action
+        }
+
+        function undo() {
+            if (undoStack.length === 0) return;
+            const currentState = canvas.toDataURL();
+            redoStack.push(currentState);
+            const prevState = undoStack.pop();
+            applyState(prevState);
+        }
+
+        function redo() {
+            if (redoStack.length === 0) return;
+            const currentState = canvas.toDataURL();
+            undoStack.push(currentState);
+            const nextState = redoStack.pop();
+            applyState(nextState);
+        }
+
+        function applyState(dataUrl) {
+            const img = new Image();
+            img.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+                updateActiveNote(false); // don't push to stack again
+            };
+            img.src = dataUrl;
+        }
+
+        function createNewNote(title = "New Note", parentId = null) {
             const id = 'note-' + Date.now();
             const newNote = {
                 id,
                 title,
                 content: '',
                 sketch: null,
-                updated: Date.now()
+                created: Date.now(),
+                updated: Date.now(),
+                parentId
             };
             notes.unshift(newNote);
             activeNoteId = id;
             saveNotes();
             renderNoteList();
             loadNote(id);
-            broadcastNoteSync(newNote);
+            broadcastNoteSync();
+            // Ensure markdown renders immediately
+            setTimeout(renderMarkdown, 50);
+        }
+
+        function createNewFolder() {
+            showInputPrompt("Name Your Folder", (name) => {
+                const folder = {
+                    id: 'folder-' + Date.now(),
+                    name: name,
+                    created: Date.now()
+                };
+                folders.push(folder);
+                saveNotes();
+                renderNoteList();
+            });
+        }
+
+        function deleteFolder(e, id) {
+            e.stopPropagation();
+            showPrompt('Delete Folder', 'Are you sure? This will NOT delete the notes inside, they will move to the root.', () => {
+                folders = folders.filter(f => f.id !== id);
+                notes.forEach(n => { if (n.parentId === id) n.parentId = null; });
+                saveNotes();
+                renderNoteList();
+            });
         }
 
         function renderNoteList() {
             noteList.innerHTML = '';
-            notes.forEach(note => {
-                const div = document.createElement('div');
-                div.className = `note-item ${note.id === activeNoteId ? 'active' : ''}`;
-                div.innerHTML = `
-                    <span>${note.title}</span>
-                    <button class="delete-btn tool-btn" onclick="deleteNote(event, '${note.id}')">Delete</button>
-                `;
-                div.onclick = () => selectNote(note.id);
-                noteList.appendChild(div);
+
+            // Apply sorting
+            const sortedNotes = [...notes].sort((a, b) => {
+                if (sortMethod === 'title') return a.title.localeCompare(b.title);
+                return b[sortMethod] - a[sortMethod];
             });
+
+            // 1. Render Folders
+            folders.forEach(folder => {
+                const fDiv = document.createElement('div');
+                fDiv.className = 'folder-item';
+                const isOpen = openFolders.includes(folder.id);
+                const arrow = isOpen ? '▼' : '▶';
+                fDiv.innerHTML = `
+                    <span>${arrow}</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; vertical-align: middle;">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span style="flex-grow: 1;">${folder.name}</span>
+                    <button class="delete-btn" onclick="deleteFolder(event, '${folder.id}')">Del</button>
+                `;
+                fDiv.onclick = () => {
+                    if (openFolders.includes(folder.id)) {
+                        openFolders = openFolders.filter(id => id !== folder.id);
+                    } else {
+                        openFolders.push(folder.id);
+                    }
+                    localStorage.setItem('launcher-open-folders', JSON.stringify(openFolders));
+                    renderNoteList();
+                };
+                noteList.appendChild(fDiv);
+
+                const cDiv = document.createElement('div');
+                cDiv.className = `folder-content ${isOpen ? 'open' : ''}`;
+
+                const folderNotes = sortedNotes.filter(n => n.parentId === folder.id);
+                folderNotes.forEach(note => cDiv.appendChild(createNoteElement(note)));
+
+                // Add "Add here" button if open
+                if (isOpen) {
+                    const addBtn = document.createElement('div');
+                    addBtn.className = 'note-item';
+                    addBtn.style.textAlign = 'center';
+                    addBtn.innerHTML = '<span style="opacity: 0.5;">+ Add Note Here</span>';
+                    addBtn.onclick = (e) => { e.stopPropagation(); createNewNote("New Note", folder.id); };
+                    cDiv.appendChild(addBtn);
+                }
+
+                noteList.appendChild(cDiv);
+            });
+
+            // 2. Render Root Notes
+            const rootNotes = sortedNotes.filter(n => !n.parentId);
+            rootNotes.forEach(note => noteList.appendChild(createNoteElement(note)));
+        }
+
+        function createNoteElement(note) {
+            const div = document.createElement('div');
+            div.className = `note-item ${note.id === activeNoteId ? 'active' : ''}`;
+
+            const preview = note.content
+                ? (note.content.substring(0, 40) + (note.content.length > 40 ? '...' : ''))
+                : 'Empty note';
+
+            const createdStr = new Date(note.created).toLocaleDateString();
+            const updatedStr = new Date(note.updated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            div.innerHTML = `
+                <div style="flex-grow: 1; min-width: 0;">
+                    <div class="note-item-header">
+                        <span>${note.title || 'Untitled'}</span>
+                        <button class="delete-btn" onclick="deleteNote(event, '${note.id}')">Del</button>
+                    </div>
+                    <div class="note-preview">${preview}</div>
+                    <div class="note-dates">
+                        <span>${createdStr}</span>
+                        <span>${updatedStr}</span>
+                    </div>
+                </div>
+            `;
+            div.onclick = () => selectNote(note.id);
+            return div;
         }
 
         function selectNote(id) {
@@ -612,18 +895,15 @@
 
         function deleteNote(e, id) {
             e.stopPropagation();
-            showPrompt('Delete Note', 'Are you sure you want to delete this note? This action cannot be undone.', () => {
+            showPrompt('Delete Note', 'Are you sure you want to delete this note?', () => {
                 notes = notes.filter(n => n.id !== id);
                 if (activeNoteId === id) {
                     activeNoteId = notes.length > 0 ? notes[0].id : null;
                 }
                 saveNotes();
-                if (activeNoteId) {
-                    renderNoteList();
-                    loadNote(activeNoteId);
-                } else {
-                    createNewNote();
-                }
+                renderNoteList();
+                if (activeNoteId) loadNote(activeNoteId);
+                else createNewNote();
             });
         }
 
@@ -633,7 +913,10 @@
             titleInput.value = note.title;
             textEditor.value = note.content;
             renderMarkdown();
+            setTimeout(renderMarkdown, 50); // Ensure layout is settled
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            undoStack = [];
+            redoStack = [];
             if (note.sketch) {
                 const img = new Image();
                 img.onload = () => ctx.drawImage(img, 0, 0);
@@ -642,65 +925,86 @@
         }
 
         function renderMarkdown() {
-            const preview = document.getElementById('markdown-preview');
             const raw = textEditor.value;
-            preview.innerHTML = raw
+            let html = raw
                 .replace(/^# (.*$)/gim, '<h1>$1</h1>')
                 .replace(/^## (.*$)/gim, '<h2>$1</h2>')
                 .replace(/\*\*(.*?)\*\*/gim, '<b>$1</b>')
                 .replace(/~~(.*?)~~/gim, '<del>$1</del>')
+                // Checklist support
+                .replace(/^- \[ \] (.*$)/gim, '<div class="checklist-item"><input type="checkbox" class="checklist-cb" data-line="$1"> <span class="checklist-text">$1</span></div>')
+                .replace(/^- \[x\] (.*$)/gim, '<div class="checklist-item"><input type="checkbox" class="checklist-cb" checked data-line="$1"> <span class="checklist-text checked">$1</span></div>')
                 .replace(/\n/gim, '<br>');
 
-            // Adjust heights to ensure canvas covers all content
+            previewEl.innerHTML = html;
+
+            // Handle checkbox clicks
+            previewEl.querySelectorAll('.checklist-cb').forEach(cb => {
+                cb.onclick = (e) => {
+                    const text = e.target.dataset.line;
+                    const isChecked = e.target.checked;
+                    const find = isChecked ? `- [ ] ${text}` : `- [x] ${text}`;
+                    const replace = isChecked ? `- [x] ${text}` : `- [ ] ${text}`;
+                    textEditor.value = textEditor.value.replace(find, replace);
+                    updateActiveNote();
+                };
+            });
+
+            // Adjust heights
             const scrollArea = document.getElementById('master-scroll-area');
             const editorHeight = textEditor.scrollHeight;
-            const previewHeight = preview.scrollHeight;
+            const previewHeight = previewEl.scrollHeight;
             const maxHeight = Math.max(editorHeight, previewHeight, scrollArea.clientHeight);
 
             textEditor.style.height = maxHeight + 'px';
-            preview.style.height = maxHeight + 'px';
-            if (canvas.height < maxHeight) {
-                resizeCanvas(maxHeight);
-            }
+            previewEl.style.height = maxHeight + 'px';
+            if (canvas.height < maxHeight) resizeCanvas(maxHeight);
         }
 
         function saveNotes() {
             localStorage.setItem('launcher-notes', JSON.stringify(notes));
+            localStorage.setItem('launcher-folders', JSON.stringify(folders));
         }
 
-        function updateActiveNote() {
+        function updateActiveNote(shouldPushUndo = true) {
             const note = notes.find(n => n.id === activeNoteId);
             if (note) {
                 note.title = titleInput.value;
                 note.content = textEditor.value;
-                note.sketch = canvas.toDataURL();
+                if (shouldPushUndo) {
+                    // only save sketch if drawing changed
+                    note.sketch = canvas.toDataURL();
+                }
                 note.updated = Date.now();
                 saveNotes();
-                renderNoteList();
                 renderMarkdown();
-                broadcastNoteSync(note);
+                // We update list on debounce if title changes, or just let it be
             }
         }
 
-        function broadcastNoteSync(note) {
+        function broadcastNoteSync() {
             ns.broadcastSync('launcher-notes', JSON.stringify(notes));
         }
 
-        // Event Listeners for UI
-        titleInput.oninput = updateActiveNote;
+        // --- Event Listeners ---
+        titleInput.oninput = () => { updateActiveNote(); renderNoteList(); };
         textEditor.oninput = updateActiveNote;
         document.getElementById('add-note-btn').onclick = () => createNewNote();
+        document.getElementById('add-folder-btn').onclick = createNewFolder;
+        document.getElementById('sort-method').onchange = (e) => {
+            sortMethod = e.target.value;
+            localStorage.setItem('launcher-note-sort', sortMethod);
+            renderNoteList();
+        };
 
-        // Drawing Logic
         function resizeCanvas(forceHeight) {
             const scrollArea = document.getElementById('master-scroll-area');
             const container = document.getElementById('editor-container');
             const rect = container.getBoundingClientRect();
-            const h = forceHeight || Math.max(rect.height, textEditor.scrollHeight, document.getElementById('markdown-preview').scrollHeight);
+            const h = forceHeight || Math.max(rect.height, textEditor.scrollHeight, previewEl.scrollHeight);
 
-            // Preserve drawing
             const temp = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            canvas.width = scrollArea.clientWidth || rect.width; // Fix horizontal mapping offset!
+            canvas.width = scrollArea.clientWidth || rect.width;
             canvas.height = h;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
@@ -710,6 +1014,7 @@
 
         function startDrawing(e) {
             if (mode !== 'draw') return;
+            saveState(); // Push to undo stack before starting new stroke
             isDrawing = true;
             const x = e.clientX || (e.touches && e.touches[0].clientX);
             const y = e.clientY || (e.touches && e.touches[0].clientY);
@@ -737,8 +1042,7 @@
             } else {
                 ctx.globalCompositeOperation = 'source-over';
                 ctx.strokeStyle = drawColor === 'theme' ? window.ACCENT_COLOR : drawColor;
-                const size = document.getElementById('stroke-size').value;
-                ctx.lineWidth = parseInt(size);
+                ctx.lineWidth = parseInt(document.getElementById('stroke-size').value);
             }
 
             ctx.stroke();
@@ -761,13 +1065,14 @@
         canvas.ontouchmove = drawMove;
         canvas.ontouchend = endDrawing;
 
-        // Tool Toggles
+        document.getElementById('undo-btn').onclick = undo;
+        document.getElementById('redo-btn').onclick = redo;
+
         document.getElementById('draw-tab').onclick = () => {
             mode = 'draw';
             textEditor.classList.remove('active');
             previewEl.classList.remove('active');
             canvas.classList.remove('locked');
-            document.getElementById('editor-container').classList.add('split-mode'); // keep layout
             document.getElementById('draw-tab').classList.add('active');
             document.getElementById('text-tab').classList.remove('active');
             document.getElementById('draw-tools').style.display = 'flex';
@@ -780,7 +1085,6 @@
             textEditor.classList.add('active');
             previewEl.classList.add('active');
             canvas.classList.add('locked');
-            document.getElementById('editor-container').classList.add('split-mode');
             document.getElementById('draw-tab').classList.remove('active');
             document.getElementById('text-tab').classList.add('active');
             document.getElementById('draw-tools').style.display = 'none';
@@ -788,19 +1092,16 @@
             renderMarkdown();
         };
 
-        // Consolitate Clear logic
-        const clearDrawing = () => {
-            showPrompt('Clear Drawing', 'Are you sure you want to clear your drawing on this note?', () => {
+        document.getElementById('clear-btn').onclick = () => {
+            showPrompt('Clear Drawing', 'Clear this sketch?', () => {
+                saveState();
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 updateActiveNote();
             });
         };
 
-        document.getElementById('clear-btn').onclick = clearDrawing;
-
-        // Parent controls scroll now.
-        const previewEl = document.getElementById('markdown-preview');
-
+        let isSyncingPreview = false;
+        let isSyncingText = false;
         textEditor.onscroll = () => {
             if (isSyncingPreview) return;
             isSyncingText = true;
@@ -808,7 +1109,6 @@
             previewEl.scrollTop = scrollPct * (previewEl.scrollHeight - previewEl.clientHeight);
             setTimeout(() => isSyncingText = false, 50);
         };
-
         previewEl.onscroll = () => {
             if (isSyncingText) return;
             isSyncingPreview = true;
@@ -817,29 +1117,16 @@
             setTimeout(() => isSyncingPreview = false, 50);
         };
 
-        // Double Click Canvas in Text mode to toggle ink
-        canvas.ondblclick = () => {
-            if (mode === 'text') {
-                canvas.classList.toggle('locked');
-                if (!canvas.classList.contains('locked')) {
-                    // Show a quick indicator or just let them draw
-                }
-            }
-        };
-
         document.getElementById('pen-tool').onclick = () => {
             activeTool = 'pen';
             document.getElementById('pen-tool').classList.add('active');
             document.getElementById('eraser-tool').classList.remove('active');
         };
-
         document.getElementById('eraser-tool').onclick = () => {
             activeTool = 'eraser';
             document.getElementById('eraser-tool').classList.add('active');
             document.getElementById('pen-tool').classList.remove('active');
         };
-
-
 
         document.getElementById('palette').onclick = (e) => {
             if (e.target.classList.contains('color-swatch')) {
@@ -850,7 +1137,6 @@
             }
         };
 
-        // Text formatting helpers
         document.getElementById('text-tools').onclick = (e) => {
             const btn = e.target.closest('.tool-btn');
             if (!btn) return;
@@ -870,13 +1156,12 @@
             }
             textEditor.focus();
             updateActiveNote();
+            renderMarkdown();
         };
 
-        // Cloud Incoming Sync
         window.addEventListener('storage', (e) => {
             if (e.key === 'launcher-notes') {
                 const newNotes = JSON.parse(e.newValue);
-                // Simple merge based on 'updated' timestamp
                 if (Array.isArray(newNotes)) {
                     notes = newNotes;
                     renderNoteList();
@@ -885,19 +1170,15 @@
             }
         });
 
-        // Close logic
-        const getBackUrl = () => {
-            return sessionStorage.getItem('launchSource') === 'apps' ? 'apps.html' : 'index.html';
-        };
         document.getElementById('close-btn').onclick = (e) => {
             e.preventDefault();
             document.body.classList.add('fade-out');
-            setTimeout(() => { window.location.href = getBackUrl(); }, 400);
+            setTimeout(() => { window.location.href = sessionStorage.getItem('launchSource') === 'apps' ? 'apps.html' : 'index.html'; }, 400);
         };
 
-        // Fullscreen
-        const triggerFullscreen = () => { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(() => { }); } };
-        document.body.addEventListener('click', triggerFullscreen, { once: true });
+        document.body.addEventListener('click', () => {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => { });
+        }, { once: true });
 
         init();
     </script>

@@ -530,21 +530,35 @@
                 try { allApps = JSON.parse(cached); } catch (e) { }
             }
 
-            // Hotpatch stale caches
-            const s = allApps.find(a => a.id === 'sketch');
-            if (s) s.category = 'System';
-            if (!allApps.find(a => a.id === 'apps')) allApps.push({ id: "apps", name: "Apps", category: "System" });
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "about", "apps", "re-arrange", "notifications", "shared-preferences", "changelog", "welcome", "sketch"]');
 
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"]');
-
-            const systemIds = ["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
+            const systemIds = ["launcher-settings", "about", "apps", "re-arrange", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
 
             if (!allApps || allApps.length === 0) {
                 allApps = [
+                    { id: "remote-osx", name: "Remote OSX", category: "Remote" },
+                    { id: "remote-browser", name: "Remote Browser", category: "Remote" },
+                    { id: "remote-linux", name: "Remote Linux", category: "Remote" },
                     { id: "launcher-settings", name: "Settings", category: "System" },
-                    { id: "apps", name: "Apps", category: "System" },
                     { id: "about", name: "About", category: "System" },
+                    { id: "printing", name: "Printing", category: "Office" },
+                    { id: "classroom", name: "Classroom", category: "School" },
+                    { id: "apps", name: "Apps", category: "System" },
                     { id: "re-arrange", name: "Arrange", category: "System" },
+                    { id: "rainyware", name: "Rainyware", category: "Web" },
+                    { id: "parsec", name: "Parsec", category: "Remote" },
+                    { id: "spotify", name: "Spotify", category: "Media" },
+                    { id: "apple-music", name: "Apple Music", category: "Media" },
+                    { id: "matlab", name: "MATLAB", category: "School" },
+                    { id: "youtube", name: "YouTube", category: "Media" },
+                    { id: "youtube-music", name: "YouTube Music", category: "Media" },
+                    { id: "vscode", name: "VS Code", category: "Web" },
+                    { id: "gmail", name: "GMail", category: "Office" },
+                    { id: "google-earth", name: "Google Earth", category: "Web" },
+                    { id: "google-drive", name: "Google Drive", category: "Office" },
+                    { id: "google-docs", name: "Google Docs", category: "Office" },
+                    { id: "outlook", name: "Outlook", category: "Office" },
+                    { id: "icloud", name: "iCloud", category: "Office" },
                     { id: "notifications", name: "Notifications", category: "System" },
                     { id: "shared-preferences", name: "Shared Preferences", category: "System" },
                     { id: "changelog", name: "Changelog", category: "System" },

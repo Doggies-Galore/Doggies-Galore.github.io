@@ -313,19 +313,14 @@
                     ];
                 }
 
-                // Hotpatch stale caches for correct categories
-                const sketchApp = dataApps.find(a => a.id === 'sketch');
-                if (sketchApp) sketchApp.category = 'System';
-                if (!dataApps.find(a => a.id === 'apps')) {
-                    dataApps.push({ id: "apps", name: "Apps", url: "apps.html", about: "View and download applets.", category: "System", fade: "theme" });
-                }
+
             }
 
             const container = document.getElementById('categories-container');
             container.innerHTML = '';
 
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"]');
-            const systemIds = ["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "about", "apps", "re-arrange", "notifications", "shared-preferences", "changelog", "welcome", "sketch"]');
+            const systemIds = ["launcher-settings", "about", "apps", "re-arrange", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
             const appSizes = JSON.parse(localStorage.getItem('launcher-app-sizes') || '{}');
 
             const excludeIds = ['apps'];
