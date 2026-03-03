@@ -22,6 +22,12 @@
                     document.documentElement.appendChild(style);
                 }
             }
+
+            window.addEventListener('DOMContentLoaded', () => {
+                requestAnimationFrame(() => {
+                    document.documentElement.classList.add('ready');
+                });
+            });
         })();
     </script>
     <style>
