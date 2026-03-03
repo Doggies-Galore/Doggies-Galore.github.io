@@ -392,7 +392,7 @@
 
                     const downloadApp = async () => {
                         if (downloadedIds.includes(app.id)) return;
-                        downloadBtn.textContent = 'Measuring...';
+                        downloadBtn.textContent = 'Downloading...';
                         downloadBtn.disabled = true;
 
                         function formatSize(bytes) {
@@ -417,7 +417,7 @@
                                     const blob = await res.blob();
                                     totalBytes += blob.size;
                                     // Live counter on the button
-                                    downloadBtn.textContent = 'Measuring... ' + formatSize(totalBytes);
+                                    downloadBtn.textContent = 'Downloading... ' + formatSize(totalBytes);
 
                                     // If HTML, parse and queue its local sub-resources
                                     if (/\.html?$/i.test(canonical)) {
@@ -456,15 +456,19 @@
                                 if (address) {
                                     calculatedSize = await new Promise((resolve) => {
                                         const ws = new WebSocket(address);
-                                        const timeout = setTimeout(() => { ws.close(); resolve('Unknown'); }, 8000);
+                                        const timeout = setTimeout(() => {
+                                            console.warn("Size measurement timed out. Returning partial results.");
+                                            ws.close();
+                                            resolve('Unknown');
+                                        }, 20000); // Increased to 20s for deep scans
                                         ws.onopen = () => ws.send(JSON.stringify({ type: 'get_size', url: app.url }));
                                         ws.onmessage = (e) => {
                                             try {
                                                 const data = JSON.parse(e.data);
-                                                if (data.type === 'get_size' && data.size > 0) {
+                                                if (data.type === 'get_size') {
                                                     clearTimeout(timeout);
                                                     ws.close();
-                                                    resolve(formatSize(data.size));
+                                                    resolve(data.size > 0 ? formatSize(data.size) : 'Unknown');
                                                 }
                                             } catch (_) { clearTimeout(timeout); ws.close(); resolve('Unknown'); }
                                         };

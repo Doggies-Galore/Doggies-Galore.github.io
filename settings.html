@@ -524,6 +524,9 @@
             <div id="installed-apps-list" class="app-list">
                 <!-- Apps will be listed here -->
             </div>
+            <button class="btn" id="recalc-sizes-btn"
+                style="margin-top: 25px; width: auto; padding: 12px 30px; font-size: 1rem;">Recalculate All
+                Sizes</button>
         </div>
     </div>
 
@@ -1064,6 +1067,61 @@
             loadInstalledApps();
             window.dispatchEvent(new Event('storage'));
         }
+
+        async function recalculateSizes() {
+            const btn = document.getElementById('recalc-sizes-btn');
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '[]');
+            const cache = JSON.parse(localStorage.getItem('launcher-store-cache') || '[]');
+            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications"];
+
+            const installed = cache.filter(app => downloadedIds.includes(app.id) && !systemIds.includes(app.id));
+            if (!installed.length) return;
+
+            btn.disabled = true;
+            btn.textContent = "Connecting to Scanner...";
+
+            const formatSize = (bytes) => {
+                if (bytes < 1024) return bytes + ' B';
+                else if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+            };
+
+            const appSizes = JSON.parse(localStorage.getItem('launcher-app-sizes') || '{}');
+
+            for (const app of installed) {
+                btn.textContent = `Scanning ${app.name}...`;
+                try {
+                    const result = await new Promise((resolve) => {
+                        const address = localStorage.getItem('launcher-ws-address');
+                        if (!address) return resolve('Unknown');
+
+                        const ws = new WebSocket(address);
+                        const timeout = setTimeout(() => { ws.close(); resolve('Unknown'); }, 25000);
+
+                        ws.onopen = () => ws.send(JSON.stringify({ type: 'get_size', url: app.url }));
+                        ws.onmessage = (e) => {
+                            const data = JSON.parse(e.data);
+                            if (data.type === 'get_size') {
+                                clearTimeout(timeout);
+                                ws.close();
+                                resolve(data.size > 0 ? formatSize(data.size) : 'Unknown');
+                            }
+                        };
+                        ws.onerror = () => { clearTimeout(timeout); resolve('Unknown'); };
+                    });
+                    appSizes[app.id] = result;
+                    localStorage.setItem('launcher-app-sizes', JSON.stringify(appSizes));
+                    loadInstalledApps(); // Refresh UI
+                } catch (e) {
+                    console.error("Scan failed for", app.name, e);
+                }
+            }
+
+            btn.disabled = false;
+            btn.textContent = "Recalculate All Sizes";
+        }
+
+        document.getElementById('recalc-sizes-btn').addEventListener('click', recalculateSizes);
 
         loadInstalledApps();
 
