@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changelog</title>
+    <style>
+        :root {
+            --bg-color: #000;
+            --accent-color: #fff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            background-color: var(--bg-color);
+            transition: background-color 0.75s ease;
+        }
+
+        body {
+            background-color: transparent;
+            color: var(--accent-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            overflow-y: auto;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            transition: background-color 0.75s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.4s cubic-bezier(0.4, 0.0, 0.2, 1) forwards !important;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-color);
+            font-size: 2vw;
+            cursor: pointer;
+            border: 3px solid var(--accent-color);
+            padding: 10px 25px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        h1 {
+            font-size: 4vw;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 15px;
+        }
+
+        .content {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .version-block {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--accent-color);
+            border-radius: 25px;
+            padding: 30px;
+        }
+
+        .version-tag {
+            font-size: 2.2rem;
+            font-weight: bold;
+            display: inline-block;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            padding: 5px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .change-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .change-item {
+            font-size: 1.4rem;
+            line-height: 1.4;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .change-item::before {
+            content: "•";
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        (function () {
+            const bg = localStorage.getItem('launcher-bg') || '#000000';
+            const accent = localStorage.getItem('launcher-accent') || '#ffffff';
+            document.documentElement.style.setProperty('--bg-color', bg);
+            document.documentElement.style.setProperty('--accent-color', accent);
+        })();
+    </script>
+    <div class="header">
+        <h1>Changelog</h1>
+        <a href="index.html" class="close-btn">Back</a>
+    </div>
+
+    <div class="content">
+        <div class="version-block">
+            <div class="version-tag">v0.6</div>
+            <ul class="change-list">
+                <li class="change-item">New themes: Coffiest, Tux, and Cuddlebug.</li>
+                <li class="change-item">Added Shared Preferences - a quick way to get at your notification tokens.</li>
+                <li class="change-item">Added Cloud Status - now you can see when Launcher is connected to a hosted
+                    websocket server.</li>
+                <li class="change-item">Changelog app - What you're reading right now!</li>
+                <li class="change-item">Added "Welcome" Applet for a tour of the launcher UI.</li>
+                <li class="change-item">Added "Sketch" Applet: A robust note-taking experience with markdown support,
+                    layered sketches, and synchronized scrolling.</li>
+            </ul>
+        </div>
+
+        <div class="version-block" style="opacity: 0.6; filter: grayscale(0.5);">
+            <div class="version-tag"
+                style="background: transparent; border: 2px solid var(--accent-color); color: var(--accent-color);">v0.5
+            </div>
+            <ul class="change-list">
+                <li class="change-item">Basic notification system with Discord/Tumblr support.</li>
+                <li class="change-item">Notification Muting</li>
+                <li class="change-item">App Storage Manager</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const getBackUrl = () => {
+            return sessionStorage.getItem('launchSource') === 'apps' ? 'apps.html' : 'index.html';
+        };
+
+        // History API back button interceptor
+        history.replaceState({ page: 'applet' }, '');
+        history.pushState({ page: 'applet-active' }, '');
+        window.addEventListener('popstate', (e) => {
+            if (e.state && e.state.page === 'applet') {
+                document.body.classList.add('fade-out');
+                setTimeout(() => { window.location.href = getBackUrl(); }, 400);
+            }
+        });
+
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.body.classList.add('fade-out');
+                setTimeout(() => { window.location.href = getBackUrl(); }, 400);
+            });
+        });
+
+        const triggerFullscreen = () => { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(() => { }); } };
+        document.body.addEventListener('click', triggerFullscreen, { once: true });
+    </script>
+    <script src="notifications.js"></script>
+</body>
+
+</html>

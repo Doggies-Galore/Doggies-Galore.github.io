@@ -992,8 +992,7 @@
 
             const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"]');
             const appSizes = JSON.parse(localStorage.getItem('launcher-app-sizes') || '{}');
-            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
-
+            const systemIds = ["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
             const installed = allApps.filter(app => downloadedIds.includes(app.id) && !systemIds.includes(app.id));
 
             if (installed.length === 0) {
@@ -1070,9 +1069,9 @@
 
         async function recalculateSizes() {
             const btn = document.getElementById('recalc-sizes-btn');
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '[]');
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"]');
             const cache = JSON.parse(localStorage.getItem('launcher-store-cache') || '[]');
-            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
+            const systemIds = ["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
 
             const installed = cache.filter(app => downloadedIds.includes(app.id) && !systemIds.includes(app.id));
             if (!installed.length) return;

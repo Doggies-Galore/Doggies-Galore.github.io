@@ -326,14 +326,17 @@
                 "about": { name: "About", url: "about.html", fade: "theme" },
                 "re-arrange": { name: "Arrange", url: "rearrange.html", fade: "theme" },
                 "notifications": { name: "Notifications", url: "notifications.html", fade: "theme" },
-                "shared-preferences": { name: "Shared Preferences", url: "preferences.html", fade: "theme" }
+                "shared-preferences": { name: "Shared Preferences", url: "preferences.html", fade: "theme" },
+                "changelog": { name: "Changelog", url: "changelog.html", fade: "theme" },
+                "welcome": { name: "Welcome", url: "welcome.html", fade: "theme" },
+                "sketch": { name: "Sketch", url: "sketch.html", fade: "theme" }
             };
 
             appMap = { ...fallbackApps };
             configApps.forEach(app => appMap[app.id] = app);
 
             // ── Migration: ensure system applets are always in downloaded IDs ──
-            const requiredSystemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
+            const requiredSystemIds = ["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
             let downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '[]');
             let idsChanged = false;
             requiredSystemIds.forEach(id => {
@@ -354,9 +357,14 @@
             if (!userGrid || !Array.isArray(userGrid) || userGrid.length !== 9) {
                 userGrid = [
                     null, null, null,
-                    null, null, "shared-preferences",
+                    "changelog", "welcome", "shared-preferences",
                     "launcher-settings", "apps", "re-arrange"
                 ];
+            }
+            // Ensure sketch is available if it exists
+            if (requiredSystemIds.includes('sketch') && !downloadedIds.includes('sketch')) {
+                downloadedIds.push('sketch');
+                idsChanged = true;
             }
 
             const openFolderId = sessionStorage.getItem('openFolderId');
@@ -392,8 +400,8 @@
                     return;
                 }
 
-                const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"]');
-                const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
+                const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences", "changelog"]');
+                const systemIds = ["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
 
                 if (typeof item === 'object' && item.type === 'folder') {
                     // Filter out uninstalled apps in this view too
@@ -470,7 +478,7 @@
 
         function preloadDownloadedApps(appsData) {
             const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '[]');
-            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
+            const systemIds = ["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
 
             // Also preload images if any (future-proofing)
             appsData.forEach(app => {
@@ -671,8 +679,8 @@
                     if (storedIdx !== null) safeIndex = parseInt(storedIdx);
                 }
 
-                const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"]');
-                const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
+                const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences", "changelog"]');
+                const systemIds = ["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
                 const actualAppIndex = userGrid.slice(0, safeIndex).filter(item => {
                     if (!item) return false;
                     if (typeof item === 'object') return true;

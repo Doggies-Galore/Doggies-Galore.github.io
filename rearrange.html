@@ -530,9 +530,14 @@
                 try { allApps = JSON.parse(cached); } catch (e) { }
             }
 
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"]');
+            // Hotpatch stale caches
+            const s = allApps.find(a => a.id === 'sketch');
+            if (s) s.category = 'System';
+            if (!allApps.find(a => a.id === 'apps')) allApps.push({ id: "apps", name: "Apps", category: "System" });
 
-            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"]');
+
+            const systemIds = ["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
 
             if (!allApps || allApps.length === 0) {
                 allApps = [
@@ -541,7 +546,10 @@
                     { id: "about", name: "About", category: "System" },
                     { id: "re-arrange", name: "Arrange", category: "System" },
                     { id: "notifications", name: "Notifications", category: "System" },
-                    { id: "shared-preferences", name: "Shared Preferences", category: "System" }
+                    { id: "shared-preferences", name: "Shared Preferences", category: "System" },
+                    { id: "changelog", name: "Changelog", category: "System" },
+                    { id: "welcome", name: "Welcome", category: "System" },
+                    { id: "sketch", name: "Sketch", category: "System" }
                 ];
             }
 
@@ -959,8 +967,8 @@
         function renderGrid() {
             const slots = document.querySelectorAll('.grid-slot');
             const grid = activeGrid();
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"]');
-            const systemIds = ["launcher-settings", "apps", "about", "re-arrange", "notifications", "shared-preferences"];
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"]');
+            const systemIds = ["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
 
             slots.forEach((slot, idx) => {
                 slot.innerHTML = '';

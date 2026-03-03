@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Tour</title>
+    <style>
+        :root {
+            --bg-color: #000;
+            --accent-color: #fff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            background-color: var(--bg-color);
+            transition: background-color 0.75s ease;
+        }
+
+        body {
+            background-color: transparent;
+            color: var(--accent-color);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            transition: opacity 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.4s cubic-bezier(0.4, 0.0, 0.2, 1) forwards !important;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+        }
+
+        .tour-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px solid var(--accent-color);
+            border-radius: 40px;
+            padding: 50px;
+            width: 100%;
+            max-width: 800px;
+            position: relative;
+            text-align: center;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 30px;
+            top: 30px;
+            color: var(--accent-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: 2px solid var(--accent-color);
+            padding: 8px 20px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .close-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .slide-container {
+            position: relative;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            position: absolute;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+            pointer-events: none;
+            width: 100%;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .slide.prev {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+
+        .slide-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .slide-title {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .slide-text {
+            font-size: 1.5rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .nav-dots {
+            display: flex;
+            gap: 12px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--accent-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: var(--accent-color);
+            transform: scale(1.2);
+        }
+
+        .btn {
+            background: transparent;
+            color: var(--accent-color);
+            border: 3px solid var(--accent-color);
+            padding: 12px 30px;
+            border-radius: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        #finish-btn {
+            display: none;
+        }
+
+        .accent-text {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        (function () {
+            const bg = localStorage.getItem('launcher-bg') || '#000000';
+            const accent = localStorage.getItem('launcher-accent') || '#ffffff';
+            document.documentElement.style.setProperty('--bg-color', bg);
+            document.documentElement.style.setProperty('--accent-color', accent);
+        })();
+    </script>
+
+    <div class="tour-card">
+        <a href="index.html" class="close-btn">Exit</a>
+
+        <div class="slide-container">
+            <!-- Slide 1 -->
+            <div class="slide active">
+                <h2 class="slide-title">Welcome Home</h2>
+                <p class="slide-text">This is your personal workspace. A clean, distraction-free environment built to
+                    move into your Chromebook.</p>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="slide">
+                <h2 class="slide-title">The Grid</h2>
+                <p class="slide-text">Launch your favorite web apps from the main grid. You can <span
+                        class="accent-text">Organize</span>, create <span class="accent-text">Folders</span>, and
+                    customize your layout.</p>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="slide">
+                <h2 class="slide-title">Cloud Sync</h2>
+                <p class="slide-text">Look for the <span class="accent-text">Cloud icon</span> in the header. It shows
+                    your connection to the bot server, syncing your settings and notifications in real-time.</p>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="slide">
+                <h2 class="slide-title">App Store</h2>
+                <p class="slide-text">Visit the <span class="accent-text">Apps</span> applet to discover and "download"
+                    new tools. Everything stays local to your browser for instant performance.</p>
+            </div>
+
+            <!-- Slide 5 -->
+            <div class="slide">
+                <h2 class="slide-title">Make it Yours</h2>
+                <p class="slide-text">Head to <span class="accent-text">Settings</span> to change your colors and
+                    background. Your workspace, your rules.</p>
+            </div>
+        </div>
+
+        <div class="nav-controls">
+            <button class="btn" id="prev-btn" disabled>Back</button>
+            <div class="nav-dots">
+                <div class="dot active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <button class="btn" id="next-btn">Next</button>
+            <button class="btn" id="finish-btn">Get Started</button>
+        </div>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const finishBtn = document.getElementById('finish-btn');
+        let currentSlide = 0;
+
+        function updateSlides(direction) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active', 'prev');
+                if (i === currentSlide) {
+                    slide.classList.add('active');
+                } else if (i < currentSlide) {
+                    slide.classList.add('prev');
+                }
+            });
+
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+
+            prevBtn.disabled = currentSlide === 0;
+            if (currentSlide === slides.length - 1) {
+                nextBtn.style.display = 'none';
+                finishBtn.style.display = 'block';
+            } else {
+                nextBtn.style.display = 'block';
+                finishBtn.style.display = 'none';
+            }
+        }
+
+        prevBtn.onclick = () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlides('prev');
+            }
+        };
+
+        nextBtn.onclick = () => {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlides('next');
+            }
+        };
+
+        const getBackUrl = () => {
+            return sessionStorage.getItem('launchSource') === 'apps' ? 'apps.html' : 'index.html';
+        };
+
+        const exitTour = () => {
+            document.body.classList.add('fade-out');
+            setTimeout(() => { window.location.href = getBackUrl(); }, 400);
+        };
+
+        finishBtn.onclick = exitTour;
+        document.querySelector('.close-btn').onclick = (e) => {
+            e.preventDefault();
+            exitTour();
+        };
+
+        // Swipe support (simple)
+        let touchStartX = 0;
+        document.body.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+        document.body.addEventListener('touchend', e => {
+            const touchEndX = e.changedTouches[0].clientX;
+            if (touchStartX - touchEndX > 50) nextBtn.click();
+            if (touchEndX - touchStartX > 50) prevBtn.click();
+        });
+
+        // Fullscreen
+        const triggerFullscreen = () => { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(() => { }); } };
+        document.body.addEventListener('click', triggerFullscreen, { once: true });
+    </script>
+    <script src="notifications.js"></script>
+</body>
+
+</html>

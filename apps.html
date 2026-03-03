@@ -237,6 +237,7 @@
             font-weight: bold;
             margin-bottom: 30px;
             display: none;
+            transition: opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
     </style>
 </head>
@@ -297,21 +298,34 @@
                 if (cached) {
                     try { dataApps = JSON.parse(cached); } catch (e) { }
                 }
+
                 if (!dataApps || dataApps.length === 0) {
                     dataApps = [
-                        { id: "launcher-settings", name: "Settings", url: "settings.html", about: "Configure your launcher.", category: "System" },
-                        { id: "about", name: "About", url: "about.html", about: "Learn more about this project.", category: "System" },
-                        { id: "re-arrange", name: "Arrange", url: "rearrange.html", about: "Organize your apps.", category: "System" },
-                        { id: "notifications", name: "Notifications", url: "notifications.html", about: "View your notification history.", category: "System" },
-                        { id: "shared-preferences", name: "Shared Preferences", url: "preferences.html", about: "Manage your Discord token, Tumblr API key, and followed blogs.", category: "System" }
+                        { id: "launcher-settings", name: "Settings", url: "settings.html", about: "Configure your launcher.", category: "System", fade: "theme" },
+                        { id: "about", name: "About", url: "about.html", about: "Learn more about this project.", category: "System", fade: "theme" },
+                        { id: "re-arrange", name: "Arrange", url: "rearrange.html", about: "Organize your apps.", category: "System", fade: "theme" },
+                        { id: "notifications", name: "Notifications", url: "notifications.html", about: "View your notification history.", category: "System", fade: "theme" },
+                        { id: "shared-preferences", name: "Shared Preferences", url: "preferences.html", about: "Manage your Discord token, Tumblr API key, and followed blogs.", category: "System", fade: "theme" },
+                        { id: "changelog", name: "Changelog", url: "changelog.html", about: "See what's new in Launcher.", category: "System", fade: "theme" },
+                        { id: "welcome", name: "Welcome", url: "welcome.html", about: "Take a tour of your launcher.", category: "System", fade: "theme" },
+                        { id: "sketch", name: "Sketch", url: "sketch.html", about: "Draw, sketch, and take notes.", category: "System", fade: "theme" },
+                        { id: "apps", name: "Apps", url: "apps.html", about: "View and download applets.", category: "System", fade: "theme" }
                     ];
+                }
+
+                // Hotpatch stale caches for correct categories
+                const sketchApp = dataApps.find(a => a.id === 'sketch');
+                if (sketchApp) sketchApp.category = 'System';
+                if (!dataApps.find(a => a.id === 'apps')) {
+                    dataApps.push({ id: "apps", name: "Apps", url: "apps.html", about: "View and download applets.", category: "System", fade: "theme" });
                 }
             }
 
             const container = document.getElementById('categories-container');
             container.innerHTML = '';
 
-            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["launcher-settings", "about", "re-arrange", "notifications", "shared-preferences"]');
+            const downloadedIds = JSON.parse(localStorage.getItem('launcher-downloaded-ids') || '["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"]');
+            const systemIds = ["remote-osx", "remote-browser", "remote-linux", "launcher-settings", "about", "printing", "classroom", "apps", "re-arrange", "rainyware", "parsec", "spotify", "apple-music", "matlab", "youtube", "youtube-music", "vscode", "gmail", "google-earth", "google-drive", "google-docs", "outlook", "icloud", "notifications", "shared-preferences", "changelog", "welcome", "sketch"];
             const appSizes = JSON.parse(localStorage.getItem('launcher-app-sizes') || '{}');
 
             const excludeIds = ['apps'];
@@ -576,6 +590,10 @@
             }
 
             document.getElementById('header').style.opacity = '0';
+            const offlineBanner = document.getElementById('offline-banner');
+            if (offlineBanner && offlineBanner.style.display !== 'none') {
+                offlineBanner.style.opacity = '0';
+            }
 
             allAnimatableElements.forEach((el, i) => {
                 el.style.transition = transitionStyle;
@@ -615,6 +633,8 @@
                     el.style.pointerEvents = 'auto';
                 });
                 document.getElementById('header').style.opacity = '1';
+                const offlineBanner = document.getElementById('offline-banner');
+                if (offlineBanner) offlineBanner.style.opacity = '1';
                 animating = false;
                 return;
             }
@@ -644,6 +664,11 @@
             });
             document.getElementById('header').style.opacity = '0';
             document.getElementById('header').style.transition = 'none';
+            const offlineBanner = document.getElementById('offline-banner');
+            if (offlineBanner) {
+                offlineBanner.style.opacity = '0';
+                offlineBanner.style.transition = 'none';
+            }
 
             const fade = sessionStorage.getItem('lastFadeColor');
             if (fade && fade !== 'theme') {
@@ -669,11 +694,16 @@
 
                     document.getElementById('header').style.transition = 'opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
                     document.getElementById('header').style.opacity = '1';
+                    if (offlineBanner) {
+                        offlineBanner.style.transition = 'opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                        offlineBanner.style.opacity = '1';
+                    }
 
                     setTimeout(() => {
                         animating = false;
                         allAnimatableElements.forEach(el => el.style.transition = '');
                         document.getElementById('header').style.transition = 'opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                        if (offlineBanner) offlineBanner.style.transition = 'opacity 0.75s cubic-bezier(0.4, 0.0, 0.2, 1)';
                         sessionStorage.removeItem('lastAppStoreIndex');
                         sessionStorage.removeItem('lastFadeColor');
                     }, 800);

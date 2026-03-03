@@ -290,6 +290,18 @@ class NotificationService {
         }
     }
 
+    broadcastSync(key, value) {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send(JSON.stringify({
+                type: 'sync',
+                username: localStorage.getItem('launcher-ws-username'),
+                token: localStorage.getItem('launcher-ws-token'),
+                key: key,
+                value: value
+            }));
+        }
+    }
+
     updateStatus(s) {
         this.status = s;
         const event = new CustomEvent('sync-status-change', { detail: s });

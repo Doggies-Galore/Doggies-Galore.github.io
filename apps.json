@@ -6,7 +6,7 @@
             "url": "https://app.jumpdesktop.com/jump#authCreds=true&neuronid=CD-01GC8ZEZNY21WKT06QCZNG4PXA",
             "fade": "#f0f0f0",
             "about": "Remote desktop access to macOS.",
-            "category": "Remote"
+            "category": "System"
         },
         {
             "id": "remote-browser",
@@ -14,7 +14,7 @@
             "url": "https://mediastation.tail76b4d2.ts.net/vnc.html?autoconnect=1",
             "fade": "#111111",
             "about": "Cloud-hosted web browser.",
-            "category": "Remote"
+            "category": "System"
         },
         {
             "id": "remote-linux",
@@ -22,7 +22,7 @@
             "url": "https://connect.raspberrypi.com/devices/2ae11a69-25e3-4c13-93a2-86a3955d5003/screen-sharing-session",
             "fade": "#111111",
             "about": "Remote access to Linux through a Raspberry Pi.",
-            "category": "Remote"
+            "category": "System"
         },
         {
             "id": "launcher-settings",
@@ -46,7 +46,7 @@
             "url": "https://papercut.jeffco.k12.co.us:9192/client",
             "fade": "#f0f0f0",
             "about": "Manage your printing jobs.",
-            "category": "Productivity"
+            "category": "System"
         },
         {
             "id": "classroom",
@@ -54,7 +54,7 @@
             "url": "https://classroom.google.com/h",
             "fade": "#ffffff",
             "about": "Access Google Classroom.",
-            "category": "Education"
+            "category": "System"
         },
         {
             "id": "apps",
@@ -78,7 +78,7 @@
             "url": "https://rainyware.rainsounds2.com",
             "fade": "#0000ff",
             "about": "Where things are done the rainy way.",
-            "category": "Entertainment"
+            "category": "System"
         },
         {
             "id": "parsec",
@@ -86,7 +86,7 @@
             "url": "https://web.parsec.app",
             "fade": "#000000",
             "about": "High-performance remote desktop tool.",
-            "category": "Remote"
+            "category": "System"
         },
         {
             "id": "spotify",
@@ -94,7 +94,7 @@
             "url": "https://spotify.com",
             "fade": "#333333",
             "about": "Listen to music online (but it's green).",
-            "category": "Entertainment"
+            "category": "System"
         },
         {
             "id": "apple-music",
@@ -102,7 +102,7 @@
             "url": "https://music.apple.com",
             "fade": "#ffffff",
             "about": "Listen to music online (but it's hot-pink).",
-            "category": "Entertainment"
+            "category": "System"
         },
         {
             "id": "matlab",
@@ -110,7 +110,7 @@
             "url": "https://matlab.mathworks.com",
             "fade": "#e16a2b",
             "about": "MATLAB Online for web-based technical computing.",
-            "category": "Education"
+            "category": "System"
         },
         {
             "id": "youtube",
@@ -118,7 +118,7 @@
             "url": "https://youtube.com",
             "fade": "#ff0000",
             "about": "Watch and share videos.",
-            "category": "Entertainment"
+            "category": "System"
         },
         {
             "id": "youtube-music",
@@ -126,7 +126,7 @@
             "url": "https://music.youtube.com",
             "fade": "#ff0000",
             "about": "Stream music from YouTube.",
-            "category": "Entertainment"
+            "category": "System"
         },
         {
             "id": "vscode",
@@ -134,7 +134,7 @@
             "url": "https://vscode.dev",
             "fade": "#333333",
             "about": "Visual Studio Code for the Web.",
-            "category": "Productivity"
+            "category": "System"
         },
         {
             "id": "gmail",
@@ -142,7 +142,7 @@
             "url": "https://mail.google.com",
             "fade": "#ffffff",
             "about": "Google's email service.",
-            "category": "Productivity"
+            "category": "System"
         },
         {
             "id": "google-earth",
@@ -150,7 +150,7 @@
             "url": "https://earth.google.com",
             "fade": "#ffffff",
             "about": "Explore the world from your browser.",
-            "category": "Education"
+            "category": "System"
         },
         {
             "id": "google-drive",
@@ -158,7 +158,7 @@
             "url": "https://drive.google.com",
             "fade": "#ffffff",
             "about": "Store and share files in the cloud.",
-            "category": "Productivity"
+            "category": "System"
         },
         {
             "id": "google-docs",
@@ -166,7 +166,7 @@
             "url": "https://docs.google.com",
             "fade": "#ffffff",
             "about": "Create and edit documents online.",
-            "category": "Productivity"
+            "category": "System"
         },
         {
             "id": "outlook",
@@ -174,7 +174,7 @@
             "url": "https://outlook.live.com",
             "fade": "#0078d4",
             "about": "Microsoft's email and calendar service.",
-            "category": "Productivity"
+            "category": "System"
         },
         {
             "id": "icloud",
@@ -182,7 +182,7 @@
             "url": "https://icloud.com",
             "fade": "#00a2e8",
             "about": "Apple's cloud services platform.",
-            "category": "Productivity"
+            "category": "System"
         },
         {
             "id": "notifications",
@@ -198,6 +198,30 @@
             "url": "preferences.html",
             "fade": "theme",
             "about": "Manage your Discord token, Tumblr API key, and followed blogs.",
+            "category": "System"
+        },
+        {
+            "id": "changelog",
+            "name": "Changelog",
+            "url": "changelog.html",
+            "fade": "theme",
+            "about": "See what's new in Launcher.",
+            "category": "System"
+        },
+        {
+            "id": "welcome",
+            "name": "Welcome",
+            "url": "welcome.html",
+            "fade": "theme",
+            "about": "Take a tour of your launcher.",
+            "category": "System"
+        },
+        {
+            "id": "sketch",
+            "name": "Sketch",
+            "url": "sketch.html",
+            "fade": "theme",
+            "about": "Draw, sketch, and take notes.",
             "category": "System"
         }
     ]
