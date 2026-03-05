@@ -154,8 +154,27 @@
             position: relative;
         }
 
-        .folder-item:hover .delete-btn {
+        .folder-item:hover .delete-btn,
+        .folder-item:hover .rename-btn {
             opacity: 1;
+        }
+
+        .folder-item.drag-over {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px dashed var(--accent-color);
+            border-radius: 12px;
+        }
+
+        .rename-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            opacity: 0;
+            transition: opacity 0.2s;
+            padding: 2px 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 6px;
         }
 
         .folder-content {
@@ -329,7 +348,7 @@
             overflow-y: auto;
             position: relative;
             background: rgba(0, 0, 0, 0.1);
-            /* Allow scrolling in text mode; in draw mode JS disables it */
+            touch-action: pan-y;
         }
 
         #master-scroll-area.draw-mode {
@@ -682,15 +701,18 @@
             cancelBtn.onclick = cleanup;
         }
 
-        function showInputPrompt(title, onConfirm) {
+        function showInputPrompt(title, onConfirm, prefill = '') {
             const modal = document.getElementById('input-modal');
             const field = document.getElementById('input-modal-field');
             const okBtn = document.getElementById('input-modal-ok');
             const cancelBtn = document.getElementById('input-modal-cancel');
 
+            document.getElementById('input-modal-title').innerText = title;
+            okBtn.innerText = prefill ? 'Rename' : 'Create';
+
             modal.classList.add('active');
-            field.value = '';
-            setTimeout(() => field.focus(), 150);
+            field.value = prefill;
+            setTimeout(() => { field.focus(); field.select(); }, 150);
 
             const cleanup = () => {
                 modal.classList.remove('active');
@@ -834,6 +856,17 @@
             });
         }
 
+        function renameFolder(e, id) {
+            e.stopPropagation();
+            const folder = folders.find(f => f.id === id);
+            if (!folder) return;
+            showInputPrompt("Rename Folder", (name) => {
+                folder.name = name;
+                saveNotes();
+                renderNoteList();
+            }, folder.name);
+        }
+
         function deleteFolder(e, id) {
             e.stopPropagation();
             showPrompt('Delete Folder', 'Are you sure? This will NOT delete the notes inside, they will move to the root.', () => {
@@ -856,14 +889,17 @@
                 fDiv.className = 'folder-item';
                 const isOpen = openFolders.includes(folder.id);
                 fDiv.innerHTML = `
-                    <span>${isOpen ? '▼' : '▶'}</span>
+                    <span style="font-size:0.8rem;">${isOpen ? '▼' : '▶'}</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" style="width: 20px; height: 20px; vertical-align: middle;">
+                        stroke-linejoin="round" style="width: 20px; height: 20px; flex-shrink:0;">
                         <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                     </svg>
-                    <span style="flex-grow: 1;">${folder.name}</span>
+                    <span style="flex-grow: 1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${folder.name}</span>
+                    <button class="rename-btn" onclick="renameFolder(event, '${folder.id}')">Ren</button>
                     <button class="delete-btn" onclick="deleteFolder(event, '${folder.id}')">Del</button>
                 `;
+
+                // Folder toggle
                 fDiv.onclick = () => {
                     if (openFolders.includes(folder.id)) {
                         openFolders = openFolders.filter(id => id !== folder.id);
@@ -873,10 +909,41 @@
                     localStorage.setItem('launcher-open-folders', JSON.stringify(openFolders));
                     renderNoteList();
                 };
+
+                // Drag-over target
+                fDiv.addEventListener('dragover', (e) => { e.preventDefault(); fDiv.classList.add('drag-over'); });
+                fDiv.addEventListener('dragleave', () => fDiv.classList.remove('drag-over'));
+                fDiv.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    fDiv.classList.remove('drag-over');
+                    const noteId = e.dataTransfer.getData('text/plain');
+                    const note = notes.find(n => n.id === noteId);
+                    if (note) {
+                        note.parentId = folder.id;
+                        // Auto-open the target folder
+                        if (!openFolders.includes(folder.id)) openFolders.push(folder.id);
+                        localStorage.setItem('launcher-open-folders', JSON.stringify(openFolders));
+                        saveNotes();
+                        renderNoteList();
+                    }
+                });
+
                 noteList.appendChild(fDiv);
 
                 const cDiv = document.createElement('div');
                 cDiv.className = `folder-content ${isOpen ? 'open' : ''}`;
+
+                // Drop zone for folder contents area too
+                cDiv.addEventListener('dragover', (e) => { e.preventDefault(); fDiv.classList.add('drag-over'); });
+                cDiv.addEventListener('dragleave', () => fDiv.classList.remove('drag-over'));
+                cDiv.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    fDiv.classList.remove('drag-over');
+                    const noteId = e.dataTransfer.getData('text/plain');
+                    const note = notes.find(n => n.id === noteId);
+                    if (note) { note.parentId = folder.id; saveNotes(); renderNoteList(); }
+                });
+
                 sortedNotes.filter(n => n.parentId === folder.id).forEach(note => cDiv.appendChild(createNoteElement(note)));
                 if (isOpen) {
                     const addBtn = document.createElement('div');
@@ -889,12 +956,28 @@
                 noteList.appendChild(cDiv);
             });
 
+            // Root drop zone: drop here to remove from folder
+            const rootDropZone = document.createElement('div');
+            rootDropZone.id = 'root-drop-zone';
+            rootDropZone.style.cssText = 'min-height: 8px; border-radius: 8px; transition: background 0.2s;';
+            rootDropZone.addEventListener('dragover', (e) => { e.preventDefault(); rootDropZone.style.background = 'rgba(255,255,255,0.08)'; });
+            rootDropZone.addEventListener('dragleave', () => rootDropZone.style.background = '');
+            rootDropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                rootDropZone.style.background = '';
+                const noteId = e.dataTransfer.getData('text/plain');
+                const note = notes.find(n => n.id === noteId);
+                if (note) { note.parentId = null; saveNotes(); renderNoteList(); }
+            });
+            noteList.appendChild(rootDropZone);
+
             sortedNotes.filter(n => !n.parentId).forEach(note => noteList.appendChild(createNoteElement(note)));
         }
 
         function createNoteElement(note) {
             const div = document.createElement('div');
             div.className = `note-item ${note.id === activeNoteId ? 'active' : ''}`;
+            div.draggable = true;
             const preview = note.content
                 ? (note.content.substring(0, 40) + (note.content.length > 40 ? '...' : ''))
                 : 'Empty note';
@@ -913,6 +996,12 @@
                     </div>
                 </div>
             `;
+            div.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', note.id);
+                e.dataTransfer.effectAllowed = 'move';
+                setTimeout(() => div.style.opacity = '0.4', 0);
+            });
+            div.addEventListener('dragend', () => div.style.opacity = '');
             div.onclick = () => selectNote(note.id);
             return div;
         }
@@ -1086,9 +1175,9 @@
 
             currentPressure = getPressure(e);
 
-            // Show pressure for Apple Pencil
+            // Show pressure level for Apple Pencil
             if (e.pointerType === 'pen') {
-                pressureIndicator.textContent = `✏️ ${Math.round(currentPressure * 100)}%`;
+                pressureIndicator.textContent = `Pressure: ${Math.round(currentPressure * 100)}%`;
             }
 
             const pos = getPointerPos(e);
@@ -1261,6 +1350,16 @@
                     renderNoteList();
                     loadNote(activeNoteId);
                 }
+            }
+            if (e.key === 'launcher-accent' && e.newValue) {
+                window.ACCENT_COLOR = e.newValue;
+                document.documentElement.style.setProperty('--accent-color', e.newValue);
+                const themeSwatch = document.querySelector('.color-swatch[data-color="theme"]');
+                if (themeSwatch) themeSwatch.style.background = e.newValue;
+            }
+            if (e.key === 'launcher-bg' && e.newValue) {
+                window.BG_COLOR = e.newValue;
+                document.documentElement.style.setProperty('--bg-color', e.newValue);
             }
         });
 
