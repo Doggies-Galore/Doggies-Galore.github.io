@@ -73,6 +73,7 @@
             flex-direction: column;
             flex-shrink: 0;
             z-index: 100;
+            touch-action: pan-y;
         }
 
         .sidebar-header {
@@ -87,6 +88,7 @@
             flex-grow: 1;
             overflow-y: auto;
             padding: 10px;
+            touch-action: pan-y;
         }
 
         .note-item {
@@ -207,6 +209,7 @@
             gap: 10px;
             align-items: center;
             flex-wrap: wrap;
+            touch-action: pan-x pan-y;
         }
 
         .tool-btn {
@@ -222,6 +225,7 @@
             text-decoration: none;
             display: inline-block;
             text-align: center;
+            touch-action: manipulation;
         }
 
         /* Modal Styles */
@@ -240,6 +244,7 @@
             pointer-events: none;
             transition: opacity 0.3s ease;
             backdrop-filter: blur(5px);
+            touch-action: pan-x pan-y;
         }
 
         .modal-overlay.active {
@@ -324,6 +329,12 @@
             overflow-y: auto;
             position: relative;
             background: rgba(0, 0, 0, 0.1);
+            /* Allow scrolling in text mode; in draw mode JS disables it */
+        }
+
+        #master-scroll-area.draw-mode {
+            overflow-y: hidden;
+            touch-action: none;
         }
 
         #split-view-container {
@@ -340,6 +351,7 @@
             z-index: 10;
             cursor: crosshair;
             pointer-events: auto;
+            touch-action: none;
         }
 
         #canvas-layer.locked {
@@ -364,9 +376,9 @@
             position: relative;
             pointer-events: none;
             opacity: 0.3;
-            /* visible but faint in draw mode */
             transition: opacity 0.3s, background 0.3s;
             overflow: hidden;
+            touch-action: pan-y;
         }
 
         #text-editor.active {
@@ -388,10 +400,10 @@
             pointer-events: auto;
             scrollbar-width: none;
             opacity: 0.3;
-            /* visible but faint in draw mode */
             transition: opacity 0.3s;
             overflow: hidden;
             display: block !important;
+            touch-action: pan-y;
         }
 
         #markdown-preview.active {
@@ -413,6 +425,7 @@
             transition: all 0.2s;
             font-size: 0.8rem;
             font-weight: bold;
+            touch-action: manipulation;
         }
 
         .toggle-tab.active {
@@ -439,6 +452,7 @@
             border-radius: 50%;
             border: 2px solid transparent;
             cursor: pointer;
+            touch-action: manipulation;
         }
 
         .color-swatch.active {
@@ -456,9 +470,9 @@
             outline: none;
             margin-right: 20px;
             width: 250px;
+            touch-action: manipulation;
         }
 
-        /* Tiny Markdown-ish helpers */
         .formatting-tools {
             display: flex;
             gap: 5px;
@@ -473,7 +487,9 @@
             pointer-events: auto;
         }
 
-
+        .formatting-tools.hidden {
+            display: none;
+        }
 
         #markdown-preview h1 {
             margin-bottom: 20px;
@@ -512,6 +528,17 @@
             text-decoration: line-through;
             opacity: 0.6;
         }
+
+        /* Pencil pressure indicator */
+        #pressure-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 0.7rem;
+            opacity: 0.4;
+            z-index: 50;
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -544,7 +571,7 @@
         </div>
         <div
             style="padding: 5px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
-            <select id="sort-method" class="tool-btn" style="padding: 2px 5px; font-size: 0.7rem;">
+            <select id="sort-method" class="tool-btn" style="padding: 2px 5px; font-size: 0.7rem; touch-action: manipulation;">
                 <option value="updated">Sorted by: Modified</option>
                 <option value="created">Sorted by: Created</option>
                 <option value="title">Sorted by: Name</option>
@@ -570,7 +597,7 @@
                     <button class="tool-btn" id="redo-btn" title="Redo" style="padding: 8px 10px;">↷</button>
                 </div>
                 <button class="tool-btn" id="clear-btn">Clear</button>
-                <select id="stroke-size" class="tool-btn" style="background: var(--bg-color);">
+                <select id="stroke-size" class="tool-btn" style="background: var(--bg-color); touch-action: manipulation;">
                     <option value="2">Fine</option>
                     <option value="4" selected>Medium</option>
                     <option value="8">Thick</option>
@@ -586,7 +613,8 @@
                 </div>
             </div>
 
-            <div class="formatting-tools" id="text-tools">
+            <!-- Text formatting tools: hidden in draw mode, shown in write mode -->
+            <div class="formatting-tools hidden" id="text-tools">
                 <button class="tool-btn" data-wrap="**">B</button>
                 <button class="tool-btn" data-wrap="~~">S</button>
                 <button class="tool-btn" data-prefix="# ">H1</button>
@@ -596,7 +624,7 @@
         </div>
 
         <div id="editor-container">
-            <div id="master-scroll-area">
+            <div id="master-scroll-area" class="draw-mode">
                 <canvas id="canvas-layer"></canvas>
                 <div id="split-view-container">
                     <textarea id="text-editor" placeholder="Start typing... (Markdown supported)"></textarea>
@@ -607,6 +635,8 @@
 
         <a href="index.html" class="tool-btn" id="close-btn">Exit</a>
     </div>
+
+    <div id="pressure-indicator"></div>
 
     <div class="modal-overlay" id="prompt-modal">
         <div class="modal-content">
@@ -691,6 +721,7 @@
         let isDrawing = false;
         let activeTool = 'pen';
         let lastX = 0, lastY = 0;
+        let currentPressure = 1;
 
         // Undo/Redo Storage
         let undoStack = [];
@@ -703,9 +734,39 @@
         const noteList = document.getElementById('note-list');
         const titleInput = document.getElementById('note-title-input');
         const previewEl = document.getElementById('markdown-preview');
+        const pressureIndicator = document.getElementById('pressure-indicator');
+        const masterScrollArea = document.getElementById('master-scroll-area');
         const ns = new NotificationService();
 
-        // Initialization
+        // ─── Pointer Event Helpers ───────────────────────────────────────────────
+
+        function getPointerPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            // Handle both pointer events and legacy touch/mouse
+            let clientX, clientY;
+            if (e.touches) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function getPressure(e) {
+            // Apple Pencil sends real pressure; finger/mouse default to 0.5 or 1
+            if (e.pointerType === 'pen' && e.pressure > 0) {
+                return e.pressure;
+            }
+            return 1;
+        }
+
+        // ─── Initialization ──────────────────────────────────────────────────────
+
         function init() {
             if (notes.length === 0 && folders.length === 0) {
                 createNewNote("First Note");
@@ -718,31 +779,25 @@
             }
             resizeCanvas();
             document.getElementById('sort-method').value = sortMethod;
-
-            // Force first render
             renderMarkdown();
         }
 
         function saveState() {
             undoStack.push(canvas.toDataURL());
             if (undoStack.length > MAX_STACK) undoStack.shift();
-            redoStack = []; // Clear redo on new action
+            redoStack = [];
         }
 
         function undo() {
             if (undoStack.length === 0) return;
-            const currentState = canvas.toDataURL();
-            redoStack.push(currentState);
-            const prevState = undoStack.pop();
-            applyState(prevState);
+            redoStack.push(canvas.toDataURL());
+            applyState(undoStack.pop());
         }
 
         function redo() {
             if (redoStack.length === 0) return;
-            const currentState = canvas.toDataURL();
-            undoStack.push(currentState);
-            const nextState = redoStack.pop();
-            applyState(nextState);
+            undoStack.push(canvas.toDataURL());
+            applyState(redoStack.pop());
         }
 
         function applyState(dataUrl) {
@@ -750,7 +805,7 @@
             img.onload = () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(img, 0, 0);
-                updateActiveNote(false); // don't push to stack again
+                updateActiveNote(false);
             };
             img.src = dataUrl;
         }
@@ -758,13 +813,8 @@
         function createNewNote(title = "New Note", parentId = null) {
             const id = 'note-' + Date.now();
             const newNote = {
-                id,
-                title,
-                content: '',
-                sketch: null,
-                created: Date.now(),
-                updated: Date.now(),
-                parentId
+                id, title, content: '', sketch: null,
+                created: Date.now(), updated: Date.now(), parentId
             };
             notes.unshift(newNote);
             activeNoteId = id;
@@ -772,17 +822,12 @@
             renderNoteList();
             loadNote(id);
             broadcastNoteSync();
-            // Ensure markdown renders immediately
             setTimeout(renderMarkdown, 50);
         }
 
         function createNewFolder() {
             showInputPrompt("Name Your Folder", (name) => {
-                const folder = {
-                    id: 'folder-' + Date.now(),
-                    name: name,
-                    created: Date.now()
-                };
+                const folder = { id: 'folder-' + Date.now(), name, created: Date.now() };
                 folders.push(folder);
                 saveNotes();
                 renderNoteList();
@@ -801,22 +846,19 @@
 
         function renderNoteList() {
             noteList.innerHTML = '';
-
-            // Apply sorting
             const sortedNotes = [...notes].sort((a, b) => {
                 if (sortMethod === 'title') return a.title.localeCompare(b.title);
                 return b[sortMethod] - a[sortMethod];
             });
 
-            // 1. Render Folders
             folders.forEach(folder => {
                 const fDiv = document.createElement('div');
                 fDiv.className = 'folder-item';
                 const isOpen = openFolders.includes(folder.id);
-                const arrow = isOpen ? '▼' : '▶';
                 fDiv.innerHTML = `
-                    <span>${arrow}</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; vertical-align: middle;">
+                    <span>${isOpen ? '▼' : '▶'}</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" style="width: 20px; height: 20px; vertical-align: middle;">
                         <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                     </svg>
                     <span style="flex-grow: 1;">${folder.name}</span>
@@ -835,11 +877,7 @@
 
                 const cDiv = document.createElement('div');
                 cDiv.className = `folder-content ${isOpen ? 'open' : ''}`;
-
-                const folderNotes = sortedNotes.filter(n => n.parentId === folder.id);
-                folderNotes.forEach(note => cDiv.appendChild(createNoteElement(note)));
-
-                // Add "Add here" button if open
+                sortedNotes.filter(n => n.parentId === folder.id).forEach(note => cDiv.appendChild(createNoteElement(note)));
                 if (isOpen) {
                     const addBtn = document.createElement('div');
                     addBtn.className = 'note-item';
@@ -848,26 +886,20 @@
                     addBtn.onclick = (e) => { e.stopPropagation(); createNewNote("New Note", folder.id); };
                     cDiv.appendChild(addBtn);
                 }
-
                 noteList.appendChild(cDiv);
             });
 
-            // 2. Render Root Notes
-            const rootNotes = sortedNotes.filter(n => !n.parentId);
-            rootNotes.forEach(note => noteList.appendChild(createNoteElement(note)));
+            sortedNotes.filter(n => !n.parentId).forEach(note => noteList.appendChild(createNoteElement(note)));
         }
 
         function createNoteElement(note) {
             const div = document.createElement('div');
             div.className = `note-item ${note.id === activeNoteId ? 'active' : ''}`;
-
             const preview = note.content
                 ? (note.content.substring(0, 40) + (note.content.length > 40 ? '...' : ''))
                 : 'Empty note';
-
             const createdStr = new Date(note.created).toLocaleDateString();
             const updatedStr = new Date(note.updated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
             div.innerHTML = `
                 <div style="flex-grow: 1; min-width: 0;">
                     <div class="note-item-header">
@@ -913,7 +945,7 @@
             titleInput.value = note.title;
             textEditor.value = note.content;
             renderMarkdown();
-            setTimeout(renderMarkdown, 50); // Ensure layout is settled
+            setTimeout(renderMarkdown, 50);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             undoStack = [];
             redoStack = [];
@@ -931,14 +963,12 @@
                 .replace(/^## (.*$)/gim, '<h2>$1</h2>')
                 .replace(/\*\*(.*?)\*\*/gim, '<b>$1</b>')
                 .replace(/~~(.*?)~~/gim, '<del>$1</del>')
-                // Checklist support
                 .replace(/^- \[ \] (.*$)/gim, '<div class="checklist-item"><input type="checkbox" class="checklist-cb" data-line="$1"> <span class="checklist-text">$1</span></div>')
                 .replace(/^- \[x\] (.*$)/gim, '<div class="checklist-item"><input type="checkbox" class="checklist-cb" checked data-line="$1"> <span class="checklist-text checked">$1</span></div>')
                 .replace(/\n/gim, '<br>');
 
             previewEl.innerHTML = html;
 
-            // Handle checkbox clicks
             previewEl.querySelectorAll('.checklist-cb').forEach(cb => {
                 cb.onclick = (e) => {
                     const text = e.target.dataset.line;
@@ -950,8 +980,7 @@
                 };
             });
 
-            // Adjust heights
-            const scrollArea = document.getElementById('master-scroll-area');
+            const scrollArea = masterScrollArea;
             const editorHeight = textEditor.scrollHeight;
             const previewHeight = previewEl.scrollHeight;
             const maxHeight = Math.max(editorHeight, previewHeight, scrollArea.clientHeight);
@@ -971,14 +1000,10 @@
             if (note) {
                 note.title = titleInput.value;
                 note.content = textEditor.value;
-                if (shouldPushUndo) {
-                    // only save sketch if drawing changed
-                    note.sketch = canvas.toDataURL();
-                }
+                if (shouldPushUndo) note.sketch = canvas.toDataURL();
                 note.updated = Date.now();
                 saveNotes();
                 renderMarkdown();
-                // We update list on debounce if title changes, or just let it be
             }
         }
 
@@ -986,7 +1011,8 @@
             ns.broadcastSync('launcher-notes', JSON.stringify(notes));
         }
 
-        // --- Event Listeners ---
+        // ─── Event Listeners ─────────────────────────────────────────────────────
+
         titleInput.oninput = () => { updateActiveNote(); renderNoteList(); };
         textEditor.oninput = updateActiveNote;
         document.getElementById('add-note-btn').onclick = () => createNewNote();
@@ -998,13 +1024,11 @@
         };
 
         function resizeCanvas(forceHeight) {
-            const scrollArea = document.getElementById('master-scroll-area');
             const container = document.getElementById('editor-container');
             const rect = container.getBoundingClientRect();
             const h = forceHeight || Math.max(rect.height, textEditor.scrollHeight, previewEl.scrollHeight);
-
             const temp = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            canvas.width = scrollArea.clientWidth || rect.width;
+            canvas.width = masterScrollArea.clientWidth || rect.width;
             canvas.height = h;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
@@ -1012,25 +1036,51 @@
         }
         window.onresize = resizeCanvas;
 
+        // ─── Drawing with Pointer Events (Apple Pencil + Touch + Mouse) ──────────
+
         function startDrawing(e) {
             if (mode !== 'draw') return;
-            saveState(); // Push to undo stack before starting new stroke
+            e.preventDefault();
+
+            // Only allow pen (Apple Pencil) or single-finger touch (not two-finger scroll)
+            if (e.pointerType === 'touch' && e.isPrimary === false) return;
+
+            saveState();
             isDrawing = true;
-            const x = e.clientX || (e.touches && e.touches[0].clientX);
-            const y = e.clientY || (e.touches && e.touches[0].clientY);
-            const rect = canvas.getBoundingClientRect();
-            lastX = x - rect.left;
-            lastY = y - rect.top;
+            currentPressure = getPressure(e);
+
+            const pos = getPointerPos(e);
+            lastX = pos.x;
+            lastY = pos.y;
+
+            // Start a new path dot for tap marks
+            ctx.beginPath();
+            ctx.arc(lastX, lastY, (parseInt(document.getElementById('stroke-size').value) * currentPressure) / 2, 0, Math.PI * 2);
+            if (activeTool === 'eraser') {
+                ctx.globalCompositeOperation = 'destination-out';
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.fillStyle = drawColor === 'theme' ? window.ACCENT_COLOR : drawColor;
+            }
+            ctx.fill();
         }
 
         function drawMove(e) {
             if (!isDrawing) return;
             e.preventDefault();
-            const x = e.clientX || (e.touches && e.touches[0].clientX);
-            const y = e.clientY || (e.touches && e.touches[0].clientY);
-            const rect = canvas.getBoundingClientRect();
-            const currX = x - rect.left;
-            const currY = y - rect.top;
+
+            currentPressure = getPressure(e);
+
+            // Show pressure for Apple Pencil
+            if (e.pointerType === 'pen') {
+                pressureIndicator.textContent = `✏️ ${Math.round(currentPressure * 100)}%`;
+            }
+
+            const pos = getPointerPos(e);
+            const currX = pos.x;
+            const currY = pos.y;
+
+            const baseSize = parseInt(document.getElementById('stroke-size').value);
 
             ctx.beginPath();
             ctx.moveTo(lastX, lastY);
@@ -1042,7 +1092,10 @@
             } else {
                 ctx.globalCompositeOperation = 'source-over';
                 ctx.strokeStyle = drawColor === 'theme' ? window.ACCENT_COLOR : drawColor;
-                ctx.lineWidth = parseInt(document.getElementById('stroke-size').value);
+                // Apply pressure to line width (Apple Pencil gets dynamic width)
+                ctx.lineWidth = e.pointerType === 'pen'
+                    ? Math.max(1, baseSize * currentPressure * 1.5)
+                    : baseSize;
             }
 
             ctx.stroke();
@@ -1050,20 +1103,25 @@
             lastY = currY;
         }
 
-        function endDrawing() {
+        function endDrawing(e) {
             if (isDrawing) {
                 isDrawing = false;
+                pressureIndicator.textContent = '';
                 updateActiveNote();
             }
         }
 
-        canvas.onmousedown = startDrawing;
-        canvas.onmousemove = drawMove;
-        canvas.onmouseup = endDrawing;
-        canvas.onmouseleave = endDrawing;
-        canvas.ontouchstart = startDrawing;
-        canvas.ontouchmove = drawMove;
-        canvas.ontouchend = endDrawing;
+        // Use pointer events as primary input method (covers Pencil, touch, mouse)
+        canvas.addEventListener('pointerdown', startDrawing, { passive: false });
+        canvas.addEventListener('pointermove', drawMove, { passive: false });
+        canvas.addEventListener('pointerup', endDrawing);
+        canvas.addEventListener('pointercancel', endDrawing);
+        canvas.addEventListener('pointerleave', endDrawing);
+
+        // Enable pointer capture for smooth strokes that go outside canvas
+        canvas.addEventListener('pointerdown', (e) => {
+            try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+        });
 
         document.getElementById('undo-btn').onclick = undo;
         document.getElementById('redo-btn').onclick = redo;
@@ -1073,10 +1131,13 @@
             textEditor.classList.remove('active');
             previewEl.classList.remove('active');
             canvas.classList.remove('locked');
+            masterScrollArea.classList.add('draw-mode');
             document.getElementById('draw-tab').classList.add('active');
             document.getElementById('text-tab').classList.remove('active');
             document.getElementById('draw-tools').style.display = 'flex';
+            // Hide text formatting tools completely in draw mode
             document.getElementById('text-tools').classList.remove('active');
+            document.getElementById('text-tools').classList.add('hidden');
             renderMarkdown();
         };
 
@@ -1085,10 +1146,13 @@
             textEditor.classList.add('active');
             previewEl.classList.add('active');
             canvas.classList.add('locked');
+            masterScrollArea.classList.remove('draw-mode');
             document.getElementById('draw-tab').classList.remove('active');
             document.getElementById('text-tab').classList.add('active');
             document.getElementById('draw-tools').style.display = 'none';
+            // Show text formatting tools in write mode
             document.getElementById('text-tools').classList.add('active');
+            document.getElementById('text-tools').classList.remove('hidden');
             renderMarkdown();
         };
 
@@ -1173,7 +1237,9 @@
         document.getElementById('close-btn').onclick = (e) => {
             e.preventDefault();
             document.body.classList.add('fade-out');
-            setTimeout(() => { window.location.href = sessionStorage.getItem('launchSource') === 'apps' ? 'apps.html' : 'index.html'; }, 400);
+            setTimeout(() => {
+                window.location.href = sessionStorage.getItem('launchSource') === 'apps' ? 'apps.html' : 'index.html';
+            }, 400);
         };
 
         document.body.addEventListener('click', () => {
