@@ -1026,15 +1026,30 @@
         function resizeCanvas(forceHeight) {
             const container = document.getElementById('editor-container');
             const rect = container.getBoundingClientRect();
-            const h = forceHeight || Math.max(rect.height, textEditor.scrollHeight, previewEl.scrollHeight);
-            const temp = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            canvas.width = masterScrollArea.clientWidth || rect.width;
-            canvas.height = h;
+            const newW = masterScrollArea.clientWidth || rect.width;
+            const newH = forceHeight || Math.max(rect.height, textEditor.scrollHeight, previewEl.scrollHeight);
+
+            // Skip if nothing actually changed — avoids needless clears
+            if (canvas.width === newW && canvas.height === newH) return;
+
+            // Snapshot current drawing as a dataURL before resizing
+            // (getImageData/putImageData breaks when width changes even by 1px)
+            const snapshot = (canvas.width > 0 && canvas.height > 0)
+                ? canvas.toDataURL()
+                : null;
+
+            canvas.width = newW;
+            canvas.height = newH;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            ctx.putImageData(temp, 0, 0);
+
+            if (snapshot) {
+                const img = new Image();
+                img.onload = () => ctx.drawImage(img, 0, 0);
+                img.src = snapshot;
+            }
         }
-        window.onresize = resizeCanvas;
+        window.onresize = () => resizeCanvas();
 
         // ─── Drawing with Pointer Events (Apple Pencil + Touch + Mouse) ──────────
 
@@ -1126,35 +1141,50 @@
         document.getElementById('undo-btn').onclick = undo;
         document.getElementById('redo-btn').onclick = redo;
 
-        document.getElementById('draw-tab').onclick = () => {
-            mode = 'draw';
-            textEditor.classList.remove('active');
-            previewEl.classList.remove('active');
-            canvas.classList.remove('locked');
-            masterScrollArea.classList.add('draw-mode');
-            document.getElementById('draw-tab').classList.add('active');
-            document.getElementById('text-tab').classList.remove('active');
-            document.getElementById('draw-tools').style.display = 'flex';
-            // Hide text formatting tools completely in draw mode
-            document.getElementById('text-tools').classList.remove('active');
-            document.getElementById('text-tools').classList.add('hidden');
-            renderMarkdown();
-        };
+        function switchMode(newMode) {
+            // Snapshot the drawing BEFORE any DOM changes cause layout reflow
+            const sketchSnapshot = (canvas.width > 0 && canvas.height > 0)
+                ? canvas.toDataURL()
+                : null;
 
-        document.getElementById('text-tab').onclick = () => {
-            mode = 'text';
-            textEditor.classList.add('active');
-            previewEl.classList.add('active');
-            canvas.classList.add('locked');
-            masterScrollArea.classList.remove('draw-mode');
-            document.getElementById('draw-tab').classList.remove('active');
-            document.getElementById('text-tab').classList.add('active');
-            document.getElementById('draw-tools').style.display = 'none';
-            // Show text formatting tools in write mode
-            document.getElementById('text-tools').classList.add('active');
-            document.getElementById('text-tools').classList.remove('hidden');
+            mode = newMode;
+            const isDrawMode = newMode === 'draw';
+
+            textEditor.classList.toggle('active', !isDrawMode);
+            previewEl.classList.toggle('active', !isDrawMode);
+            canvas.classList.toggle('locked', !isDrawMode);
+            masterScrollArea.classList.toggle('draw-mode', isDrawMode);
+
+            document.getElementById('draw-tab').classList.toggle('active', isDrawMode);
+            document.getElementById('text-tab').classList.toggle('active', !isDrawMode);
+            document.getElementById('draw-tools').style.display = isDrawMode ? 'flex' : 'none';
+
+            const textTools = document.getElementById('text-tools');
+            if (isDrawMode) {
+                textTools.classList.remove('active');
+                textTools.classList.add('hidden');
+            } else {
+                textTools.classList.add('active');
+                textTools.classList.remove('hidden');
+            }
+
+            // Let the DOM reflow settle, then re-render markdown (may resize canvas),
+            // then restore the snapshot so nothing gets lost
             renderMarkdown();
-        };
+            if (sketchSnapshot) {
+                requestAnimationFrame(() => {
+                    const img = new Image();
+                    img.onload = () => {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0);
+                    };
+                    img.src = sketchSnapshot;
+                });
+            }
+        }
+
+        document.getElementById('draw-tab').onclick = () => switchMode('draw');
+        document.getElementById('text-tab').onclick  = () => switchMode('text');
 
         document.getElementById('clear-btn').onclick = () => {
             showPrompt('Clear Drawing', 'Clear this sketch?', () => {
