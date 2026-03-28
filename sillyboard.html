@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Sillyboard</title>
+    <meta name="description" content="Sillyboard — the grooviest soundboard app built for Trump, Stoats, and Dr. Yaoi">
+    <style>
+        :root {
+            --bg-color: #000;
+            --accent-color: #fff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        body {
+            background-color: transparent;
+            color: var(--accent-color);
+            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to   { opacity: 0; transform: scale(0.95); }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.4s cubic-bezier(0.4, 0.0, 0.2, 1) forwards !important;
+        }
+
+        /* ── Theme transitions via registered custom properties ────────────
+           @property lets the browser interpolate the variables themselves,
+           so EVERY element that reads them transitions in perfect sync
+           without needing per-element transition declarations.           */
+        @property --bg-color {
+            syntax: '<color>';
+            inherits: true;
+            initial-value: #000000;
+        }
+        @property --accent-color {
+            syntax: '<color>';
+            inherits: true;
+            initial-value: #ffffff;
+        }
+
+        html {
+            background-color: var(--bg-color);
+        }
+
+        :root {
+            transition:
+                --bg-color     0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
+                --accent-color 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        /* Interaction-only transitions (not theme-related) */
+        .sound-btn {
+            transition: transform 0.08s ease, box-shadow 0.15s ease;
+        }
+        .hdr-btn {
+            transition: opacity 0.2s ease;
+        }
+
+        /* ── Header ─────────────────────────────────────────────────────── */
+        #header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 28px;
+            border-bottom: 3px solid var(--accent-color);
+            flex-shrink: 0;
+        }
+
+        #header h1 {
+            font-size: clamp(1.4rem, 3.5vw, 2.4rem);
+            font-weight: 900;
+            letter-spacing: 0.04em;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .hdr-btn {
+            background: transparent;
+            color: var(--accent-color);
+            border: 3px solid var(--accent-color);
+            padding: 12px 30px;
+            border-radius: 18px;
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .hdr-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        /* ── Soundboard grid ─────────────────────────────────────────────── */
+        #board {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(6px, 2vmin, 20px);
+            padding: clamp(8px, 3vmin, 30px) clamp(10px, 4vmin, 40px);
+        }
+
+        .sound-btn {
+            width: 90%;
+            max-width: 700px;
+            flex: 1;
+            border: 5px solid var(--accent-color);
+            border-radius: 36px;
+            background: transparent;
+            color: var(--accent-color);
+            font-family: inherit;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sound-btn:hover {
+            transform: scale(1.018);
+            background: rgba(255,255,255,0.04);
+        }
+
+        .sound-btn:active,
+        .sound-btn.playing {
+            transform: scale(0.97);
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        /* ripple */
+        .sound-btn::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            width: 0; height: 0;
+            background: rgba(255,255,255,0.25);
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            pointer-events: none;
+            transition: width 0.45s ease, height 0.45s ease, opacity 0.45s ease;
+        }
+
+        .sound-btn.ripple::after {
+            width: 600px;
+            height: 600px;
+            opacity: 0;
+        }
+
+        .btn-icon {
+            font-size: 2.5vw;
+            pointer-events: none;
+        }
+
+        .btn-label {
+            pointer-events: none;
+        }
+
+        /* ── Loading overlay ─────────────────────────────────────────────── */
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 9999;
+            transition: opacity 0.4s ease;
+        }
+
+        #loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #loading-overlay p {
+            font-size: clamp(1.6rem, 5vw, 2.4rem);
+            font-weight: 700;
+            opacity: 0.85;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50%       { opacity: 1; }
+        }
+
+        /* ── Settings overlay ────────────────────────────────────────────── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(6px);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: var(--bg-color);
+            border: 4px solid var(--accent-color);
+            border-radius: 24px;
+            padding: clamp(20px, 6vw, 40px);
+            width: 92%;
+            max-width: 560px;
+            max-height: 88vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h2 {
+            font-size: clamp(1.4rem, 5vw, 2.2rem);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: clamp(16px, 4vw, 30px);
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: clamp(1.05rem, 3.5vw, 1.4rem);
+            opacity: 0.8;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding-bottom: 6px;
+            margin-bottom: 14px;
+            display: inline-block;
+        }
+
+        /* theme grid — one per row for easy phone tapping */
+        .theme-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(7px, 2vw, 10px);
+            margin-bottom: clamp(18px, 4vw, 30px);
+        }
+
+        .btn {
+            padding: clamp(11px, 2.5vw, 15px) 12px;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            border-radius: 12px;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            cursor: pointer;
+            background: transparent;
+            transition: all 0.2s;
+            font-weight: bold;
+            text-align: center;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        /* custom pickers */
+        .picker-row {
+            display: flex;
+            justify-content: center;
+            gap: clamp(20px, 8vw, 50px);
+            margin-top: 10px;
+        }
+
+        .color-picker-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+        }
+
+        input[type="color"] {
+            width: 80px;
+            height: 50px;
+            border: 2px solid var(--accent-color);
+            border-radius: 12px;
+            padding: 2px;
+            background: none;
+            cursor: pointer;
+        }
+
+        .modal-close-row {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .modal-close-btn {
+            flex: none;
+            padding: 14px 50px;
+            font-size: 1.1rem;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            transition: opacity 0.2s;
+        }
+
+        .modal-close-btn:hover { opacity: 0.85; }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Apply theme immediately to avoid flash
+        (function () {
+            const bg = localStorage.getItem('sillyboard-bg') ||
+                       localStorage.getItem('launcher-bg') || '#000000';
+            const ac = localStorage.getItem('sillyboard-accent') ||
+                       localStorage.getItem('launcher-accent') || '#ffffff';
+            document.documentElement.style.setProperty('--bg-color', bg);
+            document.documentElement.style.setProperty('--accent-color', ac);
+        })();
+    </script>
+
+    <!-- Wake Lock keepalive — keeps the screen on -->
+    <script>
+        (async function () {
+            if ('wakeLock' in navigator) {
+                let wl;
+                async function acquire() {
+                    try { wl = await navigator.wakeLock.request('screen'); } catch (e) {}
+                }
+                acquire();
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'visible') acquire();
+                });
+            }
+        })();
+    </script>
+
+    <!-- Loading overlay -->
+    <div id="loading-overlay" aria-live="polite" aria-label="Loading sounds">
+        <p>Hang on...</p>
+    </div>
+
+    <!-- Header -->
+    <div id="header">
+        <h1>Sillyboard :3</h1>
+        <div class="header-actions">
+            <button class="hdr-btn" id="settings-btn" aria-label="Open Settings">Settings</button>
+        </div>
+    </div>
+
+    <!-- Buttons -->
+    <div id="board" role="main">
+        <button class="sound-btn" id="btn-buzzer"  data-sound="buzzer"  aria-label="Play Buzzer">
+            <span class="btn-label">Buzzer</span>
+        </button>
+        <button class="sound-btn" id="btn-chinema" data-sound="chinema" aria-label="Play Chinema">
+            <span class="btn-label">Chinema</span>
+        </button>
+        <button class="sound-btn" id="btn-lucky"   data-sound="lucky"   aria-label="Play Lucky for You">
+            <span class="btn-label">Lucky for You</span>
+        </button>
+        <button class="sound-btn" id="btn-pipe"    data-sound="pipe"    aria-label="Play Pipe Fall">
+            <span class="btn-label">Pipe Fall</span>
+        </button>
+        <button class="sound-btn" id="btn-riff"    data-sound="riff"    aria-label="Play Riff">
+            <span class="btn-label">Riff</span>
+        </button>
+        <button class="sound-btn" id="btn-sotrue"  data-sound="sotrue"  aria-label="Play So True">
+            <span class="btn-label">So True</span>
+        </button>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal" role="dialog" aria-modal="true" aria-label="Settings">
+        <div class="modal-content">
+            <h2>Settings</h2>
+
+            <div class="section-title">Theme Presets</div>
+            <div class="theme-grid">
+                <button class="btn" onclick="setTheme('#000000','#ffffff')">IAmAnOLED</button>
+                <button class="btn" onclick="setTheme('#1a1a1a','#ffffff')">Dark Gray</button>
+                <button class="btn" onclick="setTheme('#ffffff','#000000')">Light Mode</button>
+                <button class="btn" onclick="setTheme('#001524','#ffecd1')">Midnight</button>
+                <button class="btn" onclick="setTheme('#2d1b4e','#d4b8ff')">Purple</button>
+                <button class="btn" onclick="setTheme('#4a1528','#ffb3c6')">Pink</button>
+                <button class="btn" onclick="setTheme('#3d1c00','#ffb067')">Orange</button>
+                <button class="btn" onclick="setTheme('#0b2b1d','#a3ffcc')">Forest</button>
+                <button class="btn" onclick="setTheme('#001f3f','#80c4ff')">Ocean</button>
+                <button class="btn" onclick="setTheme('#330000','#ff9999')">Crimson</button>
+                <button class="btn" onclick="setTheme('#0d1117','#00ff00')">Hacker</button>
+                <button class="btn" onclick="setTheme('#2d0c18','#ffcc80')">Sunset</button>
+                <button class="btn" onclick="setTheme('#000000','#0000ff')">Rainyware</button>
+                <button class="btn" onclick="setTheme('#00ff00','#006600')">TIME FOR GREEN!!!!!</button>
+                <button class="btn" onclick="setTheme('#000000','#ff0000')">HellofaBluelightFilter</button>
+                <button class="btn" onclick="setTheme('#1a0d0b','#d4a373')">Coffiest</button>
+                <button class="btn" onclick="setTheme('#000000','#f39c12')">Tux</button>
+                <button class="btn" onclick="setTheme('#4b2e2a','#fff3e0')">Cuddlebug</button>
+            </div>
+
+            <div class="section-title">Custom Theme</div>
+            <div class="picker-row">
+                <div class="color-picker-wrap">
+                    <span>Background</span>
+                    <input type="color" id="bg-picker">
+                </div>
+                <div class="color-picker-wrap">
+                    <span>Accent</span>
+                    <input type="color" id="ac-picker">
+                </div>
+            </div>
+
+            <div class="modal-close-row">
+                <button class="modal-close-btn" id="settings-close">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── Theme helpers ────────────────────────────────────────────────────
+        function setTheme(bg, ac) {
+            document.documentElement.style.setProperty('--bg-color', bg);
+            document.documentElement.style.setProperty('--accent-color', ac);
+            localStorage.setItem('sillyboard-bg', bg);
+            localStorage.setItem('sillyboard-accent', ac);
+        }
+
+        const bgPicker = document.getElementById('bg-picker');
+        const acPicker = document.getElementById('ac-picker');
+
+        function syncPickersToTheme() {
+            bgPicker.value = getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim() || '#000000';
+            acPicker.value = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#ffffff';
+        }
+
+        bgPicker.addEventListener('input', () => {
+            document.documentElement.style.setProperty('--bg-color', bgPicker.value);
+            localStorage.setItem('sillyboard-bg', bgPicker.value);
+        });
+        acPicker.addEventListener('input', () => {
+            document.documentElement.style.setProperty('--accent-color', acPicker.value);
+            localStorage.setItem('sillyboard-accent', acPicker.value);
+        });
+
+        // ── Settings modal ────────────────────────────────────────────────
+        const settingsModal = document.getElementById('settings-modal');
+
+        document.getElementById('settings-btn').addEventListener('click', () => {
+            syncPickersToTheme();
+            settingsModal.classList.add('active');
+        });
+
+        document.getElementById('settings-close').addEventListener('click', () => {
+            settingsModal.classList.remove('active');
+        });
+
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) settingsModal.classList.remove('active');
+        });
+
+        // ── Audio preloading with loading screen ─────────────────────────
+        // Each key maps to one src string (single) or an array of srcs (random pick).
+        const soundDefs = {
+            buzzer:  'Soundboard/SoundBoard -Buzzer.wav',
+            chinema: 'Soundboard/SoundBoard -Chinema.wav',
+            lucky:  [
+                'Soundboard/SoundBoard -Lucky for You %231.wav',
+                'Soundboard/SoundBoard -Lucky for You %232.wav'
+            ],
+            pipe:    'Soundboard/SoundBoard -Pipe Fall.wav',
+            riff:    'Soundboard/SoundBoard -Riff.wav',
+            sotrue: [
+                'Soundboard/SoundBoard -So True %231.wav',
+                'Soundboard/SoundBoard -So True %232.wav'
+            ]
+        };
+
+        const audioCache = {};
+        const loadingOverlay = document.getElementById('loading-overlay');
+
+        // Flatten all src paths so we can track each one
+        const allSrcs = [];
+        for (const [key, val] of Object.entries(soundDefs)) {
+            const srcs = Array.isArray(val) ? val : [val];
+            audioCache[key] = srcs.map(src => {
+                const a = new Audio(src);
+                a.preload = 'auto';
+                allSrcs.push(a);
+                return a;
+            });
+        }
+
+        let loaded = 0;
+        const total = allSrcs.length;
+
+        function onReady() {
+            loaded++;
+            if (loaded >= total) {
+                loadingOverlay.classList.add('hidden');
+                // Remove from DOM after fade
+                setTimeout(() => loadingOverlay.remove(), 450);
+            }
+        }
+
+        allSrcs.forEach(a => {
+            if (a.readyState >= 4) {
+                // Already fully loaded (cache hit)
+                onReady();
+            } else {
+                a.addEventListener('canplaythrough', onReady, { once: true });
+                // Fallback: don't block forever on error
+                a.addEventListener('error', onReady, { once: true });
+                a.load();
+            }
+        });
+
+        // Safety fallback — hide after 6s no matter what
+        setTimeout(() => {
+            if (loadingOverlay.parentNode) {
+                loadingOverlay.classList.add('hidden');
+                setTimeout(() => loadingOverlay.remove(), 450);
+            }
+        }, 6000);
+
+        // ── Playback — capped simultaneous instances ──────────────────────
+        // Clips are stored in insertion order in an array (oldest first).
+        // When MAX_CLIPS is reached the oldest is evicted before a new one
+        // plays, keeping memory and CPU usage flat under heavy clicking.
+        const MAX_CLIPS  = 6;
+        const clipQueue  = []; // { clip, btn } in insertion order
+        const playingCount = new Map(); // btn → active clip count
+
+        function pickRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function evictOldest() {
+            const oldest = clipQueue.shift();
+            if (!oldest) return;
+            oldest.clip.pause();
+            oldest.clip.src = ''; // release media resource
+            // Decrement counter for evicted clip's button
+            const n = (playingCount.get(oldest.btn) || 1) - 1;
+            if (n <= 0) {
+                playingCount.delete(oldest.btn);
+                oldest.btn.classList.remove('playing');
+            } else {
+                playingCount.set(oldest.btn, n);
+            }
+        }
+
+        function playSound(key, btn) {
+            const pool = audioCache[key];
+            if (!pool || pool.length === 0) return;
+
+            // Evict oldest clip if at the cap
+            if (clipQueue.length >= MAX_CLIPS) evictOldest();
+
+            const clip = pickRandom(pool).cloneNode();
+            const entry = { clip, btn };
+            clipQueue.push(entry);
+
+            playingCount.set(btn, (playingCount.get(btn) || 0) + 1);
+            btn.classList.add('playing');
+            triggerRipple(btn);
+
+            clip.play().catch(() => {});
+
+            clip.addEventListener('ended', () => {
+                // Remove from queue
+                const idx = clipQueue.indexOf(entry);
+                if (idx !== -1) clipQueue.splice(idx, 1);
+                clip.src = ''; // release media resource
+
+                const remaining = (playingCount.get(btn) || 1) - 1;
+                if (remaining <= 0) {
+                    playingCount.delete(btn);
+                    btn.classList.remove('playing');
+                } else {
+                    playingCount.set(btn, remaining);
+                }
+            });
+        }
+
+        function triggerRipple(btn) {
+            btn.classList.remove('ripple');
+            void btn.offsetWidth;
+            btn.classList.add('ripple');
+            setTimeout(() => btn.classList.remove('ripple'), 500);
+        }
+
+        // ── Wire up buttons ────────────────────────────────────────────────
+        document.querySelectorAll('.sound-btn').forEach(btn => {
+            btn.addEventListener('click', () => playSound(btn.dataset.sound, btn));
+        });
+    </script>
+</body>
+</html>
