@@ -182,38 +182,40 @@
             user-select: none;
         }
 
-        /* ── Soundboard grid — 2 columns, viewport-locked ──────────────── */
+        /* ── Soundboard list — single column, scrollable ──────────────── */
         #board {
             flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-auto-rows: 1fr;
-            gap: clamp(4px, 1vmin, 8px);
-            padding: clamp(6px, 1.5vmin, 12px);
-            overflow: hidden;
-            /* Blocks scrolling entirely as requested */
-            touch-action: none;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(6px, 1.5vmin, 12px);
+            padding: clamp(8px, 2vmin, 16px) clamp(10px, 3vmin, 24px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            /* Allow touch scrolling inside the board; manipulation blocks double-tap zoom */
+            touch-action: pan-y manipulation;
         }
 
         .sound-btn {
             width: 100%;
-            height: 100%;
-            border: 3px solid var(--accent-color);
-            border-radius: 18px;
+            flex-shrink: 0;
+            border: 4px solid var(--accent-color);
+            border-radius: 28px;
             background: transparent;
             color: var(--accent-color);
             font-family: inherit;
-            font-size: clamp(0.9rem, 2.5vh, 1.4rem);
-            font-weight: 900;
+            font-size: clamp(1.3rem, 3.5vw, 2rem);
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
-            padding: 4px;
+            gap: 10px;
             user-select: none;
             position: relative;
             overflow: hidden;
+            padding: clamp(21px, 4.5vmin, 33px) 12px;
+            /* Allow vertical scrolling on the container, but keep buttons responsive */
             touch-action: manipulation;
         }
 
@@ -922,15 +924,6 @@
         </div>
     </div>
 
-    <!-- Notice Modal (Styled Alerts) -->
-    <div class="modal-overlay" id="notice-modal" role="dialog" aria-modal="true" aria-label="Notification">
-        <div class="modal-content" style="max-width:320px; text-align:center;">
-            <h2 id="notice-title">Notice</h2>
-            <p id="notice-text" style="margin-bottom: 24px; font-size: 1rem; opacity: 0.8; line-height: 1.4;"></p>
-            <button class="modal-close-btn" id="notice-close" style="width: 100%; height:48px;">Got it! :3</button>
-        </div>
-    </div>
-
     <!-- Mic Permission Modal -->
     <div class="modal-overlay" id="mic-perm-modal" role="dialog" aria-modal="true" aria-label="Microphone Permission">
         <div class="modal-content" style="max-width:350px;">
@@ -1077,21 +1070,6 @@
         let currentGain = parseFloat(localStorage.getItem('sillyboard-gain') || '1');
         if (isNaN(currentGain) || currentGain < 0) currentGain = 1;
 
-        // Generic Notice Modal
-        const noticeModal = document.getElementById('notice-modal');
-        const noticeTitle = document.getElementById('notice-title');
-        const noticeText = document.getElementById('notice-text');
-        const noticeClose = document.getElementById('notice-close');
-
-        function showNotice(title, text) {
-            noticeTitle.textContent = title;
-            noticeText.textContent = text;
-            noticeModal.classList.add('active');
-        }
-
-        noticeClose.addEventListener('click', () => noticeModal.classList.remove('active'));
-        noticeModal.addEventListener('click', (e) => { if (e.target === noticeModal) noticeModal.classList.remove('active'); });
-
         function ensureAudioContext() {
             if (audioCtx) return;
             // Native fallback for Safari, with critical 'interactive' latency hint to force smallest audio buffer
@@ -1100,17 +1078,7 @@
 
             gainNode = audioCtx.createGain();
             gainNode.gain.value = currentGain;
-
-            // Global Limiter to prevent pops and clipping distortion
-            const limiter = audioCtx.createDynamicsCompressor();
-            limiter.threshold.setValueAtTime(-1, audioCtx.currentTime); // Just below peak
-            limiter.knee.setValueAtTime(40, audioCtx.currentTime);
-            limiter.ratio.setValueAtTime(12, audioCtx.currentTime);
-            limiter.attack.setValueAtTime(0, audioCtx.currentTime);
-            limiter.release.setValueAtTime(0.25, audioCtx.currentTime);
-
-            gainNode.connect(limiter);
-            limiter.connect(audioCtx.destination);
+            gainNode.connect(audioCtx.destination);
 
             // iOS WebKit aggressively suspends idle AudioContexts to save battery,
             // which introduces a 300-500ms hardware wakeup penalty on your next tap.
@@ -1166,7 +1134,6 @@
         const titleEl = document.getElementById('silly-title');
         const adminBtn = document.getElementById('admin-btn');
         const adminModal = document.getElementById('admin-modal');
-        let adminUnlocked = false;
 
         let adminClicks = 0;
         let adminTimer = null;
@@ -1186,7 +1153,7 @@
             clearTimeout(adminTimer);
             if (adminClicks >= 5) {
                 adminBtn.style.display = 'inline-block';
-                adminUnlocked = true;
+                localStorage.setItem('sillyboard-admin', 'true');
                 adminClicks = 0;
             } else {
                 adminTimer = setTimeout(() => { adminClicks = 0; }, 800);
@@ -1339,8 +1306,6 @@
                     scheduleRemotePlayback(data.key, data.targetServerTime, data.variant);
                 } else if (data.type === 'stop') {
                     stopSound(data.key);
-                } else if (data.type === 'global_intensity') {
-                    lastGlobalIntensity = data.intensity;
                 } else if (data.type === 'client_list') {
                     renderRemoteList(data.clients);
                 } else if (data.type === 'error') {
@@ -1457,8 +1422,6 @@
 
         let autoGainValue = 1.0;
         let audioMonitor = null;
-        let hasMicAccess = false;
-        let lastGlobalIntensity = 0;
 
         async function initAutoGain() {
             if (!autogainEnabled) {
@@ -1473,7 +1436,6 @@
 
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                hasMicAccess = true;
                 const audioCtxTemp = new (window.AudioContext || window.webkitAudioContext)();
                 const source = audioCtxTemp.createMediaStreamSource(stream);
                 const processor = audioCtxTemp.createAnalyser();
@@ -1484,11 +1446,6 @@
 
                 setInterval(() => {
                     if (!autogainEnabled) return;
-                    // SILENT WINDOW CALIBRATION
-                    // If we are currently playing back sounds, HOLD the previous intensity
-                    // to avoid feedback loops (detecting our own speaker output as "room noise")
-                    if (clipQueue.length > 0) return;
-
                     processor.getByteFrequencyData(dataArray);
                     let sum = 0;
                     for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
@@ -1498,24 +1455,9 @@
                     let newGain = 1.0 + (rms / 30);
                     autoGainValue = Math.min(3.0, Math.max(0.5, newGain));
                     currentRoomIntensity = rms;
-
-                    // Analysis at 200ms for fast local feedback
                 }, 200);
 
-                // Broadcast intensity to the collective at a slightly lower 1s rate to avoid network floods
-                setInterval(() => {
-                    if (repeaterEnabled && repeaterSocket && repeaterSocket.readyState === WebSocket.OPEN && hasMicAccess) {
-                        repeaterSocket.send(JSON.stringify({
-                            type: 'intensity_update',
-                            intensity: currentRoomIntensity
-                        }));
-                    }
-                }, 1000);
-
-            } catch (e) {
-                console.error("Mic access denied for Auto-Gain", e);
-                hasMicAccess = false;
-            }
+            } catch (e) { console.error("Mic access denied for Auto-Gain", e); }
         }
 
         micGrantBtn.addEventListener('click', async () => {
@@ -1584,7 +1526,7 @@
                         }
                         renderStreamables();
                     } else {
-                        showNotice("Disabled", "Please enable Repeater Mode (and ensure connected) first! :3");
+                        alert("Please enable Repeater Mode first.");
                     }
                 });
 
@@ -1613,23 +1555,15 @@
         const pitchSliderWrap = document.getElementById('pitch-slider-wrap');
         // pitchEnabled logic removed per request, sliders are always available in admin now
 
-        // Unified sync helper: maps a target server time to a local audioCtx time
-        function getAudioStartTime(targetServerTime) {
+        function scheduleRemotePlayback(key, targetServerTime, variantIndex = null) {
             const now = Date.now();
             const targetLocalTime = targetServerTime - serverTimeOffset;
             const delayMs = targetLocalTime - now;
-            
-            // Hard block on extreme late arrivals
-            if (delayMs < -1000) return null;
-            
-            ensureAudioContext();
-            // Schedule in the future, if it's already past (late), play ASAP
-            return audioCtx.currentTime + (Math.max(0, delayMs) / 1000);
-        }
 
-        function scheduleRemotePlayback(key, targetServerTime, variantIndex = null) {
-            const audioTargetTime = getAudioStartTime(targetServerTime);
-            if (audioTargetTime === null) return;
+            if (delayMs < -500) return; // Too late
+
+            ensureAudioContext();
+            const audioTargetTime = audioCtx.currentTime + (Math.max(0, delayMs) / 1000);
 
             // Check if this key is in streamables first
             playSound(key, null, audioTargetTime, variantIndex);
@@ -1681,17 +1615,17 @@
             isBoardLocked = (SOUND_DEFS.locked === 1 || manualLock) && !manualUnlock;
 
             // Admin button visibility (only show if admin is unlocked AND board is not closed)
-            adminBtn.style.display = (adminUnlocked && !isBoardLocked) ? 'inline-block' : 'none';
+            const isAdminUnlocked = localStorage.getItem('sillyboard-admin') === 'true';
+            adminBtn.style.display = (isAdminUnlocked && !isBoardLocked) ? 'inline-block' : 'none';
 
             if (isBoardLocked) {
                 renderLockedView();
                 return;
             }
 
-            // Only show Override section in Admin if board is currently unlocked via manual override 
-            // OR if the JSON config itself is locked (allowing a re-lock)
-            if (manualUnlock || SOUND_DEFS.locked === 1) {
-                document.getElementById('admin-override-section').style.display = 'block';
+            // Only show Re-Lock button in Admin if the underlying JSON itself is locked
+            if (SOUND_DEFS.locked === 1) {
+                document.getElementById('lock-board-btn').style.display = 'block';
             }
 
             // Validate saved entries against dynamic JSON keys
@@ -1712,10 +1646,6 @@
 
         function renderLockedView() {
             boardEl.innerHTML = '';
-            boardEl.style.display = 'flex';
-            boardEl.style.flexDirection = 'column';
-            boardEl.style.alignItems = 'center';
-            boardEl.style.justifyContent = 'center';
             hotbarEl.style.display = 'none';
 
             const container = document.createElement('div');
@@ -2093,28 +2023,16 @@
             // ── Per-Sound Auto-Gain Normalization ────────────────────
             const finalVariantIdx = variantIndex !== null ? variantIndex : calculateTargetIndex(key);
             const buffer = pool[finalVariantIdx];
-            const peak = Math.max(0.01, bufferPeaks[`${key}:${finalVariantIdx}`] || 1.0);
-            
-            let effectiveIntensity = currentRoomIntensity;
-            // If we don't have mic but others do, use shared room intensity
-            if (!hasMicAccess && lastGlobalIntensity > 0) {
-                effectiveIntensity = lastGlobalIntensity;
-            }
+            const peak = bufferPeaks[`${key}:${finalVariantIdx}`] || 1.0;
 
             // Adjust gain if autogain active
             if (gainNode) {
-                let normalizationFactor = Math.min(2.5, 1.0 / peak); // Peak-normalization (safety capped)
-                
-                // Target: Baseline 1.0 in quiet room, climbing with intensity
-                let targetPeak = 1.0 + (effectiveIntensity / 35); 
-                
+                let normalizationFactor = 1.0 / peak;
+                let targetPeak = 0.8 + (currentRoomIntensity / 40);
                 let dynamicGain = normalizationFactor * targetPeak;
                 if (!autogainEnabled) dynamicGain = 1.0;
-
                 const totalTargetGain = currentGain * dynamicGain;
-                // Final master gain control with smooth ramp to prevent pops
-                gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
-                gainNode.gain.linearRampToValueAtTime(Math.min(3.5 * currentGain, totalTargetGain), audioCtx.currentTime + 0.1);
+                gainNode.gain.setTargetAtTime(Math.min(3.0 * currentGain, totalTargetGain), audioCtx.currentTime, 0.05);
             }
 
             const source = audioCtx.createBufferSource();
