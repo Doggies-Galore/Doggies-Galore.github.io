@@ -1166,6 +1166,7 @@
         const titleEl = document.getElementById('silly-title');
         const adminBtn = document.getElementById('admin-btn');
         const adminModal = document.getElementById('admin-modal');
+        let adminUnlocked = false;
 
         let adminClicks = 0;
         let adminTimer = null;
@@ -1185,7 +1186,7 @@
             clearTimeout(adminTimer);
             if (adminClicks >= 5) {
                 adminBtn.style.display = 'inline-block';
-                localStorage.setItem('sillyboard-admin', 'true');
+                adminUnlocked = true;
                 adminClicks = 0;
             } else {
                 adminTimer = setTimeout(() => { adminClicks = 0; }, 800);
@@ -1680,17 +1681,17 @@
             isBoardLocked = (SOUND_DEFS.locked === 1 || manualLock) && !manualUnlock;
 
             // Admin button visibility (only show if admin is unlocked AND board is not closed)
-            const isAdminUnlocked = localStorage.getItem('sillyboard-admin') === 'true';
-            adminBtn.style.display = (isAdminUnlocked && !isBoardLocked) ? 'inline-block' : 'none';
+            adminBtn.style.display = (adminUnlocked && !isBoardLocked) ? 'inline-block' : 'none';
 
             if (isBoardLocked) {
                 renderLockedView();
                 return;
             }
 
-            // Only show Re-Lock button in Admin if the underlying JSON itself is locked
-            if (SOUND_DEFS.locked === 1) {
-                document.getElementById('lock-board-btn').style.display = 'block';
+            // Only show Override section in Admin if board is currently unlocked via manual override 
+            // OR if the JSON config itself is locked (allowing a re-lock)
+            if (manualUnlock || SOUND_DEFS.locked === 1) {
+                document.getElementById('admin-override-section').style.display = 'block';
             }
 
             // Validate saved entries against dynamic JSON keys
@@ -1711,6 +1712,10 @@
 
         function renderLockedView() {
             boardEl.innerHTML = '';
+            boardEl.style.display = 'flex';
+            boardEl.style.flexDirection = 'column';
+            boardEl.style.alignItems = 'center';
+            boardEl.style.justifyContent = 'center';
             hotbarEl.style.display = 'none';
 
             const container = document.createElement('div');
