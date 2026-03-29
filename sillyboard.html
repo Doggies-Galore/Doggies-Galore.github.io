@@ -1078,7 +1078,17 @@
 
             gainNode = audioCtx.createGain();
             gainNode.gain.value = currentGain;
-            gainNode.connect(audioCtx.destination);
+
+            // Global Limiter to prevent pops and clipping distortion
+            const limiter = audioCtx.createDynamicsCompressor();
+            limiter.threshold.setValueAtTime(-1, audioCtx.currentTime); // Just below peak
+            limiter.knee.setValueAtTime(40, audioCtx.currentTime);
+            limiter.ratio.setValueAtTime(12, audioCtx.currentTime);
+            limiter.attack.setValueAtTime(0, audioCtx.currentTime);
+            limiter.release.setValueAtTime(0.25, audioCtx.currentTime);
+
+            gainNode.connect(limiter);
+            limiter.connect(audioCtx.destination);
 
             // iOS WebKit aggressively suspends idle AudioContexts to save battery,
             // which introduces a 300-500ms hardware wakeup penalty on your next tap.
@@ -1451,6 +1461,11 @@
 
                 setInterval(() => {
                     if (!autogainEnabled) return;
+                    // SILENT WINDOW CALIBRATION
+                    // If we are currently playing back sounds, HOLD the previous intensity
+                    // to avoid feedback loops (detecting our own speaker output as "room noise")
+                    if (clipQueue.length > 0) return;
+
                     processor.getByteFrequencyData(dataArray);
                     let sum = 0;
                     for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
@@ -2053,18 +2068,18 @@
 
             // Adjust gain if autogain active
             if (gainNode) {
-                let normalizationFactor = Math.min(2.5, 1.0 / peak); // Hard cap on per-file boost (safety)
+                let normalizationFactor = Math.min(2.5, 1.0 / peak); // Peak-normalization (safety capped)
                 
-                // Baseline target is 1.0 (full volume for quiet room)
-                // Scaling intensity faster (30 instead of 40)
-                let targetPeak = 1.0 + (effectiveIntensity / 30); 
+                // Target: Baseline 1.0 in quiet room, climbing with intensity
+                let targetPeak = 1.0 + (effectiveIntensity / 35); 
                 
                 let dynamicGain = normalizationFactor * targetPeak;
                 if (!autogainEnabled) dynamicGain = 1.0;
 
                 const totalTargetGain = currentGain * dynamicGain;
-                // Final safety cap (MAX 3.5x master gain for extreme environments)
-                gainNode.gain.setTargetAtTime(Math.min(3.5 * currentGain, totalTargetGain), audioCtx.currentTime, 0.05);
+                // Final master gain control with smooth ramp to prevent pops
+                gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(Math.min(3.5 * currentGain, totalTargetGain), audioCtx.currentTime + 0.1);
             }
 
             const source = audioCtx.createBufferSource();
