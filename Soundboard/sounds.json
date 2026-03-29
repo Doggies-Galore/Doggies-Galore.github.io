@@ -1,0 +1,141 @@
+{
+    "locked": 1,
+    "buzzer": {
+        "label": "Buzzer",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard -Buzzer.wav"
+            }
+        ]
+    },
+    "cinema": {
+        "label": "Cinema",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard -Cinema.wav"
+            }
+        ]
+    },
+    "lucky": {
+        "label": "Lucky for You",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard -Lucky for You %231.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -Lucky for You %232.wav"
+            }
+        ]
+    },
+    "pipe": {
+        "label": "Pipe Fall",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard -Pipe Fall.wav"
+            }
+        ]
+    },
+    "riff": {
+        "label": "Riff",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard -Riff.wav"
+            }
+        ]
+    },
+    "sotrue": {
+        "label": "So True",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard -So True %231.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -So True %232.wav"
+            }
+        ]
+    },
+    "fahh": {
+        "label": "Fahh",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard -Fahh %231.wav",
+                "weight": 90
+            },
+            {
+                "src": "Soundboard/SoundBoard -Fahh %232.wav",
+                "weight": 10
+            }
+        ]
+    },
+    "jacky": {
+        "label": "Jacky",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard -Jacky %231.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -Jacky %232.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -Jacky %233.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -Jacky %234.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -Jacky %235.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -Jacky %236.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -Jacky %237.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -Jacky %238.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -Jacky %239.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -Jacky %2310.wav"
+            }
+        ]
+    },
+    "no": {
+        "label": "No",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard -No %231.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -No %232.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -No %233.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -No %234.wav"
+            }
+        ]
+    },
+    "nyaa": {
+        "label": "Nyaa",
+        "cooldownGroupMs": 5000,
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard -Nyaa %231.wav",
+                "weight": 47
+            },
+            {
+                "src": "Soundboard/SoundBoard -Nyaa %232.wav",
+                "weight": 47
+            },
+            {
+                "src": "Soundboard/SoundBoard -Nyaa %233.wav",
+                "weight": 6,
+                "requiresCooldown": true
+            }
+        ]
+    }
+}
