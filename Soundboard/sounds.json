@@ -137,5 +137,24 @@
                 "requiresCooldown": true
             }
         ]
+    },
+    "streamables": {
+        "voco": {
+            "label": "VOCO",
+            "parts": 3,
+            "variants": [
+                { "src": "Soundboard/Streamables -VOCO %231.wav" },
+                { "src": "Soundboard/Streamables -VOCO %232.wav" },
+                { "src": "Soundboard/Streamables -VOCO %233.wav" }
+            ]
+        },
+        "voco1_demo": {
+            "label": "VOCO1 Demo 2003",
+            "parts": 2,
+            "variants": [
+                { "src": "Soundboard/Streamables -VOCO1 Demo 2003 %231.wav" },
+                { "src": "Soundboard/Streamables -VOCO1 Demo 2003 %232.wav" }
+            ]
+        }
     }
 }
