@@ -3,12 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <title>Sillyboard</title>
-    <meta name="description" content="Sillyboard — the grooviest soundboard app built for Trump, Stoats, and Dr. Yaoi">
+    <meta name="description" content="Sillyboard - the grooviest soundboard app built for Trump, Stoats, and Dr. Yaoi">
     <style>
         :root {
             --bg-color: #000;
@@ -19,6 +20,9 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         body {
@@ -38,13 +42,27 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.97); }
-            to   { opacity: 1; transform: scale(1); }
+            from {
+                opacity: 0;
+                transform: scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         @keyframes fadeOut {
-            from { opacity: 1; transform: scale(1); }
-            to   { opacity: 0; transform: scale(0.95); }
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.95);
+            }
         }
 
         .fade-out {
@@ -56,6 +74,7 @@
             inherits: true;
             initial-value: #000000;
         }
+
         @property --accent-color {
             syntax: '<color>';
             inherits: true;
@@ -68,19 +87,20 @@
 
         :root {
             transition:
-                --bg-color     0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
+                --bg-color 0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
                 --accent-color 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
         .sound-btn {
             /* Smooth background fade matching the settings button, but keeping the quick satisfying shrink */
             transition:
-                transform      0.1s cubic-bezier(0.4, 0.0, 0.2, 1),
+                transform 0.1s cubic-bezier(0.4, 0.0, 0.2, 1),
                 background-color 0.15s ease,
-                color          0.15s ease,
-                opacity        0.15s ease;
+                color 0.15s ease,
+                opacity 0.15s ease;
             will-change: transform, background-color, color;
         }
+
         .hdr-btn {
             transition: opacity 0.2s ease;
         }
@@ -152,7 +172,7 @@
             flex: 1;
             min-height: 38px;
             height: 42px;
-            border: 3px dashed rgba(128,128,128,0.2);
+            border: 3px dashed rgba(128, 128, 128, 0.2);
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -195,17 +215,27 @@
             position: relative;
             overflow: hidden;
             padding: clamp(21px, 4.5vmin, 33px) 12px;
+            /* Allow vertical scrolling on the container, but keep buttons responsive */
+            touch-action: manipulation;
         }
 
         .sound-btn:hover {
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.04);
         }
 
         .sound-btn:active,
         .sound-btn.playing {
-            transform: scale(0.95);
             background-color: var(--accent-color);
             color: var(--bg-color);
+        }
+
+        /* Only scale on hover/active for non-touch devices to avoid scroll jitter */
+        @media (hover: hover) {
+
+            .sound-btn:active,
+            .sound-btn.playing {
+                transform: scale(0.95);
+            }
         }
 
         .btn-label {
@@ -244,7 +274,7 @@
             width: 60%;
             max-width: 300px;
             height: 6px;
-            background: rgba(128,128,128,0.3);
+            background: rgba(128, 128, 128, 0.3);
             border-radius: 3px;
             overflow: hidden;
         }
@@ -258,8 +288,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50%       { opacity: 1; }
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
         }
 
         /* ── Locked View ────────────────────────────────────────────────── */
@@ -273,19 +310,20 @@
             text-align: center;
             animation: fadeIn 0.4s ease;
         }
+
         .locked-icon {
             font-size: 120px;
             font-weight: 900;
             margin-bottom: 20px;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
+
         .locked-title {
             font-size: 1.8rem;
             font-weight: 900;
             margin-bottom: 12px;
             color: var(--accent-color);
         }
+
         .locked-text {
             font-size: 1.1rem;
             opacity: 0.7;
@@ -297,7 +335,7 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.88);
+            background: rgba(0, 0, 0, 0.88);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -324,7 +362,7 @@
             overflow-y: auto;
             transform: scale(0.9);
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
         }
 
         .modal-overlay.active .modal-content {
@@ -342,7 +380,7 @@
         .section-title {
             font-size: clamp(0.95rem, 3vw, 1.2rem);
             opacity: 0.8;
-            border-bottom: 1px solid rgba(255,255,255,0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
             padding-bottom: 6px;
             margin-bottom: 10px;
             display: inline-block;
@@ -398,7 +436,7 @@
             background: none;
             cursor: pointer;
         }
-        
+
         /* Hijack native color picker swatches to lock to current theme variables!
            (No transition here: the variables themselves are already interpolating flawlessly over 0.6s, 
            so a secondary transition causes exponential trailing lag!) */
@@ -406,19 +444,32 @@
             padding: 0;
             border-radius: 8px;
         }
+
         input[type="color"]::-webkit-color-swatch {
             border: none;
             border-radius: 8px;
         }
-        #bg-picker::-webkit-color-swatch { background-color: var(--bg-color) !important; }
-        #ac-picker::-webkit-color-swatch { background-color: var(--accent-color) !important; }
+
+        #bg-picker::-webkit-color-swatch {
+            background-color: var(--bg-color) !important;
+        }
+
+        #ac-picker::-webkit-color-swatch {
+            background-color: var(--accent-color) !important;
+        }
 
         input[type="color"]::-moz-color-swatch {
             border: none;
             border-radius: 8px;
         }
-        #bg-picker::-moz-color-swatch { background-color: var(--bg-color) !important; }
-        #ac-picker::-moz-color-swatch { background-color: var(--accent-color) !important; }
+
+        #bg-picker::-moz-color-swatch {
+            background-color: var(--bg-color) !important;
+        }
+
+        #ac-picker::-moz-color-swatch {
+            background-color: var(--accent-color) !important;
+        }
 
         .modal-close-row {
             display: flex;
@@ -440,7 +491,9 @@
             transition: opacity 0.2s;
         }
 
-        .modal-close-btn:hover { opacity: 0.85; }
+        .modal-close-btn:hover {
+            opacity: 0.85;
+        }
 
         /* ── Amplification slider ────────────────────────────────────────── */
         .amp-section {
@@ -460,13 +513,11 @@
             flex: 1;
             height: 10px;
             border-radius: 8px;
-            background: linear-gradient(
-                to right,
-                var(--accent-color) 0%,
-                var(--accent-color) var(--amp-pct, 33.3%),
-                rgba(128,128,128,0.3) var(--amp-pct, 33.3%),
-                rgba(128,128,128,0.3) 100%
-            );
+            background: linear-gradient(to right,
+                    var(--accent-color) 0%,
+                    var(--accent-color) var(--amp-pct, 33.3%),
+                    rgba(128, 128, 128, 0.3) var(--amp-pct, 33.3%),
+                    rgba(128, 128, 128, 0.3) 100%);
             outline: none;
             cursor: pointer;
         }
@@ -479,7 +530,7 @@
             border-radius: 50%;
             background: var(--accent-color);
             border: 3px solid var(--bg-color);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
             cursor: pointer;
             transition: transform 0.1s ease;
         }
@@ -494,7 +545,7 @@
             border-radius: 50%;
             background: var(--accent-color);
             border: 3px solid var(--bg-color);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
             cursor: pointer;
         }
 
@@ -519,7 +570,7 @@
             height: 25px;
             cursor: pointer;
             accent-color: var(--accent-color);
-            -webkit-appearance: checkbox; 
+            -webkit-appearance: checkbox;
             appearance: checkbox;
         }
 
@@ -529,6 +580,7 @@
             flex-direction: column;
             gap: 8px;
         }
+
         .slider-header {
             display: flex;
             justify-content: space-between;
@@ -537,24 +589,27 @@
             font-weight: 700;
             opacity: 0.9;
         }
+
         .slider-header span:last-child {
             color: var(--accent-color);
-            background: rgba(128,128,128,0.15);
+            background: rgba(128, 128, 128, 0.15);
             padding: 2px 8px;
             border-radius: 8px;
             font-family: monospace;
             font-size: 0.9rem;
         }
+
         .styled-slider {
             -webkit-appearance: none;
             appearance: none;
             width: 100%;
             height: 10px;
-            background: rgba(128,128,128,0.25);
+            background: rgba(128, 128, 128, 0.25);
             border-radius: 6px;
             outline: none;
             cursor: pointer;
         }
+
         .styled-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 24px;
@@ -562,20 +617,22 @@
             background: var(--accent-color);
             border: 3px solid var(--bg-color);
             border-radius: 50%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
             cursor: pointer;
             transition: transform 0.15s ease;
         }
+
         .styled-slider::-webkit-slider-thumb:active {
             transform: scale(1.15);
         }
+
         .styled-slider::-moz-range-thumb {
             width: 22px;
             height: 22px;
             background: var(--accent-color);
             border: 3px solid var(--bg-color);
             border-radius: 50%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
             cursor: pointer;
         }
 
@@ -614,7 +671,7 @@
 
         .hotbar-slot.filled {
             border-style: solid;
-            background: rgba(128,128,128,0.1);
+            background: rgba(128, 128, 128, 0.1);
         }
 
         .hotbar-slot .remove-x {
@@ -660,9 +717,9 @@
         // Apply theme immediately to avoid flash
         (function () {
             const bg = localStorage.getItem('sillyboard-bg') ||
-                       localStorage.getItem('launcher-bg') || '#000000';
+                localStorage.getItem('launcher-bg') || '#000000';
             const ac = localStorage.getItem('sillyboard-accent') ||
-                       localStorage.getItem('launcher-accent') || '#ffffff';
+                localStorage.getItem('launcher-accent') || '#ffffff';
             document.documentElement.style.setProperty('--bg-color', bg);
             document.documentElement.style.setProperty('--accent-color', ac);
         })();
@@ -681,7 +738,7 @@
                         sentinel = null;
                         if (document.visibilityState === 'visible') acquireWakeLock();
                     });
-                } catch (e) {}
+                } catch (e) { }
             }
 
             await acquireWakeLock();
@@ -695,7 +752,9 @@
     <!-- Loading overlay -->
     <div id="loading-overlay" aria-live="polite" aria-label="Loading sounds">
         <p id="loading-text">Decoding sounds...</p>
-        <div id="loading-progress"><div id="loading-bar"></div></div>
+        <div id="loading-progress">
+            <div id="loading-bar"></div>
+        </div>
     </div>
 
     <!-- Header -->
@@ -717,36 +776,52 @@
     <div class="modal-overlay" id="admin-modal" role="dialog" aria-modal="true" aria-label="Admin Settings">
         <div class="modal-content">
             <h2>Admin Mode</h2>
-            
-            <div class="custom-slider-container" style="margin-top: 24px;">
-                <div class="slider-header">
-                    <span>Speed / Pitch</span>
-                    <span id="pitch-val">1.00x</span>
+
+            <!-- Playback -->
+            <div class="section-title" style="margin-top: 20px;">Playback</div>
+
+            <div class="custom-slider-container" id="pitch-slider-wrap">
+                <div class="slider-header" style="margin-bottom: 8px;">
+                    <span style="font-size: 0.9rem; opacity: 0.7;">Speed / Pitch</span>
+                    <span id="pitch-val" style="font-size: 0.9rem; font-weight: bold;">1.00x</span>
                 </div>
                 <input type="range" class="styled-slider" id="pitch-slider" min="0.25" max="3" step="0.05" value="1">
                 <p class="amp-reset-hint">Double-tap slider to reset to 1.00x</p>
             </div>
 
-            <div class="custom-slider-container" style="margin-top:28px; flex-direction:row; align-items:center; justify-content: space-between;">
-                <label for="turbo-cbx" style="font-weight:bold; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; gap:10px;">
+            <div class="custom-slider-container"
+                style="flex-direction:row; align-items:center; justify-content: space-between; margin-top: 24px; margin-bottom: 12px;">
+                <label for="turbo-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
                     Turbo Mode
                 </label>
                 <input type="checkbox" id="turbo-cbx">
             </div>
 
-            <div class="custom-slider-container" style="margin-top:16px;">
-                <div class="slider-header">
-                    <span>Repeat Rate</span>
-                    <span id="turbo-rate-val">200ms</span>
+            <div class="custom-slider-container">
+                <div class="slider-header" style="margin-bottom: 8px;">
+                    <span style="font-size: 0.9rem; opacity: 0.7;">Repeat Rate</span>
+                    <span id="turbo-rate-val" style="font-size: 0.9rem; font-weight: bold;">200ms</span>
                 </div>
                 <input type="range" class="styled-slider" id="turbo-rate" min="30" max="1000" step="10" value="200">
                 <p class="amp-reset-hint">Double-tap slider to reset to 200ms</p>
             </div>
 
-            <button class="btn" id="repeater-mode-btn" style="margin-top: 16px; width: 100%; font-weight: 900;">Repeater Mode</button>
-            <button class="btn" id="lock-board-btn" style="margin-top: 12px; width: 100%; display: none;">Override: Close Board</button>
+            <!-- Sync -->
+            <div class="section-title" style="margin-top: 30px;">Network & Sync</div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn" id="repeater-mode-btn">Repeater Mode</button>
+                <button class="btn" id="streamables-mode-btn">Streamables</button>
+                <button class="btn" id="remote-mode-btn">Remote Device List</button>
+            </div>
 
-            <div class="modal-close-row">
+            <div id="admin-override-section" style="display: none;">
+                <div class="section-title" style="margin-top: 30px;">Board Status</div>
+                <button class="btn" id="lock-board-btn" style="width: 100%;">Override: Close Board</button>
+            </div>
+
+            <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;"
+                class="modal-close-row">
                 <button class="modal-close-btn" id="admin-close">Done</button>
             </div>
         </div>
@@ -756,20 +831,108 @@
     <div class="modal-overlay" id="repeater-modal" role="dialog" aria-modal="true" aria-label="Repeater Settings">
         <div class="modal-content">
             <h2>Repeater Mode</h2>
-            <p style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.7;">Sync sounds across all connected devices using high-precision scheduling.</p>
+            <p style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.7;">Sync sounds across all connected devices
+                using high-precision scheduling.</p>
 
-            <div class="custom-slider-container" style="flex-direction:row; align-items:center; justify-content: space-between;">
-                <label for="repeater-cbx" style="font-weight:bold; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; gap:10px;">
+            <div class="section-title">Configuration</div>
+
+            <div class="custom-slider-container"
+                style="flex-direction:row; align-items:center; justify-content: space-between; margin-bottom: 12px;">
+                <label for="repeater-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
                     Enable Repeater Mode
                 </label>
                 <input type="checkbox" id="repeater-cbx">
             </div>
 
-            <div id="repeater-status" style="margin-top: 15px; font-size: 0.85rem; font-weight: bold; color: var(--accent-color); opacity: 0.6;">
+            <div class="custom-slider-container"
+                style="flex-direction:row; align-items:center; justify-content: space-between;">
+                <label for="pitch-global-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    Pitch applies Globally
+                </label>
+                <input type="checkbox" id="pitch-global-cbx">
+            </div>
+
+            <div id="repeater-status"
+                style="margin-top: 30px; font-size: 0.85rem; font-weight: bold; color: var(--accent-color); opacity: 0.6; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                 Status: Disconnected
             </div>
 
-            <button class="btn" id="repeater-close" style="margin-top: 24px; width: 100%;">Back</button>
+            <div class="modal-close-row" style="margin-top: 24px;">
+                <button class="modal-close-btn" id="repeater-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remote Modal -->
+    <div class="modal-overlay" id="remote-modal" role="dialog" aria-modal="true" aria-label="Remote Devices">
+        <div class="modal-content">
+            <h2>Remote Dashboard</h2>
+            <p style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.7;">Select targets to trigger sounds on their
+                devices only.</p>
+
+            <div class="section-title">Participants</div>
+
+            <div id="remote-list"
+                style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; background: rgba(255,255,255,0.03); border-radius:12px; padding: 10px;">
+                <!-- Dynamically filled -->
+                <p style="opacity: 0.4; text-align: center; padding: 20px;">No other devices connected...</p>
+            </div>
+
+            <div style="display:flex; gap: 8px;">
+                <button class="btn" id="remote-select-all" style="flex:1; font-size: 0.85rem;">Select All</button>
+                <button class="btn" id="remote-clear" style="flex:1; font-size: 0.85rem;">Clear</button>
+            </div>
+
+            <div class="modal-close-row" style="margin-top: 24px;">
+                <button class="modal-close-btn" id="remote-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Streamables Modal -->
+    <div class="modal-overlay" id="streamables-modal" role="dialog" aria-modal="true" aria-label="Streamable Ensembles">
+        <div class="modal-content">
+            <h2>Streamables</h2>
+            <p style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.7;">Orchestrate multi-part audio experiences
+                across all connected Sillyboards.</p>
+
+            <div class="section-title">Selection</div>
+
+            <div class="custom-slider-container"
+                style="flex-direction:row; align-items:center; justify-content: space-between; margin-bottom: 20px;">
+                <label for="stream-self-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    Use this device (self)
+                </label>
+                <input type="checkbox" id="stream-self-cbx" checked>
+            </div>
+
+            <div id="streamables-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                <!-- Filled from config -->
+            </div>
+
+            <div id="stream-status"
+                style="margin-top: 15px; font-size: 0.85rem; font-weight: bold; color: var(--accent-color); opacity: 0.6; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; text-align: center;">
+                Devices: 0
+            </div>
+
+            <div class="modal-close-row" style="margin-top: 24px;">
+                <button class="modal-close-btn" id="streamables-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mic Permission Modal -->
+    <div class="modal-overlay" id="mic-perm-modal" role="dialog" aria-modal="true" aria-label="Microphone Permission">
+        <div class="modal-content" style="max-width:350px;">
+            <h2>This app uses your microphone</h2>
+            <p style="margin-bottom: 24px; font-size: 1rem; opacity: 0.8; line-height: 1.5;">Mic access is for volume
+                analysis only, no audio is being recorded. :3</p>
+            <button class="btn" id="mic-grant-btn"
+                style="width: 100%; font-weight: 900; background: var(--accent-color); color: var(--bg-color);">Request
+                Permission</button>
         </div>
     </div>
 
@@ -825,17 +988,24 @@
             <div class="amp-section">
                 <div class="section-title">Amplification</div>
                 <div class="amp-slider-row">
-                    <input
-                        type="range"
-                        id="amp-slider"
-                        class="amp-slider"
-                        min="0" max="300" step="1" value="100"
-                        aria-label="Amplification"
-                    >
+                    <input type="range" id="amp-slider" class="amp-slider" min="0" max="300" step="1" value="100"
+                        aria-label="Amplification">
                     <span class="amp-value" id="amp-value-label">100%</span>
                 </div>
                 <p class="amp-reset-hint">Double-tap slider to reset to 100%</p>
             </div>
+
+            <!-- Auto Gain -->
+            <div class="custom-slider-container"
+                style="flex-direction:row; align-items:center; justify-content: space-between; margin-top: 12px; margin-bottom: 24px;">
+                <label for="autogain-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    Auto-Gain (300% Max)
+                </label>
+                <input type="checkbox" id="autogain-cbx">
+            </div>
+
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 24px;"></div>
 
             <div class="modal-close-row">
                 <button class="modal-close-btn" id="settings-close">Done</button>
@@ -905,7 +1075,7 @@
             // Native fallback for Safari, with critical 'interactive' latency hint to force smallest audio buffer
             const AudioContextParams = window.AudioContext || window.webkitAudioContext;
             audioCtx = new AudioContextParams({ latencyHint: 'interactive' });
-            
+
             gainNode = audioCtx.createGain();
             gainNode.gain.value = currentGain;
             gainNode.connect(audioCtx.destination);
@@ -922,7 +1092,7 @@
             silentOsc.start();
         }
 
-        const ampSlider     = document.getElementById('amp-slider');
+        const ampSlider = document.getElementById('amp-slider');
         const ampValueLabel = document.getElementById('amp-value-label');
 
         function updateAmpUI(val) {
@@ -967,16 +1137,16 @@
 
         let adminClicks = 0;
         let adminTimer = null;
-        
+
         let headerLockedClicks = 0;
         let headerLockedTimer = null;
-        
+
         // Initial visibility check will be handled in initUIForSounds to account for board lock state
         // if (localStorage.getItem('sillyboard-admin') === 'true') {
         //     adminBtn.style.display = 'inline-block';
         // }
 
-        titleEl.addEventListener('touchstart', (e) => e.preventDefault(), {passive: false}); // Prevent mobile text selection
+        titleEl.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false }); // Prevent mobile text selection
         titleEl.addEventListener('pointerdown', () => {
             // Admin unlock
             adminClicks++;
@@ -1021,7 +1191,7 @@
         }
 
         pitchSlider.addEventListener('input', updatePitchUI);
-        
+
         let pitchLastTap = 0;
         pitchSlider.addEventListener('dblclick', () => {
             pitchSlider.value = 1;
@@ -1035,7 +1205,7 @@
             }
             pitchLastTap = now;
         }, { passive: true });
-        
+
         // Turbo state
         const turboCbx = document.getElementById('turbo-cbx');
         const turboRate = document.getElementById('turbo-rate');
@@ -1080,7 +1250,7 @@
         const repeaterModal = document.getElementById('repeater-modal');
         const repeaterCbx = document.getElementById('repeater-cbx');
         const repeaterStatus = document.getElementById('repeater-status');
-        
+
         let repeaterEnabled = localStorage.getItem('sillyboard-repeater') === 'true';
         repeaterCbx.checked = repeaterEnabled;
 
@@ -1118,12 +1288,30 @@
                     // serverOffset = serverTime - (now+clientTime)/2
                     serverTimeOffset = data.serverTime - ((now + data.clientTime) / 2);
                     updateRepeaterStatus("Connected & Synced", 1);
+
+                    // Register after sync
+                    sendRegistration();
                 } else if (data.type === 'play') {
                     // Prevent phasing: ignore the echo of our own signal returning from server
                     if (data.clientId === myClientId) return;
-                    
-                    // Schedule sound playback
-                    scheduleRemotePlayback(data.key, data.targetServerTime);
+
+                    // Global pitch override
+                    if (data.pitch !== undefined) {
+                        currentPitch = data.pitch;
+                        pitchVal.textContent = currentPitch.toFixed(2) + 'x';
+                        pitchSlider.value = currentPitch;
+                    }
+
+                    // Schedule sound playback (handle specific stream-variant if provided)
+                    scheduleRemotePlayback(data.key, data.targetServerTime, data.variant);
+                } else if (data.type === 'stop') {
+                    stopSound(data.key);
+                } else if (data.type === 'global_intensity') {
+                    lastGlobalIntensity = data.intensity;
+                } else if (data.type === 'client_list') {
+                    renderRemoteList(data.clients);
+                } else if (data.type === 'error') {
+                    alert(data.message);
                 }
             };
 
@@ -1137,7 +1325,253 @@
             };
         }
 
-        function scheduleRemotePlayback(key, targetServerTime) {
+        function parseDeviceInfo() {
+            const ua = navigator.userAgent;
+            let os = "Unknown OS";
+            if (ua.match(/iPhone|iPad|iPod/)) os = "iOS";
+            else if (ua.match(/Android/)) os = "Android";
+            else if (ua.match(/Windows/)) os = "Windows";
+            else if (ua.match(/Macintosh/)) os = "macOS";
+
+            let browser = "Unknown Browser";
+            if (ua.match(/Chrome/)) browser = "Chrome";
+            else if (ua.match(/Safari/)) browser = "Safari";
+            else if (ua.match(/Firefox/)) browser = "Firefox";
+
+            // Mobile model heuristic
+            let model = "Desktop";
+            if (ua.match(/iPhone/)) model = "iPhone";
+            else if (ua.match(/iPad/)) model = "iPad";
+            else if (ua.match(/Android/)) {
+                const parts = ua.match(/Android [^;]+; ([^;)]+)/);
+                model = parts ? parts[1] : "Android Device";
+            }
+
+            return { os, browser, model };
+        }
+
+        function sendRegistration() {
+            if (!repeaterSocket || repeaterSocket.readyState !== WebSocket.OPEN) return;
+            const info = parseDeviceInfo();
+            repeaterSocket.send(JSON.stringify({
+                type: 'register',
+                id: myClientId,
+                ...info
+            }));
+        }
+
+        const remoteModal = document.getElementById('remote-modal');
+        const remoteListEl = document.getElementById('remote-list');
+        let selectedRemoteIds = new Set();
+
+        function renderRemoteList(allClients) {
+            totalDeviceCount = allClients.length;
+            streamStatus.textContent = `Devices: ${totalDeviceCount}`;
+            renderStreamables();
+
+            remoteListEl.innerHTML = '';
+            const others = allClients.filter(c => c.id !== myClientId);
+
+            if (others.length === 0) {
+                remoteListEl.innerHTML = '<p style="opacity: 0.4;">No other devices connected...</p>';
+                return;
+            }
+
+            others.forEach(c => {
+                const row = document.createElement('div');
+                row.style.cssText = "display:flex; align-items:center; gap:12px; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px; cursor:pointer;";
+
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.checked = selectedRemoteIds.has(c.id);
+
+                const label = document.createElement('div');
+                label.style.flex = "1";
+                label.innerHTML = `<span style="font-weight:bold;">${c.model}</span> <span style="opacity:0.6; font-size:0.8rem;">(${c.os} • ${c.browser})</span>`;
+
+                row.appendChild(cb);
+                row.appendChild(label);
+
+                row.addEventListener('click', () => {
+                    cb.checked = !cb.checked;
+                    if (cb.checked) selectedRemoteIds.add(c.id);
+                    else selectedRemoteIds.delete(c.id);
+                });
+
+                remoteListEl.appendChild(row);
+            });
+        }
+
+        document.getElementById('remote-mode-btn').addEventListener('click', () => remoteModal.classList.add('active'));
+        document.getElementById('remote-close').addEventListener('click', () => remoteModal.classList.remove('active'));
+        document.getElementById('remote-select-all').addEventListener('click', () => {
+            document.querySelectorAll('#remote-list input[type="checkbox"]').forEach(cb => {
+                cb.parentElement.click(); if (!cb.checked) cb.parentElement.click();
+            });
+        });
+        document.getElementById('remote-clear').addEventListener('click', () => {
+            selectedRemoteIds.clear();
+            document.querySelectorAll('#remote-list input[type="checkbox"]').forEach(cb => cb.checked = false);
+        });
+
+        // ── Auto Gain logic ────────────────────────────────────────────────
+        const autogainCbx = document.getElementById('autogain-cbx');
+        let autogainEnabled = localStorage.getItem('sillyboard-autogain') !== 'false'; // Default to true
+        autogainCbx.checked = autogainEnabled;
+
+        const micPermModal = document.getElementById('mic-perm-modal');
+        const micGrantBtn = document.getElementById('mic-grant-btn');
+
+        let autoGainValue = 1.0;
+        let audioMonitor = null;
+        let hasMicAccess = false;
+        let lastGlobalIntensity = 0;
+
+        async function initAutoGain() {
+            if (!autogainEnabled) {
+                autoGainValue = 1.0; return;
+            }
+
+            // Check if we've ever shown the memo
+            if (localStorage.getItem('sillyboard-mic-seen') !== 'true') {
+                micPermModal.classList.add('active');
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                hasMicAccess = true;
+                const audioCtxTemp = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioCtxTemp.createMediaStreamSource(stream);
+                const processor = audioCtxTemp.createAnalyser();
+                processor.fftSize = 256;
+                source.connect(processor);
+
+                const dataArray = new Uint8Array(processor.frequencyBinCount);
+
+                setInterval(() => {
+                    if (!autogainEnabled) return;
+                    processor.getByteFrequencyData(dataArray);
+                    let sum = 0;
+                    for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+                    let rms = sum / dataArray.length; // rough intensity
+
+                    // Simple mapping: silent room (rms < 5) -> gain 1.0; loud room (rms > 60) -> gain 3.0
+                    let newGain = 1.0 + (rms / 30);
+                    autoGainValue = Math.min(3.0, Math.max(0.5, newGain));
+                    currentRoomIntensity = rms;
+
+                    // BROADCAST OUR INTENSITY to the collective if we have mic access
+                    if (repeaterEnabled && repeaterSocket && repeaterSocket.readyState === WebSocket.OPEN) {
+                        repeaterSocket.send(JSON.stringify({
+                            type: 'intensity_update',
+                            intensity: rms
+                        }));
+                    }
+                }, 1000); // 1s sync is enough for room intensity
+
+            } catch (e) {
+                console.error("Mic access denied for Auto-Gain", e);
+                hasMicAccess = false;
+            }
+        }
+
+        micGrantBtn.addEventListener('click', async () => {
+            localStorage.setItem('sillyboard-mic-seen', 'true');
+            micPermModal.classList.remove('active');
+            await initAutoGain();
+        });
+
+        autogainCbx.addEventListener('change', () => {
+            autogainEnabled = autogainCbx.checked;
+            localStorage.setItem('sillyboard-autogain', autogainEnabled);
+            if (autogainEnabled) initAutoGain();
+        });
+
+        // Current room target (loudness) based on mic
+        let currentRoomIntensity = 0;
+        if (autogainEnabled) initAutoGain();
+
+        // ── Streamables logic ──────────────────────────────────────────────
+        const streamModal = document.getElementById('streamables-modal');
+        const streamListEl = document.getElementById('streamables-list');
+        const streamStatus = document.getElementById('stream-status');
+        const streamSelfCbx = document.getElementById('stream-self-cbx');
+        let totalDeviceCount = 0;
+        let activeStreamKey = null;
+
+        function renderStreamables() {
+            if (!SOUND_DEFS.streamables) return;
+            streamListEl.innerHTML = '';
+
+            const effectiveCount = totalDeviceCount - (streamSelfCbx.checked ? 0 : 1);
+            streamStatus.textContent = `Devices: ${Math.max(0, effectiveCount)}`;
+
+            Object.keys(SOUND_DEFS.streamables).forEach(key => {
+                const s = SOUND_DEFS.streamables[key];
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                if (activeStreamKey === key) btn.style.background = 'var(--accent-color)';
+                if (activeStreamKey === key) btn.style.color = 'var(--bg-color)';
+                btn.style.width = '100%';
+                btn.innerHTML = `<strong>${s.label}</strong> <span style="font-size:0.7rem; opacity:0.6;">(${s.parts} parts)</span>`;
+
+                if (effectiveCount < s.parts) {
+                    btn.style.opacity = '0.3';
+                    btn.disabled = true;
+                    btn.title = `${s.parts} Devices required`;
+                }
+
+                btn.addEventListener('click', () => {
+                    if (repeaterSocket && repeaterSocket.readyState === WebSocket.OPEN) {
+                        if (activeStreamKey === key) {
+                            // STOP
+                            repeaterSocket.send(JSON.stringify({ type: 'stop', key: key }));
+                            activeStreamKey = null;
+                        } else {
+                            if (activeStreamKey) repeaterSocket.send(JSON.stringify({ type: 'stop', key: activeStreamKey }));
+
+                            activeStreamKey = key;
+                            repeaterSocket.send(JSON.stringify({
+                                type: 'stream_play',
+                                key: key,
+                                parts: s.parts,
+                                includeSender: streamSelfCbx.checked,
+                                pitch: pitchGlobal ? currentPitch : 1.0
+                            }));
+                        }
+                        renderStreamables();
+                    } else {
+                        alert("Please enable Repeater Mode first.");
+                    }
+                });
+
+                streamListEl.appendChild(btn);
+            });
+        }
+
+        streamSelfCbx.addEventListener('change', renderStreamables);
+
+        document.getElementById('streamables-mode-btn').addEventListener('click', () => {
+            renderStreamables();
+            streamModal.classList.add('active');
+        });
+        document.getElementById('streamables-close').addEventListener('click', () => streamModal.classList.remove('active'));
+
+        // Global pitch sync toggle
+        const pitchGlobalCbx = document.getElementById('pitch-global-cbx');
+        let pitchGlobal = localStorage.getItem('sillyboard-pitch-global') === 'true';
+        pitchGlobalCbx.checked = pitchGlobal;
+        pitchGlobalCbx.addEventListener('change', () => {
+            pitchGlobal = pitchGlobalCbx.checked;
+            localStorage.setItem('sillyboard-pitch-global', pitchGlobal);
+        });
+
+        // Admin Pitch logic
+        const pitchSliderWrap = document.getElementById('pitch-slider-wrap');
+        // pitchEnabled logic removed per request, sliders are always available in admin now
+
+        function scheduleRemotePlayback(key, targetServerTime, variantIndex = null) {
             const now = Date.now();
             const targetLocalTime = targetServerTime - serverTimeOffset;
             const delayMs = targetLocalTime - now;
@@ -1145,17 +1579,24 @@
             if (delayMs < -500) return; // Too late
 
             ensureAudioContext();
-            // Convert to AudioContext clock
             const audioTargetTime = audioCtx.currentTime + (Math.max(0, delayMs) / 1000);
-            
-            // We need a specific playSound variant for scheduled time
-            playSound(key, null, audioTargetTime);
+
+            // Check if this key is in streamables first
+            playSound(key, null, audioTargetTime, variantIndex);
         }
 
         repeaterBtn.addEventListener('click', () => repeaterModal.classList.add('active'));
         document.getElementById('repeater-close').addEventListener('click', () => repeaterModal.classList.remove('active'));
         repeaterModal.addEventListener('click', (e) => {
             if (e.target === repeaterModal) repeaterModal.classList.remove('active');
+        });
+
+        streamModal.addEventListener('click', (e) => {
+            if (e.target === streamModal) streamModal.classList.remove('active');
+        });
+
+        remoteModal.addEventListener('click', (e) => {
+            if (e.target === remoteModal) remoteModal.classList.remove('active');
         });
 
         repeaterCbx.addEventListener('change', () => {
@@ -1177,7 +1618,7 @@
         // ── Build board & hotbar (called after JSON load) ──────────────────
         const boardEl = document.getElementById('board');
         const hotbarEl = document.getElementById('hotbar');
-        const boardButtons = {}; 
+        const boardButtons = {};
 
         let isBoardLocked = false;
         let bigIconUnlocked = false;
@@ -1186,7 +1627,7 @@
             // Override check
             const manualUnlock = localStorage.getItem('sillyboard-manual-unlock') === 'true';
             const manualLock = localStorage.getItem('sillyboard-manual-lock') === 'true';
-            
+
             isBoardLocked = (SOUND_DEFS.locked === 1 || manualLock) && !manualUnlock;
 
             // Admin button visibility (only show if admin is unlocked AND board is not closed)
@@ -1204,9 +1645,9 @@
             }
 
             // Validate saved entries against dynamic JSON keys
-            hotbarSlots = hotbarSlots.filter(k => SOUND_DEFS[k] && k !== 'locked').slice(0, MAX_HOTBAR);
+            hotbarSlots = hotbarSlots.filter(k => SOUND_DEFS[k] && k !== 'locked' && k !== 'streamables').slice(0, MAX_HOTBAR);
 
-            SOUND_KEYS.filter(k => k !== 'locked').forEach(key => {
+            SOUND_KEYS.filter(k => k !== 'locked' && k !== 'streamables').forEach(key => {
                 const btn = document.createElement('button');
                 btn.className = 'sound-btn';
                 btn.id = 'btn-' + key;
@@ -1222,15 +1663,15 @@
         function renderLockedView() {
             boardEl.innerHTML = '';
             hotbarEl.style.display = 'none';
-            
+
             const container = document.createElement('div');
             container.className = 'locked-container';
-            
+
             const icon = document.createElement('div');
             icon.className = 'locked-icon';
             icon.textContent = ':3';
             icon.setAttribute('aria-hidden', 'true');
-            
+
             let bigClicks = 0;
             let bigTimer = null;
             icon.addEventListener('pointerdown', () => {
@@ -1332,8 +1773,7 @@
                 slotsEl.appendChild(slotDiv);
             }
 
-            // Render sound picker buttons
-            SOUND_KEYS.filter(k => SOUND_DEFS[k] && SOUND_DEFS[k].label).forEach(key => {
+            SOUND_KEYS.filter(k => SOUND_DEFS[k] && SOUND_DEFS[k].label && k !== 'streamables').forEach(key => {
                 const btn = document.createElement('button');
                 btn.className = 'btn' + (hotbarSlots.includes(key) ? ' in-hotbar' : '');
                 btn.textContent = SOUND_DEFS[key].label;
@@ -1351,10 +1791,13 @@
 
         // ── AudioBuffer pre-decode loading ───────────────────────────────
         // Fetch each file → decode into an AudioBuffer during the loading
-        // screen. Playback uses AudioBufferSourceNode (zero-latency).
+        // screen. Playback uses AudioBufferSourceNode (zero-latency)
+        // decoded during the loading screen.
         const bufferCache = {}; // key → AudioBuffer[]
+        const bufferPeaks = {}; // key:variant → float (0-1 peak amplitude)
+
         const loadingOverlay = document.getElementById('loading-overlay');
-        const loadingBar     = document.getElementById('loading-bar');
+        const loadingBar = document.getElementById('loading-bar');
 
         // Flatten all fetches
         const allFetches = [];
@@ -1392,11 +1835,22 @@
             }
 
             const allFetches = [];
+
+            // Standard sounds
             for (const key of SOUND_KEYS) {
+                if (key === 'locked' || key === 'streamables') continue;
                 const def = SOUND_DEFS[key];
                 if (def.variants) {
-                    def.variants.forEach(v => allFetches.push({ key, src: v.src }));
+                    def.variants.forEach((v, idx) => allFetches.push({ key, src: v.src, idx }));
                 }
+            }
+
+            // Streamable sounds
+            if (SOUND_DEFS.streamables) {
+                Object.keys(SOUND_DEFS.streamables).forEach(key => {
+                    const s = SOUND_DEFS.streamables[key];
+                    s.variants.forEach((v, idx) => allFetches.push({ key, src: v.src, idx }));
+                });
             }
 
             let fetchLoaded = 0;
@@ -1418,7 +1872,7 @@
             );
 
             const buffers = await Promise.all(fetchPromises);
-            
+
             loadingBar.style.width = '100%';
             await new Promise(r => setTimeout(r, 150));
 
@@ -1428,15 +1882,27 @@
                     const audioBuffer = await audioCtx.decodeAudioData(payload.arr);
                     if (!bufferCache[payload.key]) bufferCache[payload.key] = [];
                     bufferCache[payload.key].push(audioBuffer);
+
+                    // Peak Analysis for per-sound Auto-Gain
+                    let max = 0;
+                    const channelData = audioBuffer.getChannelData(0);
+                    // Sample-based peak (every 100th to save compute)
+                    for (let i = 0; i < channelData.length; i += 100) {
+                        const val = Math.abs(channelData[i]);
+                        if (val > max) max = val;
+                    }
+                    // Store peak for this specific variant
+                    const variantId = `${payload.key}:${bufferCache[payload.key].length - 1}`;
+                    bufferPeaks[variantId] = max || 1.0;
                 } catch (e) {
-                    console.error("Failed to decode", payload.src);
+                    console.error("Failed to decode", payload.src, e);
                 }
             }
 
             loadingOverlay.classList.add('hidden');
             setTimeout(() => loadingOverlay.remove(), 400);
 
-            SOUND_KEYS.forEach(key => {
+            SOUND_KEYS.filter(k => k !== 'locked' && k !== 'streamables').forEach(key => {
                 if (boardButtons[key]) bindPressEvent(boardButtons[key], key);
             });
         }
@@ -1451,11 +1917,11 @@
                 // Fallback to random uniform if config is broken
                 return pool[Math.floor(Math.random() * pool.length)];
             }
-            
+
             // Filter available variants (check cooldowns)
             const now = Date.now();
             let availableIndexes = [];
-            
+
             for (let i = 0; i < def.variants.length; i++) {
                 const variant = def.variants[i];
                 if (variant.requiresCooldown && def.cooldownGroupMs) {
@@ -1474,7 +1940,7 @@
                 const lastIdx = lastPlayedIndex.get(key);
                 availableIndexes = availableIndexes.filter(i => i !== lastIdx);
                 // If this drops us to 0 (impossible visually, but safe), rollback
-                if (availableIndexes.length === 0) availableIndexes = [0]; 
+                if (availableIndexes.length === 0) availableIndexes = [0];
             }
 
             // Weighted random selection
@@ -1495,7 +1961,7 @@
             }
 
             lastPlayedIndex.set(key, targetIndex);
-            
+
             // Update cooldown tracking if this sound has a group cooldown
             if (def.cooldownGroupMs) {
                 lastCooldownGroupTime[key] = now;
@@ -1515,14 +1981,14 @@
         }, 10000);
 
         // ── Playback — capped simultaneous instances via AudioBufferSourceNode ──
-        const MAX_CLIPS  = 8;
-        const clipQueue  = []; // { source, btn } in insertion order
+        const MAX_CLIPS = 8;
+        const clipQueue = []; // { source, btn } in insertion order
         const playingCount = new Map(); // btn → active clip count
 
         function evictOldest() {
             const oldest = clipQueue.shift();
             if (!oldest) return;
-            try { oldest.source.stop(); } catch(e) {}
+            try { oldest.source.stop(); } catch (e) { }
             const n = (playingCount.get(oldest.btn) || 1) - 1;
             if (n <= 0) {
                 playingCount.delete(oldest.btn);
@@ -1532,22 +1998,36 @@
             }
         }
 
-        function playSound(key, btn, scheduledTime = null) {
+        function playSound(key, btn, scheduledTime = null, variantIndex = null) {
             const pool = bufferCache[key];
             if (!pool || pool.length === 0) return;
 
             // If we are the sender and repeater is enabled, notify others
             if (!scheduledTime && repeaterEnabled && repeaterSocket && repeaterSocket.readyState === WebSocket.OPEN) {
-                // Schedule for 150ms in the future to account for transit
                 const targetServerTime = Date.now() + serverTimeOffset + 150;
-                repeaterSocket.send(JSON.stringify({
-                    type: 'play',
-                    key: key,
-                    targetServerTime: targetServerTime,
-                    clientId: myClientId
-                }));
-                // We play our own at that same time for perfect sync
-                scheduledTime = audioCtx.currentTime + 0.150;
+
+                if (selectedRemoteIds.size > 0) {
+                    // REMOTE MODE: Only play on selected devices, skip local
+                    repeaterSocket.send(JSON.stringify({
+                        type: 'play_targeted',
+                        key: key,
+                        targetServerTime: targetServerTime,
+                        targetIds: Array.from(selectedRemoteIds),
+                        pitch: pitchGlobal ? currentPitch : 1.0
+                    }));
+                    return; // DO NOT PLAY LOCALLY
+                } else {
+                    // NORMAL REPEATER: Play for everyone including self
+                    repeaterSocket.send(JSON.stringify({
+                        type: 'play',
+                        key: key,
+                        targetServerTime: targetServerTime,
+                        clientId: myClientId,
+                        pitch: pitchGlobal ? currentPitch : 1.0
+                    }));
+                    // We play our own for perfect sync
+                    scheduledTime = audioCtx.currentTime + 0.150;
+                }
             }
 
             // Evict oldest if at the cap
@@ -1556,7 +2036,28 @@
             ensureAudioContext();
             if (audioCtx.state === 'suspended') audioCtx.resume();
 
-            const buffer = pickWeightedRandom(pool, key);
+            // ── Per-Sound Auto-Gain Normalization ────────────────────
+            const finalVariantIdx = variantIndex !== null ? variantIndex : calculateTargetIndex(key);
+            const buffer = pool[finalVariantIdx];
+            const peak = Math.max(0.01, bufferPeaks[`${key}:${finalVariantIdx}`] || 1.0);
+            
+            let effectiveIntensity = currentRoomIntensity;
+            // If we don't have mic but others do, use shared room intensity
+            if (!hasMicAccess && lastGlobalIntensity > 0) {
+                effectiveIntensity = lastGlobalIntensity;
+            }
+
+            // Adjust gain if autogain active
+            if (gainNode) {
+                let normalizationFactor = Math.min(2.5, 1.0 / peak); // Hard cap on per-file boost (safety)
+                let targetPeak = 0.8 + (effectiveIntensity / 40); 
+                let dynamicGain = normalizationFactor * targetPeak;
+                if (!autogainEnabled) dynamicGain = 1.0;
+                const totalTargetGain = currentGain * dynamicGain;
+                // Final safety cap (MAX 3.0x master gain)
+                gainNode.gain.setTargetAtTime(Math.min(3.0 * currentGain, totalTargetGain), audioCtx.currentTime, 0.05);
+            }
+
             const source = audioCtx.createBufferSource();
             source.buffer = buffer;
             source.playbackRate.value = currentPitch;
@@ -1567,7 +2068,7 @@
             source.start(playTime);
 
             // 2. Queue tracking
-            const entry = { source, btn };
+            const entry = { source, btn, key };
             clipQueue.push(entry);
 
             // 3. UI Updates
@@ -1579,6 +2080,11 @@
             source.addEventListener('ended', () => {
                 const idx = clipQueue.indexOf(entry);
                 if (idx !== -1) clipQueue.splice(idx, 1);
+
+                if (key === activeStreamKey) {
+                    activeStreamKey = null;
+                    renderStreamables();
+                }
 
                 if (btn) {
                     const remaining = (playingCount.get(btn) || 1) - 1;
@@ -1592,10 +2098,71 @@
             });
         }
 
+        function stopSound(key) {
+            clipQueue.filter(c => c.key === key).forEach(c => {
+                try { c.source.stop(); } catch (e) { }
+            });
+            if (activeStreamKey === key) {
+                activeStreamKey = null;
+                renderStreamables();
+            }
+        }
+
+        function calculateTargetIndex(key) {
+            const def = SOUND_DEFS[key] || (SOUND_DEFS.streamables && SOUND_DEFS.streamables[key]);
+            if (!def) return 0;
+            const pool = bufferCache[key];
+            if (!pool || pool.length <= 1) return 0;
+
+            const now = Date.now();
+            let availableIndexes = [];
+
+            for (let i = 0; i < def.variants.length; i++) {
+                const variant = def.variants[i];
+                if (variant.requiresCooldown && def.cooldownGroupMs) {
+                    const lastTime = lastCooldownGroupTime[key] || 0;
+                    if (now - lastTime < def.cooldownGroupMs) {
+                        continue; // skip this variant
+                    }
+                }
+                availableIndexes.push(i);
+            }
+
+            if (availableIndexes.length === 0) return 0;
+
+            // Anti-repeat heuristic 
+            if (availableIndexes.length > 1) {
+                const lastIdx = lastPlayedIndex.get(key);
+                availableIndexes = availableIndexes.filter(i => i !== lastIdx);
+                if (availableIndexes.length === 0) availableIndexes = [0];
+            }
+
+            // Weighted random selection
+            let totalWeight = 0;
+            for (let i of availableIndexes) {
+                totalWeight += def.variants[i].weight !== undefined ? def.variants[i].weight : 1;
+            }
+
+            let rnd = Math.random() * totalWeight;
+            let targetIndex = availableIndexes[0];
+            for (let i of availableIndexes) {
+                const w = def.variants[i].weight !== undefined ? def.variants[i].weight : 1;
+                if (rnd < w) {
+                    targetIndex = i;
+                    break;
+                }
+                rnd -= w;
+            }
+
+            lastPlayedIndex.set(key, targetIndex);
+            if (def.cooldownGroupMs) lastCooldownGroupTime[key] = now;
+            return targetIndex;
+        }
+
         // ── Service Worker registration ──────────────────────────────────
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js', { scope: './' })
-                .catch(() => {});
+                .catch(() => { });
         }
 
         // ── Autoplay unlock on first touch ──────────────────────────────
@@ -1612,15 +2179,15 @@
 
             function trigger(e) {
                 if (e && e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
-                
-                // Debounce to prevent multiple events (touchstart + mousedown) from playing multiple times
+
+                // Debounce
                 const now = Date.now();
-                if (btn._lastPress && (now - btn._lastPress < 50)) return;
+                if (btn._lastPress && (now - btn._lastPress < 60)) return;
                 btn._lastPress = now;
 
                 playSound(key, btn);
 
-                // Handle Turbo Mode recursive firing
+                // Turbo logic
                 if (activeInterval) clearInterval(activeInterval);
                 if (turboEnabled) {
                     activeInterval = setInterval(() => {
@@ -1636,23 +2203,20 @@
                 }
             }
 
-            // Raw touchstart for lowest possible mobile latency (passive: true ensures it doesn't block DOM)
-            btn.addEventListener('touchstart', trigger, { passive: true });
-            btn.addEventListener('touchend', halt, { passive: true });
-            btn.addEventListener('touchcancel', halt, { passive: true });
-            
-            // Raw mousedown for lowest possible desktop latency 
-            // (WebKit can delay 'pointerdown' while deciding if it's a Force Touch or Pencil event)
-            btn.addEventListener('mousedown', (e) => {
-                if (e.button !== 0) return; // Only allow left clicks
+            // Pointer events are the modern standard: WebKit handles "tap vs scroll" 
+            // natively. If a scroll starts, it fires 'pointercancel'.
+            btn.addEventListener('pointerdown', (e) => {
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
                 trigger(e);
             });
-            btn.addEventListener('mouseup', halt);
-            btn.addEventListener('mouseleave', halt);
-            
+            btn.addEventListener('pointerup', halt);
+            btn.addEventListener('pointercancel', halt);
+            btn.addEventListener('pointerleave', halt);
+
+            // Re-triggering safety
             btn.addEventListener('keydown', trigger);
             btn.addEventListener('keyup', halt);
-            
+
             // Prevent native click to stop double-firing
             btn.addEventListener('click', e => e.preventDefault());
         }
@@ -1662,4 +2226,5 @@
         });
     </script>
 </body>
+
 </html>
