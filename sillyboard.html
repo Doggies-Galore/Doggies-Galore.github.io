@@ -1612,15 +1612,23 @@
         const pitchSliderWrap = document.getElementById('pitch-slider-wrap');
         // pitchEnabled logic removed per request, sliders are always available in admin now
 
-        function scheduleRemotePlayback(key, targetServerTime, variantIndex = null) {
+        // Unified sync helper: maps a target server time to a local audioCtx time
+        function getAudioStartTime(targetServerTime) {
             const now = Date.now();
             const targetLocalTime = targetServerTime - serverTimeOffset;
             const delayMs = targetLocalTime - now;
-
-            if (delayMs < -500) return; // Too late
-
+            
+            // Hard block on extreme late arrivals
+            if (delayMs < -1000) return null;
+            
             ensureAudioContext();
-            const audioTargetTime = audioCtx.currentTime + (Math.max(0, delayMs) / 1000);
+            // Schedule in the future, if it's already past (late), play ASAP
+            return audioCtx.currentTime + (Math.max(0, delayMs) / 1000);
+        }
+
+        function scheduleRemotePlayback(key, targetServerTime, variantIndex = null) {
+            const audioTargetTime = getAudioStartTime(targetServerTime);
+            if (audioTargetTime === null) return;
 
             // Check if this key is in streamables first
             playSound(key, null, audioTargetTime, variantIndex);
