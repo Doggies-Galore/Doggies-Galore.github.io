@@ -1461,14 +1461,18 @@
                     autoGainValue = Math.min(3.0, Math.max(0.5, newGain));
                     currentRoomIntensity = rms;
 
-                    // BROADCAST OUR INTENSITY to the collective if we have mic access
-                    if (repeaterEnabled && repeaterSocket && repeaterSocket.readyState === WebSocket.OPEN) {
+                    // Analysis at 200ms for fast local feedback
+                }, 200);
+
+                // Broadcast intensity to the collective at a slightly lower 1s rate to avoid network floods
+                setInterval(() => {
+                    if (repeaterEnabled && repeaterSocket && repeaterSocket.readyState === WebSocket.OPEN && hasMicAccess) {
                         repeaterSocket.send(JSON.stringify({
                             type: 'intensity_update',
-                            intensity: rms
+                            intensity: currentRoomIntensity
                         }));
                     }
-                }, 1000); // 1s sync is enough for room intensity
+                }, 1000);
 
             } catch (e) {
                 console.error("Mic access denied for Auto-Gain", e);
@@ -2050,12 +2054,17 @@
             // Adjust gain if autogain active
             if (gainNode) {
                 let normalizationFactor = Math.min(2.5, 1.0 / peak); // Hard cap on per-file boost (safety)
-                let targetPeak = 0.8 + (effectiveIntensity / 40); 
+                
+                // Baseline target is 1.0 (full volume for quiet room)
+                // Scaling intensity faster (30 instead of 40)
+                let targetPeak = 1.0 + (effectiveIntensity / 30); 
+                
                 let dynamicGain = normalizationFactor * targetPeak;
                 if (!autogainEnabled) dynamicGain = 1.0;
+
                 const totalTargetGain = currentGain * dynamicGain;
-                // Final safety cap (MAX 3.0x master gain)
-                gainNode.gain.setTargetAtTime(Math.min(3.0 * currentGain, totalTargetGain), audioCtx.currentTime, 0.05);
+                // Final safety cap (MAX 3.5x master gain for extreme environments)
+                gainNode.gain.setTargetAtTime(Math.min(3.5 * currentGain, totalTargetGain), audioCtx.currentTime, 0.05);
             }
 
             const source = audioCtx.createBufferSource();
