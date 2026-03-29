@@ -807,12 +807,24 @@
                 <p class="amp-reset-hint">Double-tap slider to reset to 200ms</p>
             </div>
 
-            <!-- Sync -->
+            <!-- Network & Sync -->
             <div class="section-title" style="margin-top: 30px;">Network & Sync</div>
+            
+            <div class="custom-slider-container" style="flex-direction:row; align-items:center; justify-content: space-between; margin-bottom: 20px;">
+                <label for="ws-enabled-cbx" style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    Server Connection
+                </label>
+                <input type="checkbox" id="ws-enabled-cbx" checked>
+            </div>
+
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <button class="btn" id="repeater-mode-btn">Repeater Mode</button>
                 <button class="btn" id="streamables-mode-btn">Streamables</button>
                 <button class="btn" id="remote-mode-btn">Remote Device List</button>
+            </div>
+
+            <div id="repeater-status" style="margin-top: 20px; font-size: 0.85rem; font-weight: bold; color: var(--accent-color); opacity: 0.6; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; text-align: center;">
+                Status: Disconnected
             </div>
 
             <div id="admin-override-section" style="display: none;">
@@ -852,11 +864,6 @@
                     Pitch applies Globally
                 </label>
                 <input type="checkbox" id="pitch-global-cbx">
-            </div>
-
-            <div id="repeater-status"
-                style="margin-top: 30px; font-size: 0.85rem; font-weight: bold; color: var(--accent-color); opacity: 0.6; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                Status: Disconnected
             </div>
 
             <div class="modal-close-row" style="margin-top: 24px;">
@@ -1276,11 +1283,13 @@
         }
 
         async function initRepeater() {
-            if (!repeaterEnabled) {
+            if (!wsEnabled) {
                 if (repeaterSocket) repeaterSocket.close();
                 updateRepeaterStatus("Disconnected");
                 return;
             }
+            // Always connect, even if repeater logic is toggled off
+            if (repeaterSocket && repeaterSocket.readyState <= 1) return;
 
             updateRepeaterStatus("Connecting...");
             repeaterSocket = new WebSocket(REPEATER_URL);
@@ -1586,6 +1595,29 @@
             localStorage.setItem('sillyboard-pitch-global', pitchGlobal);
         });
 
+        // Network config
+        const wsEnabledCbx = document.getElementById('ws-enabled-cbx');
+        let wsEnabled = localStorage.getItem('sillyboard-ws-enabled') !== 'false';
+        wsEnabledCbx.checked = wsEnabled;
+
+        wsEnabledCbx.addEventListener('change', () => {
+            wsEnabled = wsEnabledCbx.checked;
+            localStorage.setItem('sillyboard-ws-enabled', wsEnabled);
+            if (!wsEnabled) {
+                if (repeaterSocket) repeaterSocket.close();
+            } else {
+                initRepeater();
+            }
+        });
+
+        repeaterCbx.addEventListener('change', () => {
+            repeaterEnabled = repeaterCbx.checked;
+            localStorage.setItem('sillyboard-repeater', repeaterEnabled);
+        });
+
+        // Initialize connection on load if enabled
+        if (wsEnabled) initRepeater();
+
         // Admin Pitch logic
         const pitchSliderWrap = document.getElementById('pitch-slider-wrap');
         // pitchEnabled logic removed per request, sliders are always available in admin now
@@ -1621,8 +1653,10 @@
         repeaterCbx.addEventListener('change', () => {
             repeaterEnabled = repeaterCbx.checked;
             localStorage.setItem('sillyboard-repeater', repeaterEnabled);
-            initRepeater();
         });
+
+        // Initialize connection on load
+        initRepeater();
 
         if (repeaterEnabled) initRepeater();
 
@@ -2197,9 +2231,20 @@
         document.addEventListener('touchstart', _unlockAudio, { once: true, capture: true, passive: true });
         document.addEventListener('mousedown', _unlockAudio, { once: true, capture: true });
 
-        // ── Wire up board buttons for INSTANT playback ──────────────────
+        // ── Wire up board buttons for INSTANT playback (with scroll protection) ──────────
+        const activeTouchTimers = new Set();
+        
+        // If the user starts scrolling the board, immediately cancel all pending touch triggers
+        boardEl.addEventListener('scroll', () => {
+            activeTouchTimers.forEach(tid => clearTimeout(tid));
+            activeTouchTimers.clear();
+        }, { passive: true });
+
         function bindPressEvent(btn, key) {
             let activeInterval = null;
+            let downTimer = null;
+            let startY = 0;
+            let isMoving = false;
 
             function trigger(e) {
                 if (e && e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
