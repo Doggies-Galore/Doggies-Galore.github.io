@@ -239,7 +239,7 @@
     <!-- Voting Screen -->
     <div id="voting-view" class="view">
         <div id="voting-header">
-            <h2 id="pick-status">Pick 5 (0/5)</h2>
+            <h2 id="pick-status">(0/5)</h2>
             <button class="btn" id="submit-vote-btn">Submit</button>
         </div>
         <div id="voting-list">
@@ -354,7 +354,7 @@
         }
 
         function updateStatus() {
-            document.getElementById('pick-status').textContent = `Pick 5 (${selected.size}/5)`;
+            document.getElementById('pick-status').textContent = `(${selected.size}/5)`;
             const submitBtn = document.getElementById('submit-vote-btn');
             if (selected.size === 5) {
                 submitBtn.classList.add('ready');
