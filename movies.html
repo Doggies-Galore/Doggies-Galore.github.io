@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Movie_HUH?</title>
+    <style>
+        :root {
+            --bg-color: #000;
+            --accent-color: #fff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--accent-color);
+            font-family: 'Inter', sans-serif;
+            width: 100vw;
+            height: 100dvh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Views */
+        .view {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .view.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Title / Splash */
+        h1 {
+            font-weight: 900;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+        }
+
+        p.subtitle {
+            font-size: clamp(1rem, 4vw, 1.3rem);
+            margin-bottom: 40px;
+            max-width: 600px;
+            line-height: 1.5;
+            opacity: 0.8;
+        }
+
+        /* Buttons */
+        .btn {
+            background: transparent;
+            color: var(--accent-color);
+            border: 4px solid var(--accent-color);
+            border-radius: 20px;
+            font-family: inherit;
+            font-size: clamp(1.4rem, 5vw, 2rem);
+            font-weight: 700;
+            padding: 15px 40px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn:active:not(:disabled),
+        .btn.selected {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            transform: scale(0.95);
+        }
+
+        /* Voting View */
+        #voting-view {
+            justify-content: flex-start;
+            padding: 0;
+        }
+
+        #voting-header {
+            width: 100%;
+            padding: 20px;
+            border-bottom: 3px solid var(--accent-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        #voting-header h2 {
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            font-weight: 900;
+            text-align: left;
+        }
+
+        #submit-vote-btn {
+            border-width: 2px;
+            font-size: 1rem;
+            padding: 8px 16px;
+            border-radius: 12px;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        #submit-vote-btn.ready {
+            opacity: 1;
+            pointer-events: auto;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        #voting-list {
+            flex: 1;
+            width: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .movie-btn {
+            width: 100%;
+            flex-shrink: 0;
+            text-align: center;
+            padding: 24px 12px;
+            border-radius: 24px;
+            font-size: clamp(1.1rem, 3.5vw, 1.6rem);
+            transition: all 0.15s ease;
+        }
+
+        /* Thanks View */
+        .easter-egg {
+            cursor: pointer;
+            display: inline-block;
+            transition: transform 0.1s;
+        }
+
+        .easter-egg:active {
+            transform: scale(0.8);
+        }
+
+        /* Results Modal */
+        #results-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            padding: 60px 20px 20px 20px;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        #results-modal.active {
+            display: flex;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .result-item:first-child {
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .close-btn {
+            margin-top: 30px;
+            align-self: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Splash Screen -->
+    <div id="splash-view" class="view active">
+        <h1>Movie_HUH?</h1>
+        <p class="subtitle">Most of these laserdiscs were owned by rich white guys, so my collection may be skewed
+            :3</p>
+        <button class="btn" id="start-vote-btn" disabled>Connecting...</button>
+        <p id="conn-status" style="margin-top: 20px; font-size: 0.8rem; opacity: 0.5;">Waiting for server...</p>
+    </div>
+
+    <!-- Voting Screen -->
+    <div id="voting-view" class="view">
+        <div id="voting-header">
+            <h2 id="pick-status">Pick 5 (0/5)</h2>
+            <button class="btn" id="submit-vote-btn">Submit</button>
+        </div>
+        <div id="voting-list">
+            <!-- Buttons injected by JS -->
+        </div>
+    </div>
+
+    <!-- Thanks Screen -->
+    <div id="thanks-view" class="view">
+        <h1>Thanks for voting <span class="easter-egg" id="cat-face">:3</span></h1>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="results-modal">
+        <h1 style="text-align: center; margin-bottom: 30px;">Poll Results</h1>
+        <div id="results-list"></div>
+        <button class="btn close-btn"
+            onclick="document.getElementById('results-modal').classList.remove('active')">Close</button>
+    </div>
+
+    <script>
+        const movies = [
+            "Top Gun", "The Sound of Music", "The Abyss",
+            "Clear and Present Danger", "Mission: Impossible", "A Few Good Men", "Close Encounters of the Third Kind",
+            "Jurassic Park", "The Wizard of Oz", "Mrs. Doubtfire",
+            "The Fugitive", "The Hunt for Red October", "Apollo 13", "Dances with Wolves", "In & Out (it's gaye™)", "Contact",
+            "Crimson Tide", "Terminator 2: Judgment Day", "Blade Runner", "Little Shop of Horrors",
+            "The Terminator", "Toy Story", "Quiz Show"
+        ];
+
+        let selected = new Set();
+        let ws;
+
+        // Init WebSocket
+        function connectWS() {
+            const url = 'wss://aibostation.tail76b4d2.ts.net/';
+            const statusEl = document.getElementById('conn-status');
+
+            try {
+                ws = new WebSocket(url);
+
+                ws.onopen = () => {
+                    const btn = document.getElementById('start-vote-btn');
+                    btn.disabled = false;
+                    btn.textContent = 'Vote!';
+                    if (statusEl) statusEl.textContent = 'Connected!';
+                };
+
+                ws.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.type === 'results') {
+                            showResults(data.votes);
+                        }
+                    } catch (e) { }
+                };
+                ws.onclose = () => {
+                    const btn = document.getElementById('start-vote-btn');
+                    btn.disabled = true;
+                    btn.textContent = 'Connecting...';
+                    if (statusEl) statusEl.textContent = 'Disconnected... Retrying in 2s';
+                    setTimeout(connectWS, 2000);
+                };
+                ws.onerror = () => { ws.close(); };
+            } catch (e) {
+                console.error("WS connection error:", e);
+                if (statusEl) statusEl.textContent = 'Connection Error. Retrying in 5s...';
+                setTimeout(connectWS, 5000);
+            }
+        }
+        connectWS();
+
+        // Check LocalStorage
+        if (localStorage.getItem('moviehuh_voted')) {
+            showView('thanks-view');
+        }
+
+        // View management
+        function showView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        document.getElementById('start-vote-btn').addEventListener('click', () => {
+            renderList();
+            showView('voting-view');
+        });
+
+        function renderList() {
+            const list = document.getElementById('voting-list');
+            list.innerHTML = '';
+            movies.forEach(movie => {
+                const btn = document.createElement('button');
+                btn.className = 'btn movie-btn';
+                btn.textContent = movie;
+                btn.onclick = () => toggleMovie(movie, btn);
+                list.appendChild(btn);
+            });
+            updateStatus();
+        }
+
+        function toggleMovie(movie, btn) {
+            if (selected.has(movie)) {
+                selected.delete(movie);
+                btn.classList.remove('selected');
+            } else {
+                if (selected.size >= 5) return; // limit 5
+                selected.add(movie);
+                btn.classList.add('selected');
+            }
+            updateStatus();
+        }
+
+        function updateStatus() {
+            document.getElementById('pick-status').textContent = `Pick 5 (${selected.size}/5)`;
+            const submitBtn = document.getElementById('submit-vote-btn');
+            if (selected.size === 5) {
+                submitBtn.classList.add('ready');
+                // Lock other buttons visually
+                document.querySelectorAll('.movie-btn').forEach(btn => {
+                    if (!btn.classList.contains('selected')) {
+                        btn.style.opacity = '0.4';
+                    }
+                });
+            } else {
+                submitBtn.classList.remove('ready');
+                document.querySelectorAll('.movie-btn').forEach(btn => {
+                    btn.style.opacity = '1';
+                });
+            }
+        }
+
+        document.getElementById('submit-vote-btn').addEventListener('click', () => {
+            if (selected.size !== 5) return;
+
+            // Send to WS
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'vote',
+                    picks: Array.from(selected)
+                }));
+            }
+
+            localStorage.setItem('moviehuh_voted', 'true');
+            showView('thanks-view');
+        });
+
+        // Easter Egg
+        let clicks = 0;
+        let lastClick = 0;
+
+        function handleEasterEgg(e) {
+            const now = Date.now();
+            if (now - lastClick > 800) clicks = 0; // reset if too long
+            lastClick = now;
+            clicks++;
+
+            if (clicks >= 5) {
+                clicks = 0;
+
+                // Allow revoting
+                localStorage.removeItem('moviehuh_voted');
+                selected.clear();
+
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ type: 'get_results' }));
+                } else {
+                    alert("It looks like the WebSocket server is currently offline or not running on port 8765. Please ensure server.py is running!");
+                }
+
+                // Alert about clear and reset view
+                alert("Voting state reset! You can now vote again.");
+                showView('splash-view');
+            }
+        }
+
+        document.getElementById('cat-face').addEventListener('click', handleEasterEgg);
+
+        function showResults(votes) {
+            const list = document.getElementById('results-list');
+            list.innerHTML = '';
+
+            // Sort by votes
+            const sorted = Object.entries(votes || {}).sort((a, b) => b[1] - a[1]);
+
+            if (sorted.length === 0) {
+                list.innerHTML = '<div class="result-item" style="justify-content: center;">No votes yet!</div>';
+            } else {
+                sorted.forEach(([movie, count]) => {
+                    const div = document.createElement('div');
+                    div.className = 'result-item';
+                    div.innerHTML = `<span>${movie}</span><span>${count}</span>`;
+                    list.appendChild(div);
+                });
+            }
+
+            document.getElementById('results-modal').classList.add('active');
+        }
+    </script>
+</body>
+
+</html>
