@@ -1,5 +1,5 @@
 {
-    "locked": 1,
+    "locked": 0,
     "buzzer": {
         "label": "Buzzer",
         "variants": [
@@ -39,7 +39,52 @@
         "label": "Riff",
         "variants": [
             {
-                "src": "Soundboard/SoundBoard -Riff.wav"
+                "src": "Soundboard/SoundBoard -Riff.wav",
+                "weight": 14
+            },
+            {
+                "src": "Soundboard/SoundBoard -Riff %232.wav",
+                "weight": 1
+            }
+        ]
+    },
+    "rah": {
+        "label": "Rah",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard -rahhh.wav",
+                "weight": 14
+            },
+            {
+                "src": "Soundboard/SoundBoard -Rah %232.wav",
+                "weight": 1
+            }
+        ]
+    },
+    "question": {
+        "label": "Question",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard -Question.wav"
+            }
+        ]
+    },
+    "whiplash": {
+        "label": "Whiplash",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard -Whiplash %231.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard -Whiplash %232.wav"
+            }
+        ]
+    },
+    "frainbart": {
+        "label": "FrainBart",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard -FrainBart.wav"
             }
         ]
     },
@@ -143,17 +188,27 @@
             "label": "VOCO",
             "parts": 3,
             "variants": [
-                { "src": "Soundboard/Streamables -VOCO %231.wav" },
-                { "src": "Soundboard/Streamables -VOCO %232.wav" },
-                { "src": "Soundboard/Streamables -VOCO %233.wav" }
+                {
+                    "src": "Soundboard/Streamables -VOCO %231.wav"
+                },
+                {
+                    "src": "Soundboard/Streamables -VOCO %232.wav"
+                },
+                {
+                    "src": "Soundboard/Streamables -VOCO %233.wav"
+                }
             ]
         },
         "voco1_demo": {
             "label": "VOCO1 Demo 2003",
             "parts": 2,
             "variants": [
-                { "src": "Soundboard/Streamables -VOCO1 Demo 2003 %231.wav" },
-                { "src": "Soundboard/Streamables -VOCO1 Demo 2003 %232.wav" }
+                {
+                    "src": "Soundboard/Streamables -VOCO1 Demo 2003 %231.wav"
+                },
+                {
+                    "src": "Soundboard/Streamables -VOCO1 Demo 2003 %232.wav"
+                }
             ]
         }
     }
