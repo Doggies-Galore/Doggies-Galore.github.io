@@ -1,0 +1,12 @@
+{
+  "common_name": "Asian badger",
+  "scientific_name": "Meles leucurus",
+  "subfamily": "Melinae",
+  "genus": "Meles",
+  "description": "The Asian badger, also known as the sand badger, is a species of badger native to Asia. It is widely distributed from the Volga River in the west to the Korean Peninsula in the east.",
+  "fun_fact": "Unlike many other badgers, they often hibernate in family groups, with adults sharing their dens with the previous year's cubs.",
+  "weight": "3.5–9 kg",
+  "lifespan": "5–10 years",
+  "wiki_url": "https://en.wikipedia.org/wiki/Asian_badger",
+  "image_url": "./assets/photo.webp"
+}

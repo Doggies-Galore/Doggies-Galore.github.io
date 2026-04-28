@@ -1,0 +1,12 @@
+{
+  "common_name": "Domestic ferret",
+  "scientific_name": "Mustela furo",
+  "subfamily": "Mustelinae",
+  "genus": "Mustela",
+  "description": "The ferret is the domesticated form of the European polecat, a mammal belonging to the same genus as the weasel, Mustela, in the family Mustelidae.",
+  "fun_fact": "The name 'ferret' is derived from the Latin word furittus, meaning 'little thief', referring to their habit of stealing and stashing small items.",
+  "weight": "0.5–2.0 kg",
+  "lifespan": "5–8 years",
+  "wiki_url": "https://en.wikipedia.org/wiki/Ferret",
+  "image_url": "./assets/photo.webp"
+}

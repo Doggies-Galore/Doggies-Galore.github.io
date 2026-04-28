@@ -1,0 +1,12 @@
+{
+  "common_name": "Fisher",
+  "scientific_name": "Pekania pennanti",
+  "subfamily": "Guloninae",
+  "genus": "Pekania",
+  "description": "The fisher is a small carnivorous mammal native to North America. It is a member of the mustelid family and is the only living species in the genus Pekania.",
+  "fun_fact": "They are one of the few animals capable of successfully preying on porcupines by using their agility to attack the face or flip them over.",
+  "weight": "2–6 kg",
+  "lifespan": "7–10 years",
+  "wiki_url": "https://en.wikipedia.org/wiki/Fisher_(animal)",
+  "image_url": "./assets/photo.webp"
+}
