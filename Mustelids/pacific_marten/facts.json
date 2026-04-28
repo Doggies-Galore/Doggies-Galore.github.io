@@ -1,0 +1,12 @@
+{
+  "common_name": "Pacific marten",
+  "scientific_name": "Martes caurina",
+  "subfamily": "Guloninae",
+  "genus": "Martes",
+  "description": "The Pacific marten is a species of North American mammal in the family Mustelidae. It is found in the western United States and southwestern Canada.",
+  "fun_fact": "They are capable of descending tree trunks headfirst by rotating their hind limbs, a rare ability among mammals.",
+  "weight": "0.75–1.8 kg",
+  "lifespan": "4–6 years",
+  "wiki_url": "https://en.wikipedia.org/wiki/Pacific_marten",
+  "image_url": "./assets/photo.webp"
+}

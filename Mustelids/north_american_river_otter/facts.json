@@ -1,0 +1,12 @@
+{
+  "common_name": "North American river otter",
+  "scientific_name": "Lontra canadensis",
+  "subfamily": "Lutrinae",
+  "genus": "Lontra",
+  "description": "The North American river otter, also known as the northern river otter or common otter, is a semiaquatic mammal endemic to the North American continent.",
+  "fun_fact": "They are famous for their playful behavior, such as sliding down mud or snow banks, which helps them strengthen social bonds and practice hunting skills.",
+  "weight": "5–14 kg",
+  "lifespan": "8–13 years",
+  "wiki_url": "https://en.wikipedia.org/wiki/North_American_river_otter",
+  "image_url": "./assets/photo.webp"
+}

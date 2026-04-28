@@ -1,0 +1,12 @@
+{
+  "common_name": "Greater hog badger",
+  "scientific_name": "Arctonyx collaris",
+  "subfamily": "Melinae",
+  "genus": "Arctonyx",
+  "description": "The greater hog badger is a mustelid native to Southeast Asia. It is listed as Vulnerable on the IUCN Red List because the population is thought to be declining due to habitat loss and hunting.",
+  "fun_fact": "They are among the largest terrestrial mustelids and are capable of digging complex tunnel systems that serve as essential habitat for many other small animals.",
+  "weight": "7–14 kg",
+  "lifespan": "8–12 years",
+  "wiki_url": "https://en.wikipedia.org/wiki/Greater_hog_badger",
+  "image_url": "./assets/photo.webp"
+}

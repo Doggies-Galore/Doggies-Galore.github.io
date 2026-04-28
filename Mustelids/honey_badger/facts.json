@@ -1,0 +1,12 @@
+{
+  "common_name": "Honey badger",
+  "scientific_name": "Mellivora capensis",
+  "subfamily": "Mellivorinae",
+  "genus": "Mellivora",
+  "description": "The honey badger, also known as the ratel, is a mammal widely distributed in Africa, Southwest Asia, and the Indian subcontinent. Because of its wide range and occurrence in many different habitats, it is listed as Least Concern on the IUCN Red List.",
+  "fun_fact": "They have incredibly thick, loose skin that allows them to twist and turn inside it to bite back at an attacker even if they are caught in its jaws.",
+  "weight": "5–16 kg",
+  "lifespan": "7–8 years",
+  "wiki_url": "https://en.wikipedia.org/wiki/Honey_badger",
+  "image_url": "./assets/photo.webp"
+}
