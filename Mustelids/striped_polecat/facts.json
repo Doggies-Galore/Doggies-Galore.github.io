@@ -1,0 +1,12 @@
+{
+  "common_name": "Striped polecat",
+  "scientific_name": "Ictonyx striatus",
+  "subfamily": "Ictonychinae",
+  "genus": "Ictonyx",
+  "description": "The striped polecat, also known as the zorilla, is a member of the family Mustelidae that resembles a skunk. It is found in sub-Saharan Africa.",
+  "fun_fact": "Often called the zorilla, their defensive spray is so powerful it can cause temporary blindness in potential predators.",
+  "weight": "0.5–1.8 kg",
+  "lifespan": "Unknown",
+  "wiki_url": "https://en.wikipedia.org/wiki/Striped_polecat",
+  "image_url": "./assets/photo.webp"
+}

@@ -1,0 +1,12 @@
+{
+  "common_name": "Southern river otter",
+  "scientific_name": "Lontra provocax",
+  "subfamily": "Lutrinae",
+  "genus": "Lontra",
+  "description": "The southern river otter is a species of otter that lives in Chile and Argentina. It is also known as the huillín.",
+  "fun_fact": "In Chile, they are known as the 'Huillín' and have the smallest geographical range of all otter species, living in both freshwater and marine habitats.",
+  "weight": "5–10 kg",
+  "lifespan": "Unknown",
+  "wiki_url": "https://en.wikipedia.org/wiki/Southern_river_otter",
+  "image_url": "./assets/photo.webp"
+}

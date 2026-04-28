@@ -1,0 +1,12 @@
+{
+  "common_name": "Wolverine",
+  "scientific_name": "Gulo gulo",
+  "subfamily": "Guloninae",
+  "genus": "Gulo",
+  "description": "The wolverine, also referred to as the glutton, carcajou, or quickhatch, is the largest terrestrial member of the family Mustelidae. It is a muscular carnivore and a solitary animal.",
+  "fun_fact": "Their paws act like natural snowshoes by spreading to twice their size when they hit the ground, allowing them to travel easily over deep snow.",
+  "weight": "8–18 kg",
+  "lifespan": "5–10 years",
+  "wiki_url": "https://en.wikipedia.org/wiki/Wolverine",
+  "image_url": "./assets/photo.webp"
+}

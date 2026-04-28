@@ -1,0 +1,12 @@
+{
+  "common_name": "Siberian weasel",
+  "scientific_name": "Mustela sibirica",
+  "subfamily": "Mustelinae",
+  "genus": "Mustela",
+  "description": "The Siberian weasel, also known as the kolinsky, is a medium-sized species of mustelid native to Asia.",
+  "fun_fact": "The famous 'Kolinsky sable-hair' artist brushes are actually made from the winter fur of the male Siberian weasel, not from actual sables.",
+  "weight": "0.36–0.82 kg",
+  "lifespan": "2.1 years",
+  "wiki_url": "https://en.wikipedia.org/wiki/Siberian_weasel",
+  "image_url": "./assets/photo.webp"
+}

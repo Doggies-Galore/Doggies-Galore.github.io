@@ -1,0 +1,12 @@
+{
+  "common_name": "Sable",
+  "scientific_name": "Martes zibellina",
+  "subfamily": "Guloninae",
+  "genus": "Martes",
+  "description": "The sable is a species of marten, a small carnivorous mammal inhabiting forest environments, primarily in Russia from the Ural Mountains throughout Siberia, and northern Mongolia.",
+  "fun_fact": "Their fur is unique because it feels smooth regardless of which direction you stroke it, unlike most animals where the fur has a distinct 'grain'.",
+  "weight": "0.7–1.8 kg",
+  "lifespan": "Up to 18 years",
+  "wiki_url": "https://en.wikipedia.org/wiki/Sable",
+  "image_url": "./assets/photo.webp"
+}

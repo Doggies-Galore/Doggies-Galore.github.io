@@ -1,0 +1,12 @@
+{
+  "common_name": "Yellow-throated marten",
+  "scientific_name": "Martes flavigula",
+  "subfamily": "Guloninae",
+  "genus": "Martes",
+  "description": "The yellow-throated marten, also known as the kharza, is a marten species native to Asia. It is listed as Least Concern on the IUCN Red List due to its wide distribution.",
+  "fun_fact": "They are the largest marten species in the Old World and are sometimes seen hunting in small family groups to take down larger prey like musk deer.",
+  "weight": "1.2–5.7 kg",
+  "lifespan": "7–10 years",
+  "wiki_url": "https://en.wikipedia.org/wiki/Yellow-throated_marten",
+  "image_url": "./assets/photo.webp"
+}
