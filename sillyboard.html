@@ -261,27 +261,15 @@
         }
 
         #loading-overlay p {
-            font-size: clamp(1.4rem, 4vw, 2rem);
-            font-weight: 700;
-            opacity: 0.85;
-            animation: pulse 1.2s ease-in-out infinite;
+            display: none;
         }
 
         #loading-progress {
-            width: 60%;
-            max-width: 300px;
-            height: 6px;
-            background: rgba(128, 128, 128, 0.3);
-            border-radius: 3px;
-            overflow: hidden;
+            display: none;
         }
 
         #loading-bar {
-            height: 100%;
-            width: 0%;
-            background: var(--accent-color);
-            border-radius: 3px;
-            transition: width 0.15s ease;
+            display: none;
         }
 
         @keyframes pulse {
@@ -706,6 +694,108 @@
             opacity: 0.35;
             pointer-events: none;
         }
+
+        /* ── Board page navigation ────────────────────────────────────────────── */
+        #board-nav {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 2px solid var(--accent-color);
+            gap: 12px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            background: transparent;
+            color: var(--accent-color);
+            border: 3px solid var(--accent-color);
+            padding: 18px 26px;
+            border-radius: 20px;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 900;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        #page-indicator {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 800;
+            opacity: 0.8;
+            text-align: center;
+            min-width: 70px;
+            user-select: none;
+        }
+
+        /* ── Seguestions form ──────────────────────────────────────────────── */
+        .name-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+            margin-bottom: 16px;
+        }
+
+        .name-chip {
+            padding: 8px 18px;
+            border: 2px solid var(--accent-color);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--accent-color);
+            font-family: inherit;
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s;
+            touch-action: manipulation;
+        }
+
+        .name-chip.selected {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .seg-textarea,
+        .seg-input {
+            width: 100%;
+            background: rgba(128, 128, 128, 0.1);
+            border: 2px solid var(--accent-color);
+            border-radius: 12px;
+            color: var(--accent-color);
+            font-family: inherit;
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            padding: 10px 12px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .seg-textarea {
+            min-height: 80px;
+            resize: vertical;
+            margin-bottom: 12px;
+        }
+
+        .seg-input {
+            margin-bottom: 12px;
+        }
+
+        .seg-textarea::placeholder,
+        .seg-input::placeholder {
+            opacity: 0.4;
+        }
     </style>
 </head>
 
@@ -766,8 +856,15 @@
     <!-- Hotbar -->
     <div id="hotbar"></div>
 
-    <!-- Sound Board (scrollable list) -->
+    <!-- Sound Board (paged grid) -->
     <div id="board" role="main"></div>
+
+    <!-- Board Page Navigation -->
+    <div id="board-nav">
+        <button class="nav-btn" id="prev-page-btn" aria-label="Previous page" disabled>◄</button>
+        <span id="page-indicator">1 / 1</span>
+        <button class="nav-btn" id="next-page-btn" aria-label="Next page" disabled>►</button>
+    </div>
 
     <!-- Admin Modal -->
     <div class="modal-overlay" id="admin-modal" role="dialog" aria-modal="true" aria-label="Admin Settings">
@@ -851,6 +948,15 @@
                 <input type="checkbox" id="pitch-global-cbx">
             </div>
 
+            <div id="android-volume-container" class="custom-slider-container"
+                style="display:none; flex-direction:row; align-items:center; justify-content: space-between; margin-top: 12px;">
+                <label for="remote-volume-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    Allow Server to Force Volume Max
+                </label>
+                <input type="checkbox" id="remote-volume-cbx">
+            </div>
+
             <div id="repeater-status"
                 style="margin-top: 30px; font-size: 0.85rem; font-weight: bold; color: var(--accent-color); opacity: 0.6; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
                 Status: Disconnected
@@ -880,6 +986,10 @@
             <div style="display:flex; gap: 8px;">
                 <button class="btn" id="remote-select-all" style="flex:1; font-size: 0.85rem;">Select All</button>
                 <button class="btn" id="remote-clear" style="flex:1; font-size: 0.85rem;">Clear</button>
+            </div>
+
+            <div style="display:flex; gap: 8px; margin-top: 12px;">
+                <button class="btn" id="remote-force-volume" style="flex:1; font-size: 0.85rem; border-color: var(--accent-color); color: var(--accent-color);">Force Volume Up (All)</button>
             </div>
 
             <div class="modal-close-row" style="margin-top: 24px;">
@@ -922,6 +1032,43 @@
     </div>
 
 
+
+    <!-- Seguestions Modal -->
+    <div class="modal-overlay" id="seguestions-modal" role="dialog" aria-modal="true" aria-label="Seguestions Box">
+        <div class="modal-content">
+            <h2>Seguestions Box 💌</h2>
+            <p style="margin-bottom: 4px; font-size: 0.9rem; opacity: 0.7;">Send a suggestion, request, or just vibe.</p>
+
+            <div class="section-title" style="margin-top: 16px;">Who are you?</div>
+            <div class="name-chips">
+                <button class="name-chip" data-name="Opioids">Opioids</button>
+                <button class="name-chip" data-name="So True">So True</button>
+                <button class="name-chip" data-name="Nya">Nya</button>
+                <button class="name-chip" data-name="Yaoi">Yaoi</button>
+                <button class="name-chip" data-name="Shawn">Shawn</button>
+            </div>
+
+            <div class="section-title">Message</div>
+            <textarea id="seg-message" class="seg-textarea" placeholder="Say something nice... or not :3" maxlength="500" style="margin-top: 8px;"></textarea>
+
+            <div class="section-title">Link <span style="opacity:0.5; font-weight:400;">(optional)</span></div>
+            <input type="url" id="seg-link" class="seg-input" placeholder="https://..." maxlength="500" style="margin-top: 8px;">
+
+            <div class="section-title">File <span style="opacity:0.5; font-weight:400;">(optional, max 5 MB)</span></div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px; margin-bottom: 16px;">
+                <button class="btn" id="seg-file-btn" style="flex-shrink: 0; padding: 8px 16px; font-size: 0.9rem;">Choose File</button>
+                <span id="seg-filename" style="font-size: 0.85rem; opacity: 0.55; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">No file chosen</span>
+                <input type="file" id="seg-file-input" style="display: none;">
+            </div>
+
+            <div id="seg-status" style="min-height: 1.4em; font-size: 0.9rem; font-weight: 700; text-align: center; margin-bottom: 10px;"></div>
+
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" id="seg-cancel" style="flex: 1;">Cancel</button>
+                <button class="modal-close-btn" id="seg-submit" style="flex: 2;">Send it! 💌</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Settings Modal -->
     <div class="modal-overlay" id="settings-modal" role="dialog" aria-modal="true" aria-label="Settings">
@@ -982,6 +1129,11 @@
                 <p class="amp-reset-hint">Double-tap slider to reset to 100%</p>
             </div>
 
+            <!-- Seguestions Box -->
+            <div style="margin-top: clamp(14px,3vw,24px); margin-bottom: clamp(14px,3vw,24px);">
+                <button class="btn" id="seguestions-box-btn" style="width: 100%; font-weight: 900; font-size: clamp(0.95rem,2.5vw,1.1rem);">&#128140; Seguestions Box</button>
+            </div>
+
             <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 24px;"></div>
 
             <div class="modal-close-row">
@@ -991,11 +1143,12 @@
     </div>
 
     <script>
-        // ── Sound definitions ───────────────────────────────────────────────
-        // Each key → { label, srcs[] }
-        // Data will be fetched from Soundboard/sounds.json
+        // ── Sound definitions ─────────────────────────────────────────────
         let SOUND_DEFS = {};
         let SOUND_KEYS = [];
+
+        // Always hide admin button on fresh page load — 5-tap title unlock re-enables per session
+        localStorage.removeItem('sillyboard-admin');
 
         // ── Theme helpers ────────────────────────────────────────────────────
         function setTheme(bg, ac) {
@@ -1332,8 +1485,16 @@
                 } else if (data.type === 'client_list') {
                     renderRemoteList(data.clients);
 
+                } else if (data.type === 'seguestion_ack') {
+                    handleSeguestionAck(data);
+
                 } else if (data.type === 'error') {
                     alert(data.message);
+
+                } else if (data.type === 'force_volume') {
+                    if (window.Android && remoteVolumeEnabled) {
+                        window.Android.forceVolumeUp();
+                    }
                 }
             };
 
@@ -1363,11 +1524,20 @@
 
             // Mobile model heuristic
             let model = "Desktop";
-            if (ua.match(/iPhone/)) model = "iPhone";
-            else if (ua.match(/iPad/)) model = "iPad";
-            else if (ua.match(/Android/)) {
+            if (window.Android && typeof window.Android.getDeviceModel === 'function') {
+                model = window.Android.getDeviceModel();
+            } else if (ua.match(/iPhone/)) {
+                model = "iPhone";
+            } else if (ua.match(/iPad/)) {
+                model = "iPad";
+            } else if (ua.match(/Android/)) {
                 const parts = ua.match(/Android [^;]+; ([^;)]+)/);
                 model = parts ? parts[1] : "Android Device";
+            }
+
+            // Opioids S25 special handling
+            if (model.includes("S25")) {
+                model = "Opioids";
             }
 
             return { os, browser, model };
@@ -1514,6 +1684,20 @@
             localStorage.setItem('sillyboard-pitch-global', pitchGlobal);
         });
 
+        const remoteVolumeCbx = document.getElementById('remote-volume-cbx');
+        const androidVolumeContainer = document.getElementById('android-volume-container');
+        
+        if (window.Android) {
+            androidVolumeContainer.style.display = 'flex';
+        }
+
+        let remoteVolumeEnabled = localStorage.getItem('sillyboard-remote-volume') === 'true';
+        remoteVolumeCbx.checked = remoteVolumeEnabled;
+        remoteVolumeCbx.addEventListener('change', () => {
+            remoteVolumeEnabled = remoteVolumeCbx.checked;
+            localStorage.setItem('sillyboard-remote-volume', remoteVolumeEnabled);
+        });
+
         // Admin Pitch logic
         const pitchSliderWrap = document.getElementById('pitch-slider-wrap');
         // pitchEnabled logic removed per request, sliders are always available in admin now
@@ -1554,6 +1738,109 @@
 
         if (repeaterEnabled) initRepeater();
 
+        // ── Seguestions ────────────────────────────────────────────────────
+        const segModal      = document.getElementById('seguestions-modal');
+        const segSubmitBtn  = document.getElementById('seg-submit');
+        const segStatusEl   = document.getElementById('seg-status');
+        const segFileInput  = document.getElementById('seg-file-input');
+        const segFilename   = document.getElementById('seg-filename');
+        let selectedSegName = '';
+        let segAttachedFile = null;
+
+        function openSeguestions() {
+            // Close settings if open
+            document.getElementById('settings-modal').classList.remove('active');
+            selectedSegName = '';
+            segAttachedFile = null;
+            document.getElementById('seg-message').value = '';
+            document.getElementById('seg-link').value = '';
+            segFilename.textContent = 'No file chosen';
+            segFileInput.value = '';
+            segStatusEl.textContent = '';
+            document.querySelectorAll('.name-chip').forEach(c => c.classList.remove('selected'));
+            segModal.classList.add('active');
+        }
+
+        document.getElementById('seguestions-box-btn').addEventListener('click', openSeguestions);
+        document.getElementById('seg-cancel').addEventListener('click', () => segModal.classList.remove('active'));
+        segModal.addEventListener('click', e => { if (e.target === segModal) segModal.classList.remove('active'); });
+
+        // Name chips
+        document.querySelectorAll('.name-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('.name-chip').forEach(c => c.classList.remove('selected'));
+                chip.classList.add('selected');
+                selectedSegName = chip.dataset.name;
+            });
+        });
+
+        // File picker
+        document.getElementById('seg-file-btn').addEventListener('click', () => segFileInput.click());
+        segFileInput.addEventListener('change', () => {
+            const file = segFileInput.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                segStatusEl.textContent = '⚠ File too large (max 5 MB).';
+                segFileInput.value = '';
+                return;
+            }
+            segAttachedFile = file;
+            segFilename.textContent = file.name;
+            segStatusEl.textContent = '';
+        });
+
+        // Handle server ack
+        function handleSeguestionAck(data) {
+            if (data.ok) {
+                segStatusEl.textContent = '✓ Sent!';
+                setTimeout(() => segModal.classList.remove('active'), 1000);
+            } else {
+                segStatusEl.textContent = '⚠ Server error: ' + (data.error || 'unknown');
+            }
+        }
+
+        // Submit
+        segSubmitBtn.addEventListener('click', async () => {
+            if (!selectedSegName) {
+                segStatusEl.textContent = '⚠ Pick a name first.';
+                return;
+            }
+            if (!repeaterSocket || repeaterSocket.readyState !== WebSocket.OPEN) {
+                segStatusEl.textContent = '⚠ Not connected to server.';
+                return;
+            }
+
+            const message = document.getElementById('seg-message').value.trim().slice(0, 500);
+            const link    = document.getElementById('seg-link').value.trim().slice(0, 500);
+
+            let filename = '';
+            let filedata = '';
+            if (segAttachedFile) {
+                segStatusEl.textContent = 'Encoding file...';
+                const buf = await segAttachedFile.arrayBuffer();
+                const bytes = new Uint8Array(buf);
+                let binary = '';
+                for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+                filedata = btoa(binary);
+                filename = segAttachedFile.name;
+            }
+
+            segStatusEl.textContent = 'Sending...';
+            segSubmitBtn.disabled = true;
+
+            repeaterSocket.send(JSON.stringify({
+                type: 'seguestion',
+                name: selectedSegName,
+                message,
+                link,
+                filename,
+                filedata,
+            }));
+
+            // Re-enable after a moment in case ack never comes
+            setTimeout(() => { segSubmitBtn.disabled = false; }, 5000);
+        });
+
         // ── Hotbar state ──────────────────────────────────────────────────
         const MAX_HOTBAR = 4;
         let hotbarSlots = JSON.parse(localStorage.getItem('sillyboard-hotbar') || '[]');
@@ -1570,6 +1857,55 @@
         let isBoardLocked = false;
         let bigIconUnlocked = false;
 
+        // ── Pagination state ────────────────────────────────────────────────────
+        let filteredSoundKeys = [];
+        let SOUNDS_PER_PAGE = 7;
+        let currentPage = 0;
+        let audioLoaded = false;
+
+        const boardNavEl   = document.getElementById('board-nav');
+        const prevPageBtn  = document.getElementById('prev-page-btn');
+        const nextPageBtn  = document.getElementById('next-page-btn');
+        const pageIndicator = document.getElementById('page-indicator');
+
+        function updatePageNav() {
+            const totalPages = Math.ceil(filteredSoundKeys.length / SOUNDS_PER_PAGE);
+            pageIndicator.textContent = `${currentPage + 1} / ${totalPages}`;
+            prevPageBtn.disabled = currentPage <= 0;
+            nextPageBtn.disabled = currentPage >= totalPages - 1;
+        }
+
+        function renderBoardPage() {
+            boardEl.innerHTML = '';
+            // Clear previous button refs for this page
+            Object.keys(boardButtons).forEach(k => delete boardButtons[k]);
+
+            const start    = currentPage * SOUNDS_PER_PAGE;
+            const pageKeys = filteredSoundKeys.slice(start, start + SOUNDS_PER_PAGE);
+
+            pageKeys.forEach(key => {
+                const btn = document.createElement('button');
+                btn.className = 'sound-btn';
+                btn.id = 'btn-' + key;
+                btn.dataset.sound = key;
+                btn.setAttribute('aria-label', 'Play ' + SOUND_DEFS[key].label);
+                btn.innerHTML = '<span class="btn-label">' + SOUND_DEFS[key].label + '</span>';
+                boardEl.appendChild(btn);
+                boardButtons[key] = btn;
+                if (audioLoaded) bindPressEvent(btn, key);
+            });
+
+            updatePageNav();
+        }
+
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 0) { currentPage--; renderBoardPage(); }
+        });
+        nextPageBtn.addEventListener('click', () => {
+            const total = Math.ceil(filteredSoundKeys.length / SOUNDS_PER_PAGE);
+            if (currentPage < total - 1) { currentPage++; renderBoardPage(); }
+        });
+
         function initUIForSounds() {
             // Override check
             const manualUnlock = localStorage.getItem('sillyboard-manual-unlock') === 'true';
@@ -1577,9 +1913,8 @@
 
             isBoardLocked = (SOUND_DEFS.locked === 1 || manualLock) && !manualUnlock;
 
-            // Admin button visibility (only show if admin is unlocked AND board is not closed)
-            const isAdminUnlocked = localStorage.getItem('sillyboard-admin') === 'true';
-            adminBtn.style.display = (isAdminUnlocked && !isBoardLocked) ? 'inline-block' : 'none';
+            // Admin button: always hidden on load; shown only when unlocked this session
+            adminBtn.style.display = 'none';
 
             if (isBoardLocked) {
                 renderLockedView();
@@ -1594,22 +1929,19 @@
             // Validate saved entries against dynamic JSON keys
             hotbarSlots = hotbarSlots.filter(k => SOUND_DEFS[k] && k !== 'locked' && k !== 'streamables').slice(0, MAX_HOTBAR);
 
-            SOUND_KEYS.filter(k => k !== 'locked' && k !== 'streamables').forEach(key => {
-                const btn = document.createElement('button');
-                btn.className = 'sound-btn';
-                btn.id = 'btn-' + key;
-                btn.dataset.sound = key;
-                btn.setAttribute('aria-label', 'Play ' + SOUND_DEFS[key].label);
-                btn.innerHTML = '<span class="btn-label">' + SOUND_DEFS[key].label + '</span>';
-                boardEl.appendChild(btn);
-                boardButtons[key] = btn;
-            });
+            // Build paginated sound list — half of all sounds per page
+            filteredSoundKeys = SOUND_KEYS.filter(k => k !== 'locked' && k !== 'streamables');
+            SOUNDS_PER_PAGE = Math.ceil(filteredSoundKeys.length / 2);
+            currentPage = 0;
+            boardNavEl.style.display = 'flex';
+            renderBoardPage();
             renderHotbar();
         }
 
         function renderLockedView() {
             boardEl.innerHTML = '';
             hotbarEl.style.display = 'none';
+            boardNavEl.style.display = 'none';
 
             const container = document.createElement('div');
             container.className = 'locked-container';
@@ -1746,9 +2078,6 @@
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingBar = document.getElementById('loading-bar');
 
-        // Flatten all fetches
-        const allFetches = [];
-
         // We create the AudioContext eagerly here (inside a script that
         // runs at parse-time — Chrome allows it before interaction if
         // the page has no prior audio-policy violation).
@@ -1776,81 +2105,83 @@
                 SOUND_DEFS = await configRes.json();
                 SOUND_KEYS = Object.keys(SOUND_DEFS);
                 initUIForSounds();
-            } catch (err) {
-                alert('Fatal Error: Failed to load sounds.json from Soundboard directory.');
-                return;
-            }
 
-            const allFetches = [];
+                const allFetches = [];
 
-            // Standard sounds
-            for (const key of SOUND_KEYS) {
-                if (key === 'locked' || key === 'streamables') continue;
-                const def = SOUND_DEFS[key];
-                if (def.variants) {
-                    def.variants.forEach((v, idx) => allFetches.push({ key, src: v.src, idx }));
-                }
-            }
-
-            // Streamable sounds
-            if (SOUND_DEFS.streamables) {
-                Object.keys(SOUND_DEFS.streamables).forEach(key => {
-                    const s = SOUND_DEFS.streamables[key];
-                    s.variants.forEach((v, idx) => allFetches.push({ key, src: v.src, idx }));
-                });
-            }
-
-            let fetchLoaded = 0;
-            const fetchTotal = allFetches.length;
-
-            const fetchPromises = allFetches.map(item =>
-                fetch(item.src)
-                    .then(r => r.arrayBuffer())
-                    .then(arr => {
-                        fetchLoaded++;
-                        const pct = Math.floor((fetchLoaded / fetchTotal) * 100);
-                        loadingBar.style.width = pct + '%';
-                        return { key: item.key, arr, src: item.src };
-                    })
-                    .catch(err => {
-                        console.error("Failed fetching", item.src, err);
-                        return null;
-                    })
-            );
-
-            const buffers = await Promise.all(fetchPromises);
-
-            loadingBar.style.width = '100%';
-            await new Promise(r => setTimeout(r, 150));
-
-            for (const payload of buffers) {
-                if (!payload) continue;
-                try {
-                    const audioBuffer = await audioCtx.decodeAudioData(payload.arr);
-                    if (!bufferCache[payload.key]) bufferCache[payload.key] = [];
-                    bufferCache[payload.key].push(audioBuffer);
-
-                    // Peak Analysis for per-sound Auto-Gain
-                    let max = 0;
-                    const channelData = audioBuffer.getChannelData(0);
-                    // Sample-based peak (every 100th to save compute)
-                    for (let i = 0; i < channelData.length; i += 100) {
-                        const val = Math.abs(channelData[i]);
-                        if (val > max) max = val;
+                // Standard sounds
+                for (const key of SOUND_KEYS) {
+                    if (key === 'locked' || key === 'streamables') continue;
+                    const def = SOUND_DEFS[key];
+                    if (def.variants) {
+                        def.variants.forEach((v, idx) => allFetches.push({ key, src: v.src, idx }));
                     }
-                    // Store peak for this specific variant
-                    const variantId = `${payload.key}:${bufferCache[payload.key].length - 1}`;
-                    bufferPeaks[variantId] = max || 1.0;
-                } catch (e) {
-                    console.error("Failed to decode", payload.src, e);
                 }
+
+                // Streamable sounds
+                if (SOUND_DEFS.streamables) {
+                    Object.keys(SOUND_DEFS.streamables).forEach(key => {
+                        const s = SOUND_DEFS.streamables[key];
+                        s.variants.forEach((v, idx) => allFetches.push({ key, src: v.src, idx }));
+                    });
+                }
+
+                let fetchLoaded = 0;
+                const fetchTotal = allFetches.length;
+
+                const fetchPromises = allFetches.map(item =>
+                    fetch(item.src)
+                        .then(r => r.arrayBuffer())
+                        .then(arr => {
+                            fetchLoaded++;
+                            const pct = Math.floor((fetchLoaded / fetchTotal) * 100);
+                            loadingBar.style.width = pct + '%';
+                            return { key: item.key, arr, src: item.src };
+                        })
+                        .catch(err => {
+                            console.error("Failed fetching", item.src, err);
+                            return null;
+                        })
+                );
+
+                const buffers = await Promise.all(fetchPromises);
+
+                loadingBar.style.width = '100%';
+                await new Promise(r => setTimeout(r, 150));
+
+                for (const payload of buffers) {
+                    if (!payload) continue;
+                    try {
+                        const audioBuffer = await audioCtx.decodeAudioData(payload.arr);
+                        if (!bufferCache[payload.key]) bufferCache[payload.key] = [];
+                        bufferCache[payload.key].push(audioBuffer);
+
+                        // Peak Analysis for per-sound Auto-Gain
+                        let max = 0;
+                        const channelData = audioBuffer.getChannelData(0);
+                        // Sample-based peak (every 100th to save compute)
+                        for (let i = 0; i < channelData.length; i += 100) {
+                            const val = Math.abs(channelData[i]);
+                            if (val > max) max = val;
+                        }
+                        // Store peak for this specific variant
+                        const variantId = `${payload.key}:${bufferCache[payload.key].length - 1}`;
+                        bufferPeaks[variantId] = max || 1.0;
+                    } catch (e) {
+                        console.error("Failed to decode", payload.src, e);
+                    }
+                }
+            } catch (err) {
+                console.error('Fatal Error:', err);
+                alert('Fatal Error: Failed to load or decode sounds.');
+            } finally {
+                loadingOverlay.classList.add('hidden');
+                setTimeout(() => loadingOverlay.remove(), 400);
             }
 
-            loadingOverlay.classList.add('hidden');
-            setTimeout(() => loadingOverlay.remove(), 400);
-
-            SOUND_KEYS.filter(k => k !== 'locked' && k !== 'streamables').forEach(key => {
-                if (boardButtons[key]) bindPressEvent(boardButtons[key], key);
+            // Audio ready — bind events for whatever page is currently rendered
+            audioLoaded = true;
+            Object.entries(boardButtons).forEach(([key, btn]) => {
+                if (btn) bindPressEvent(btn, key);
             });
         }
 
