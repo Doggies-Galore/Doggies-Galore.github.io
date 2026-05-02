@@ -808,6 +808,7 @@
             const ac = localStorage.getItem('sillyboard-accent') ||
                 localStorage.getItem('launcher-accent') || '#ffffff';
             document.documentElement.style.setProperty('--bg-color', bg);
+            if (window.Android) window.Android.updateThemeColor(bg);
             document.documentElement.style.setProperty('--accent-color', ac);
         })();
     </script>
@@ -954,7 +955,7 @@
                     style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
                     Allow Server to Force Volume Max
                 </label>
-                <input type="checkbox" id="remote-volume-cbx">
+                <input type="checkbox" id="remote-volume-cbx" checked>
             </div>
 
             <div id="repeater-status"
@@ -1153,6 +1154,7 @@
         // ── Theme helpers ────────────────────────────────────────────────────
         function setTheme(bg, ac) {
             document.documentElement.style.setProperty('--bg-color', bg);
+            if (window.Android) window.Android.updateThemeColor(bg);
             document.documentElement.style.setProperty('--accent-color', ac);
             localStorage.setItem('sillyboard-bg', bg);
             localStorage.setItem('sillyboard-accent', ac);
@@ -1168,10 +1170,15 @@
 
         bgPicker.addEventListener('input', () => {
             document.documentElement.style.setProperty('--bg-color', bgPicker.value);
+        });
+        bgPicker.addEventListener('change', () => {
+            if (window.Android) window.Android.updateThemeColor(bgPicker.value);
             localStorage.setItem('sillyboard-bg', bgPicker.value);
         });
         acPicker.addEventListener('input', () => {
             document.documentElement.style.setProperty('--accent-color', acPicker.value);
+        });
+        acPicker.addEventListener('change', () => {
             localStorage.setItem('sillyboard-accent', acPicker.value);
         });
 
@@ -1607,6 +1614,20 @@
             document.querySelectorAll('#remote-list input[type="checkbox"]').forEach(cb => cb.checked = false);
         });
 
+        document.getElementById('remote-force-volume').addEventListener('click', () => {
+            if (!repeaterSocket || repeaterSocket.readyState !== WebSocket.OPEN) {
+                alert("Repeater is disconnected.");
+                return;
+            }
+            repeaterSocket.send(JSON.stringify({ type: 'force_volume' }));
+            
+            // UI feedback
+            const btn = document.getElementById('remote-force-volume');
+            const originalText = btn.textContent;
+            btn.textContent = 'Command Sent! :3';
+            setTimeout(() => btn.textContent = originalText, 1500);
+        });
+
         // Auto-Gain removed — plain gain node used directly.
 
         // ── Streamables logic ──────────────────────────────────────────────
@@ -1691,7 +1712,7 @@
             androidVolumeContainer.style.display = 'flex';
         }
 
-        let remoteVolumeEnabled = localStorage.getItem('sillyboard-remote-volume') === 'true';
+        let remoteVolumeEnabled = localStorage.getItem('sillyboard-remote-volume') !== 'false';
         remoteVolumeCbx.checked = remoteVolumeEnabled;
         remoteVolumeCbx.addEventListener('change', () => {
             remoteVolumeEnabled = remoteVolumeCbx.checked;
