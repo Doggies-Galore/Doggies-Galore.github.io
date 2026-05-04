@@ -147,14 +147,65 @@
             color: var(--bg-color);
         }
 
-        /* ── Hotbar ─────────────────────────────────────────────────────── */
+        .fav-btn {
+            transition: transform 0.1s;
+        }
+        .fav-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* ── Hotbar & Categories ────────────────────────────────────────── */
+        #nav-area {
+            position: relative;
+            flex-shrink: 0;
+            min-height: 48px;
+            border-bottom: 2px solid var(--accent-color);
+            z-index: 100;
+        }
+
         #hotbar {
             display: flex;
             gap: clamp(3px, 1vmin, 8px);
             padding: 6px 8px;
-            flex-shrink: 0;
-            border-bottom: 2px solid var(--accent-color);
-            min-height: 48px;
+            width: 100%;
+        }
+
+        #category-ui {
+            display: none; 
+            height: 48px; 
+            text-align: center;
+            line-height: 48px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            scroll-snap-type: x mandatory;
+            user-select: none;
+        }
+        
+        #category-ui::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-tab {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 0 20px;
+            font-size: clamp(1rem, 3.5vw, 1.3rem);
+            font-weight: 700;
+            color: var(--accent-color);
+            opacity: 0.5;
+            transition: opacity 0.2s, transform 0.2s;
+            cursor: pointer;
+            scroll-snap-align: center;
+        }
+
+        .category-tab.active {
+            opacity: 1;
+            font-weight: 900;
+            transform: scale(1.1);
         }
 
         #hotbar .sound-btn {
@@ -261,15 +312,27 @@
         }
 
         #loading-overlay p {
-            display: none;
+            font-size: clamp(1.4rem, 4vw, 2rem);
+            font-weight: 700;
+            opacity: 0.85;
+            animation: pulse 1.2s ease-in-out infinite;
         }
 
         #loading-progress {
-            display: none;
+            width: 60%;
+            max-width: 300px;
+            height: 6px;
+            background: rgba(128, 128, 128, 0.3);
+            border-radius: 3px;
+            overflow: hidden;
         }
 
         #loading-bar {
-            display: none;
+            height: 100%;
+            width: 0%;
+            background: var(--accent-color);
+            border-radius: 3px;
+            transition: width 0.15s ease;
         }
 
         @keyframes pulse {
@@ -700,10 +763,9 @@
             flex-shrink: 0;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
+            padding: 12px clamp(10px, 3vmin, 24px) clamp(12px, 3vmin, 24px);
             border-top: 2px solid var(--accent-color);
-            gap: 12px;
+            gap: clamp(6px, 1.5vmin, 12px);
         }
 
         .nav-btn {
@@ -731,13 +793,9 @@
             pointer-events: none;
         }
 
-        #page-indicator {
-            font-size: clamp(1rem, 2.5vw, 1.2rem);
-            font-weight: 800;
-            opacity: 0.8;
-            text-align: center;
-            min-width: 70px;
-            user-select: none;
+        .nav-btn:disabled {
+            opacity: 0.2;
+            pointer-events: none;
         }
 
         /* ── Seguestions form ──────────────────────────────────────────────── */
@@ -849,13 +907,18 @@
     <div id="header">
         <h1 id="silly-title" style="cursor: default; user-select: none;" aria-hidden="true">Sillyboard :3</h1>
         <div class="header-actions">
-            <button class="hdr-btn" id="admin-btn" style="display:none;" aria-label="Open Admin">Admin</button>
+            <button class="hdr-btn" id="admin-btn" aria-label="Open Fun">Fun</button>
             <button class="hdr-btn" id="settings-btn" aria-label="Open Settings">Settings</button>
         </div>
     </div>
 
-    <!-- Hotbar -->
-    <div id="hotbar"></div>
+    <!-- Navigation Area (Hotbar OR Categories) -->
+    <div id="nav-area">
+        <div id="hotbar"></div>
+        <div id="category-ui">
+            <!-- filled dynamically -->
+        </div>
+    </div>
 
     <!-- Sound Board (paged grid) -->
     <div id="board" role="main"></div>
@@ -863,14 +926,13 @@
     <!-- Board Page Navigation -->
     <div id="board-nav">
         <button class="nav-btn" id="prev-page-btn" aria-label="Previous page" disabled>◄</button>
-        <span id="page-indicator">1 / 1</span>
         <button class="nav-btn" id="next-page-btn" aria-label="Next page" disabled>►</button>
     </div>
 
     <!-- Admin Modal -->
     <div class="modal-overlay" id="admin-modal" role="dialog" aria-modal="true" aria-label="Admin Settings">
         <div class="modal-content">
-            <h2>Admin Mode</h2>
+            <h2>Fun Mode</h2>
 
             <!-- Playback -->
             <div class="section-title" style="margin-top: 20px;">Playback</div>
@@ -906,7 +968,9 @@
             <div class="section-title" style="margin-top: 30px;">Network & Sync</div>
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <button class="btn" id="repeater-mode-btn">Repeater Mode</button>
+                <button class="btn" id="voice-mode-btn">Send Recording</button>
                 <button class="btn" id="streamables-mode-btn">Streamables</button>
+                <button class="btn" id="pinned-recordings-btn">Pinned Recordings</button>
                 <button class="btn" id="remote-mode-btn">Remote Device List</button>
             </div>
 
@@ -949,14 +1013,7 @@
                 <input type="checkbox" id="pitch-global-cbx">
             </div>
 
-            <div id="android-volume-container" class="custom-slider-container"
-                style="display:none; flex-direction:row; align-items:center; justify-content: space-between; margin-top: 12px;">
-                <label for="remote-volume-cbx"
-                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
-                    Allow Server to Force Volume Max
-                </label>
-                <input type="checkbox" id="remote-volume-cbx" checked>
-            </div>
+
 
             <div id="repeater-status"
                 style="margin-top: 30px; font-size: 0.85rem; font-weight: bold; color: var(--accent-color); opacity: 0.6; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
@@ -987,10 +1044,6 @@
             <div style="display:flex; gap: 8px;">
                 <button class="btn" id="remote-select-all" style="flex:1; font-size: 0.85rem;">Select All</button>
                 <button class="btn" id="remote-clear" style="flex:1; font-size: 0.85rem;">Clear</button>
-            </div>
-
-            <div style="display:flex; gap: 8px; margin-top: 12px;">
-                <button class="btn" id="remote-force-volume" style="flex:1; font-size: 0.85rem; border-color: var(--accent-color); color: var(--accent-color);">Force Volume Up (All)</button>
             </div>
 
             <div class="modal-close-row" style="margin-top: 24px;">
@@ -1034,11 +1087,71 @@
 
 
 
+    <!-- Voice Message Modal -->
+    <div class="modal-overlay" id="voice-modal" role="dialog" aria-modal="true" aria-label="Voice Message">
+        <div class="modal-content">
+            <!-- Hang On Overlay -->
+            <div id="voice-loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px;">
+                <h2 style="border:none; margin-bottom: 20px;">Hang On...</h2>
+                <div style="width: 100%; height: 8px; background: rgba(128,128,128,0.2); border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
+                    <div id="voice-loading-bar" style="width: 0%; height: 100%; background: var(--accent-color); transition: width 0.3s ease;"></div>
+                </div>
+                <p id="voice-loading-status" style="font-size: 0.9rem; opacity: 0.6;">Initializing...</p>
+                <button class="btn" id="voice-loading-cancel" style="margin-top: 30px; padding: 8px 24px; font-size: 0.9rem;">Cancel</button>
+            </div>
+
+            <div id="voice-main-ui" style="display: none;">
+                <h2>Send Message</h2>
+                <p style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.7; text-align: center;">Press and hold to record a message for everyone.</p>
+                
+                <div id="record-ui" style="text-align: center; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                    <div style="display: flex; gap: 15px; width: 100%; justify-content: center;">
+                        <button id="record-btn" class="btn" style="flex: 1; min-width: 120px; height: 70px; font-size: 1.1rem; transition: all 0.2s; user-select: none; touch-action: none; border-color: #ff4444; color: #ff4444;">Hold to Record</button>
+                        <button id="monitor-btn" class="btn" style="flex: 1; min-width: 120px; height: 70px; font-size: 1.1rem; opacity: 0.5;" disabled>Monitor</button>
+                    </div>
+                    <p id="record-status" style="font-weight: bold; opacity: 0.7;">Ready</p>
+                    
+                    <!-- Post-recording Processing UI -->
+                    <div id="voice-processing" style="width: 100%; display: none; margin-top: 10px;">
+                        <div style="width: 100%; height: 6px; background: rgba(128,128,128,0.2); border-radius: 3px; overflow: hidden; margin-bottom: 8px;">
+                            <div id="voice-processing-bar" style="width: 0%; height: 100%; background: var(--accent-color); transition: width 0.2s ease;"></div>
+                        </div>
+                        <p id="voice-processing-status" style="font-size: 0.8rem; opacity: 0.6;">Processing...</p>
+                    </div>
+                </div>
+
+                <div class="section-title">Recent Recordings</div>
+                <div id="recent-recordings" style="display: flex; flex-direction: column; gap: 10px; padding: 5px; overflow: hidden;">
+                    <!-- Filled dynamically -->
+                    <p style="opacity: 0.4; text-align: center; padding: 10px; font-size: 0.9rem;">No recordings yet.</p>
+                </div>
+
+                <div class="modal-close-row" style="margin-top: 30px;">
+                    <button class="modal-close-btn" id="voice-close">Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pinned Recordings Modal -->
+    <div class="modal-overlay" id="pinned-recordings-modal" role="dialog" aria-modal="true" aria-label="Pinned Recordings">
+        <div class="modal-content">
+            <h2>Pinned Recordings</h2>
+            <div id="pinned-list" style="display: flex; flex-direction: column; gap: 10px; padding: 5px; margin-top: 20px;">
+                <!-- Filled dynamically -->
+            </div>
+            <div class="modal-close-row" style="margin-top: 30px;">
+                <button class="modal-close-btn" id="pinned-close">Back</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Seguestions Modal -->
     <div class="modal-overlay" id="seguestions-modal" role="dialog" aria-modal="true" aria-label="Seguestions Box">
         <div class="modal-content">
-            <h2>Seguestions Box 💌</h2>
-            <p style="margin-bottom: 4px; font-size: 0.9rem; opacity: 0.7;">Send a suggestion, request, or just vibe.</p>
+            <h2>Seguestions Box</h2>
+            <p style="margin-bottom: 4px; font-size: 0.9rem; opacity: 0.7;">Send a suggestion, request, or just vibe.
+            </p>
 
             <div class="section-title" style="margin-top: 16px;">Who are you?</div>
             <div class="name-chips">
@@ -1050,23 +1163,31 @@
             </div>
 
             <div class="section-title">Message</div>
-            <textarea id="seg-message" class="seg-textarea" placeholder="Say something nice... or not :3" maxlength="500" style="margin-top: 8px;"></textarea>
+            <textarea id="seg-message" class="seg-textarea" placeholder="Got any sound ideas?"
+                maxlength="500" style="margin-top: 8px;"></textarea>
 
             <div class="section-title">Link <span style="opacity:0.5; font-weight:400;">(optional)</span></div>
-            <input type="url" id="seg-link" class="seg-input" placeholder="https://..." maxlength="500" style="margin-top: 8px;">
+            <input type="url" id="seg-link" class="seg-input" placeholder="https://..." maxlength="500"
+                style="margin-top: 8px;">
 
-            <div class="section-title">File <span style="opacity:0.5; font-weight:400;">(optional, max 5 MB)</span></div>
+            <div class="section-title">File <span style="opacity:0.5; font-weight:400;">(optional, max 5 MB)</span>
+            </div>
             <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px; margin-bottom: 16px;">
-                <button class="btn" id="seg-file-btn" style="flex-shrink: 0; padding: 8px 16px; font-size: 0.9rem;">Choose File</button>
-                <span id="seg-filename" style="font-size: 0.85rem; opacity: 0.55; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">No file chosen</span>
+                <button class="btn" id="seg-file-btn"
+                    style="flex-shrink: 0; padding: 8px 16px; font-size: 0.9rem;">Choose File</button>
+                <span id="seg-filename"
+                    style="font-size: 0.85rem; opacity: 0.55; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">No
+                    file chosen</span>
                 <input type="file" id="seg-file-input" style="display: none;">
             </div>
 
-            <div id="seg-status" style="min-height: 1.4em; font-size: 0.9rem; font-weight: 700; text-align: center; margin-bottom: 10px;"></div>
+            <div id="seg-status"
+                style="min-height: 1.4em; font-size: 0.9rem; font-weight: 700; text-align: center; margin-bottom: 10px;">
+            </div>
 
             <div style="display: flex; gap: 10px;">
                 <button class="btn" id="seg-cancel" style="flex: 1;">Cancel</button>
-                <button class="modal-close-btn" id="seg-submit" style="flex: 2;">Send it! 💌</button>
+                <button class="modal-close-btn" id="seg-submit" style="flex: 2;">Send it!</button>
             </div>
         </div>
     </div>
@@ -1075,6 +1196,17 @@
     <div class="modal-overlay" id="settings-modal" role="dialog" aria-modal="true" aria-label="Settings">
         <div class="modal-content">
             <h2>Settings</h2>
+
+            <!-- Navigation UX -->
+            <div class="section-title">Navigation UX</div>
+            <div class="custom-slider-container"
+                style="flex-direction:row; align-items:center; justify-content: space-between; margin-bottom: 24px;">
+                <label for="nav-mode-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    Use Categories
+                </label>
+                <input type="checkbox" id="nav-mode-cbx">
+            </div>
 
             <!-- Hotbar arrangement -->
             <div class="hotbar-config">
@@ -1131,8 +1263,15 @@
             </div>
 
             <!-- Seguestions Box -->
-            <div style="margin-top: clamp(14px,3vw,24px); margin-bottom: clamp(14px,3vw,24px);">
-                <button class="btn" id="seguestions-box-btn" style="width: 100%; font-weight: 900; font-size: clamp(0.95rem,2.5vw,1.1rem);">&#128140; Seguestions Box</button>
+            <div style="margin-top: clamp(14px,3vw,24px); margin-bottom: 12px;">
+                <button class="btn" id="seguestions-box-btn"
+                    style="width: 100%; font-weight: 900; font-size: clamp(0.95rem,2.5vw,1.1rem);">Seguestions
+                    Box</button>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <button class="btn" id="refresh-sillyboard-btn"
+                    style="width: 100%; border-color: #ff4444; color: #ff4444;">Refresh Sillyboard</button>
             </div>
 
             <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 24px;"></div>
@@ -1143,13 +1282,22 @@
         </div>
     </div>
 
+    <!-- Refresh Confirmation Modal -->
+    <div class="modal-overlay" id="refresh-modal" role="dialog" aria-modal="true" aria-label="Refresh Confirmation">
+        <div class="modal-content" style="text-align: center;">
+            <h2>Reset App?</h2>
+            <p style="margin-bottom: 24px; font-weight: bold; font-size: 1.1rem; opacity: 0.9;">All Content will be re-downloaded. You sure?</p>
+            <div style="display: flex; gap: 15px;">
+                <button class="btn" id="refresh-ye" style="flex: 1; height: 60px; background: #ff4444; color: white; border-color: #ff4444; font-size: 1.2rem;">Ye!</button>
+                <button class="btn" id="refresh-nvm" style="flex: 1; height: 60px; font-size: 1.2rem;">Nvm</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ── Sound definitions ─────────────────────────────────────────────
         let SOUND_DEFS = {};
         let SOUND_KEYS = [];
-
-        // Always hide admin button on fresh page load — 5-tap title unlock re-enables per session
-        localStorage.removeItem('sillyboard-admin');
 
         // ── Theme helpers ────────────────────────────────────────────────────
         function setTheme(bg, ac) {
@@ -1158,6 +1306,18 @@
             document.documentElement.style.setProperty('--accent-color', ac);
             localStorage.setItem('sillyboard-bg', bg);
             localStorage.setItem('sillyboard-accent', ac);
+        }
+
+        function applyThemeNoSave(bg, ac) {
+            document.documentElement.style.setProperty('--bg-color', bg);
+            if (window.Android) window.Android.updateThemeColor(bg);
+            document.documentElement.style.setProperty('--accent-color', ac);
+        }
+
+        function restoreTheme() {
+            const bg = localStorage.getItem('sillyboard-bg') || '#000000';
+            const ac = localStorage.getItem('sillyboard-accent') || '#ffffff';
+            applyThemeNoSave(bg, ac);
         }
 
         const bgPicker = document.getElementById('bg-picker');
@@ -1184,6 +1344,35 @@
 
         // ── Settings modal ────────────────────────────────────────────────
         const settingsModal = document.getElementById('settings-modal');
+
+        const refreshBtn = document.getElementById('refresh-sillyboard-btn');
+        const refreshModal = document.getElementById('refresh-modal');
+        const refreshYe = document.getElementById('refresh-ye');
+        const refreshNvm = document.getElementById('refresh-nvm');
+
+        refreshBtn.addEventListener('click', () => {
+            refreshModal.classList.add('active');
+        });
+
+        refreshNvm.addEventListener('click', () => {
+            refreshModal.classList.remove('active');
+        });
+
+        refreshYe.addEventListener('click', () => {
+            localStorage.clear();
+            location.reload();
+        });
+
+
+
+        let navMode = localStorage.getItem('sillyboard-nav-mode') || 'categories';
+        const navModeCbx = document.getElementById('nav-mode-cbx');
+        navModeCbx.checked = navMode === 'categories';
+        navModeCbx.addEventListener('change', () => {
+            navMode = navModeCbx.checked ? 'categories' : 'hotbar';
+            localStorage.setItem('sillyboard-nav-mode', navMode);
+            buildPages();
+        });
 
         document.getElementById('settings-btn').addEventListener('click', () => {
             syncPickersToTheme();
@@ -1272,30 +1461,14 @@
         const adminBtn = document.getElementById('admin-btn');
         const adminModal = document.getElementById('admin-modal');
 
-        let adminClicks = 0;
-        let adminTimer = null;
-
         let headerLockedClicks = 0;
         let headerLockedTimer = null;
 
-        // Initial visibility check will be handled in initUIForSounds to account for board lock state
-        // if (localStorage.getItem('sillyboard-admin') === 'true') {
-        //     adminBtn.style.display = 'inline-block';
-        // }
+        // Show fun button by default now
+        adminBtn.style.display = 'inline-block';
 
         titleEl.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false }); // Prevent mobile text selection
         titleEl.addEventListener('pointerdown', () => {
-            // Admin unlock
-            adminClicks++;
-            clearTimeout(adminTimer);
-            if (adminClicks >= 5) {
-                adminBtn.style.display = 'inline-block';
-                localStorage.setItem('sillyboard-admin', 'true');
-                adminClicks = 0;
-            } else {
-                adminTimer = setTimeout(() => { adminClicks = 0; }, 800);
-            }
-
             // Dual-stage unlock Part 2
             if (bigIconUnlocked) {
                 headerLockedClicks++;
@@ -1430,9 +1603,9 @@
             } else {
                 // All rounds done — average and commit
                 const avgOffset = pendingSyncRounds.reduce((s, r) => s + r.offset, 0) / pendingSyncRounds.length;
-                const avgRtt    = pendingSyncRounds.reduce((s, r) => s + r.rtt,    0) / pendingSyncRounds.length;
+                const avgRtt = pendingSyncRounds.reduce((s, r) => s + r.rtt, 0) / pendingSyncRounds.length;
                 serverTimeOffset = avgOffset;
-                clientRttMs      = avgRtt;
+                clientRttMs = avgRtt;
 
                 updateRepeaterStatus(`Connected ✓  RTT ${Math.round(avgRtt)}ms`, 1);
 
@@ -1498,10 +1671,10 @@
                 } else if (data.type === 'error') {
                     alert(data.message);
 
-                } else if (data.type === 'force_volume') {
-                    if (window.Android && remoteVolumeEnabled) {
-                        window.Android.forceVolumeUp();
-                    }
+
+                } else if (data.type === 'voice_message') {
+                    if (data.clientId === myClientId) return;
+                    handleVoiceMessage(data.audio);
                 }
             };
 
@@ -1542,11 +1715,6 @@
                 model = parts ? parts[1] : "Android Device";
             }
 
-            // Opioids S25 special handling
-            if (model.includes("S25")) {
-                model = "Opioids";
-            }
-
             return { os, browser, model };
         }
 
@@ -1556,8 +1724,448 @@
             repeaterSocket.send(JSON.stringify({
                 type: 'register',
                 id: myClientId,
-                ...info
+                ...info,
+                theme: localStorage.getItem('sillyboard-bg') || 'Default'
             }));
+        }
+
+        // ── Voice Messaging ──────────────────────────────────────────────────
+        const voiceModeBtn = document.getElementById('voice-mode-btn');
+        const voiceModal = document.getElementById('voice-modal');
+        const voiceClose = document.getElementById('voice-close');
+        const recordBtn = document.getElementById('record-btn');
+        const monitorBtn = document.getElementById('monitor-btn');
+        const recordStatus = document.getElementById('record-status');
+        const recentRecordingsEl = document.getElementById('recent-recordings');
+        const voiceProcessing = document.getElementById('voice-processing');
+        const voiceProcessingBar = document.getElementById('voice-processing-bar');
+        const voiceProcessingStatus = document.getElementById('voice-processing-status');
+
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        let activeMicStream = null;
+
+        // Local history of recordings
+        let myRecentRecordings = JSON.parse(localStorage.getItem('sillyboard-voice-history') || '[]');
+        let myFavorites = JSON.parse(localStorage.getItem('sillyboard-voice-favorites') || '[]');
+
+        function toggleFavorite(rec) {
+            const idx = myFavorites.findIndex(f => f.ts === rec.ts);
+            if (idx > -1) {
+                myFavorites.splice(idx, 1);
+            } else {
+                if (myFavorites.length >= 12) {
+                    alert('Max 12 favorites reached!');
+                    return;
+                }
+                myFavorites.push(rec);
+            }
+            localStorage.setItem('sillyboard-voice-favorites', JSON.stringify(myFavorites));
+            renderRecentRecordings();
+            renderPinnedList();
+            buildPages();
+        }
+
+        function renameRecording(rec) {
+            const newName = prompt("Rename recording:", rec.name || "");
+            if (newName !== null) {
+                const nameToSet = newName.trim();
+                const histIdx = myRecentRecordings.findIndex(r => r.ts === rec.ts);
+                if (histIdx > -1) myRecentRecordings[histIdx].name = nameToSet;
+                const favIdx = myFavorites.findIndex(f => f.ts === rec.ts);
+                if (favIdx > -1) myFavorites[favIdx].name = nameToSet;
+                
+                localStorage.setItem('sillyboard-voice-history', JSON.stringify(myRecentRecordings));
+                localStorage.setItem('sillyboard-voice-favorites', JSON.stringify(myFavorites));
+                renderRecentRecordings();
+                renderPinnedList();
+                buildPages();
+            }
+        }
+
+        function updateMonitorBtn() {
+            if (myRecentRecordings.length > 0) {
+                monitorBtn.disabled = false;
+                monitorBtn.style.opacity = '1';
+                monitorBtn.textContent = 'Monitor';
+            } else {
+                monitorBtn.disabled = true;
+                monitorBtn.style.opacity = '0.5';
+            }
+        }
+
+        async function initMicrophone() {
+            const loading = document.getElementById('voice-loading');
+            const mainUI = document.getElementById('voice-main-ui');
+            const bar = document.getElementById('voice-loading-bar');
+            const status = document.getElementById('voice-loading-status');
+
+            loading.style.display = 'flex';
+            mainUI.style.display = 'none';
+            bar.style.width = '10%';
+            bar.style.background = 'var(--accent-color)';
+
+            try {
+                status.textContent = 'Starting Mic...';
+                activeMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                bar.style.width = '100%';
+
+                if (!voiceModal.classList.contains('active')) {
+                    closeMicrophone();
+                    return;
+                }
+
+                loading.style.display = 'none';
+                mainUI.style.display = 'block';
+                renderRecentRecordings();
+                updateMonitorBtn();
+            } catch (err) {
+                console.error("Microphone access denied:", err);
+                status.textContent = 'Mic Error: Access Denied';
+                bar.style.background = '#ff4444';
+            }
+        }
+
+        function closeMicrophone() {
+            if (activeMicStream) {
+                activeMicStream.getTracks().forEach(t => t.stop());
+                activeMicStream = null;
+            }
+            recordStatus.textContent = 'Ready';
+            recordBtn.textContent = 'Hold to Record';
+            recordBtn.disabled = false;
+            voiceProcessing.style.display = 'none';
+        }
+
+        voiceModeBtn.addEventListener('click', () => {
+            voiceModal.classList.add('active');
+            initMicrophone();
+        });
+
+        const voiceCancel = document.getElementById('voice-loading-cancel');
+        voiceCancel.addEventListener('click', () => {
+            voiceModal.classList.remove('active');
+            closeMicrophone();
+        });
+
+        voiceClose.addEventListener('click', () => {
+            if (isRecording) stopRecording();
+            voiceModal.classList.remove('active');
+            closeMicrophone();
+        });
+
+        voiceModal.addEventListener('click', (e) => {
+            if (e.target === voiceModal) {
+                if (isRecording) stopRecording();
+                voiceModal.classList.remove('active');
+                closeMicrophone();
+            }
+        });
+
+        recordBtn.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            startRecording();
+        });
+        
+        ['pointerup', 'pointerleave', 'pointercancel'].forEach(evt => {
+            recordBtn.addEventListener(evt, () => {
+                if (isRecording) stopRecording();
+            });
+        });
+
+        monitorBtn.addEventListener('click', () => {
+            if (myRecentRecordings.length > 0) {
+                handleVoiceMessage(myRecentRecordings[0].data);
+            }
+        });
+
+        async function startRecording() {
+            if (!activeMicStream) {
+                await initMicrophone();
+                if (!activeMicStream) return;
+            }
+
+            try {
+                mediaRecorder = new MediaRecorder(activeMicStream, {
+                    mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 
+                              MediaRecorder.isTypeSupported('audio/ogg;codecs=opus') ? 'audio/ogg;codecs=opus' : ''
+                });
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) audioChunks.push(e.data);
+                };
+
+                mediaRecorder.onstart = () => {
+                    isRecording = true;
+                    recordBtn.textContent = 'Recording';
+                    recordBtn.style.background = '#ff4444';
+                    recordBtn.style.borderColor = '#ff4444';
+                    recordBtn.style.color = '#fff';
+                    recordStatus.textContent = 'Live';
+                    voiceProcessing.style.display = 'none';
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
+                    processRecording(audioBlob);
+                };
+
+                mediaRecorder.start();
+            } catch (err) {
+                console.error("Failed to start recording:", err);
+                recordStatus.textContent = 'Error';
+            }
+        }
+
+        async function processRecording(blob) {
+            voiceProcessing.style.display = 'block';
+            voiceProcessingBar.style.width = '0%';
+            voiceProcessingStatus.textContent = 'Trimming silence...';
+            
+            try {
+                ensureAudioContext();
+                const arrayBuffer = await blob.arrayBuffer();
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                
+                voiceProcessingBar.style.width = '30%';
+                
+                const threshold = 0.015;
+                const channelData = audioBuffer.getChannelData(0);
+                let startSample = 0;
+                for (let i = 0; i < channelData.length; i++) {
+                    if (Math.abs(channelData[i]) > threshold) {
+                        startSample = i;
+                        break;
+                    }
+                }
+                
+                const leadSamples = Math.floor(0.025 * audioBuffer.sampleRate);
+                const actualStart = Math.max(0, startSample - leadSamples);
+                
+                voiceProcessingStatus.textContent = 'Compressing...';
+                voiceProcessingBar.style.width = '60%';
+
+                const trimmedLength = audioBuffer.length - actualStart;
+                const trimmedBuffer = audioCtx.createBuffer(audioBuffer.numberOfChannels, trimmedLength, audioBuffer.sampleRate);
+                for (let c = 0; c < audioBuffer.numberOfChannels; c++) {
+                    trimmedBuffer.copyToChannel(audioBuffer.getChannelData(c).subarray(actualStart), c);
+                }
+
+                const wavData = audioBufferToWav(trimmedBuffer);
+                
+                voiceProcessingStatus.textContent = 'Uploading...';
+                voiceProcessingBar.style.width = '90%';
+                
+                const reader = new FileReader();
+                reader.readAsDataURL(new Blob([wavData], { type: 'audio/wav' }));
+                reader.onloadend = () => {
+                    const base64data = reader.result;
+                    saveRecording(base64data);
+                    
+                    voiceProcessingBar.style.width = '100%';
+                    voiceProcessingStatus.textContent = 'Saved!';
+                    setTimeout(() => { voiceProcessing.style.display = 'none'; }, 800);
+                };
+            } catch (err) {
+                console.error("Processing failed:", err);
+                voiceProcessingStatus.textContent = 'Failed';
+            }
+        }
+
+        function audioBufferToWav(buffer) {
+            const numOfChan = buffer.numberOfChannels,
+                  length = buffer.length * numOfChan * 2 + 44,
+                  bufferArr = new ArrayBuffer(length),
+                  view = new DataView(bufferArr);
+            let pos = 0;
+
+            function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
+            function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
+
+            setUint32(0x46464952); // "RIFF"
+            setUint32(length - 8);
+            setUint32(0x45564157); // "WAVE"
+            setUint32(0x20746d66); // "fmt "
+            setUint32(16);
+            setUint16(1); // PCM
+            setUint16(numOfChan);
+            setUint32(buffer.sampleRate);
+            setUint32(buffer.sampleRate * 2 * numOfChan);
+            setUint16(numOfChan * 2);
+            setUint16(16);
+            setUint32(0x61746164); // "data"
+            setUint32(length - 44);
+
+            for (let i = 0; i < buffer.length; i++) {
+                for (let channel = 0; channel < numOfChan; channel++) {
+                    let sample = buffer.getChannelData(channel)[i];
+                    sample = Math.max(-1, Math.min(1, sample));
+                    view.setInt16(pos, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+                    pos += 2;
+                }
+            }
+            return bufferArr;
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                recordBtn.textContent = 'Hold to Record';
+                recordBtn.style.background = 'transparent';
+                recordBtn.style.borderColor = '#ff4444';
+                recordBtn.style.color = '#ff4444';
+                recordStatus.textContent = 'Ready';
+            }
+        }
+
+        function saveRecording(data) {
+            const entry = {
+                ts: Date.now(),
+                data: data
+            };
+            myRecentRecordings.unshift(entry);
+            if (myRecentRecordings.length > 5) myRecentRecordings.pop();
+            localStorage.setItem('sillyboard-voice-history', JSON.stringify(myRecentRecordings));
+            renderRecentRecordings();
+            updateMonitorBtn();
+        }
+
+        function renderRecentRecordings() {
+            recentRecordingsEl.innerHTML = '';
+            if (myRecentRecordings.length === 0) {
+                recentRecordingsEl.innerHTML = '<p style="opacity: 0.4; text-align: center; padding: 10px; font-size: 0.9rem;">No recordings yet.</p>';
+                return;
+            }
+
+            myRecentRecordings.forEach((rec, idx) => {
+                const row = document.createElement('div');
+                row.style.cssText = "display: flex; gap: 8px; margin-bottom: 8px;";
+                
+                const playBtn = document.createElement('button');
+                playBtn.className = 'btn';
+                playBtn.style.cssText = "flex: 1; display: flex; justify-content: space-between; align-items: center; padding: 12px 18px;";
+                const date = new Date(rec.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const label = rec.name || `Recording ${date}`;
+                playBtn.innerHTML = `<span>${label}</span> <span>Send</span>`;
+                playBtn.onclick = () => broadcastVoiceMessage(rec.data);
+                
+                const renameBtn = document.createElement('button');
+                renameBtn.className = 'btn fav-btn';
+                renameBtn.innerHTML = '✎';
+                renameBtn.style.cssText = `width: 50px; font-size: 1.1rem; color: var(--accent-color);`;
+                renameBtn.onclick = () => renameRecording(rec);
+
+                const monitorBtn = document.createElement('button');
+                monitorBtn.className = 'btn fav-btn';
+                monitorBtn.innerHTML = 'M';
+                monitorBtn.style.cssText = `width: 50px; font-size: 1.1rem; color: var(--accent-color);`;
+                monitorBtn.onclick = () => handleVoiceMessage(rec.data);
+
+                const favBtn = document.createElement('button');
+                favBtn.className = 'btn fav-btn';
+                const isFav = myFavorites.some(f => f.ts === rec.ts);
+                favBtn.innerHTML = isFav ? '★' : '☆';
+                favBtn.style.cssText = `width: 50px; font-size: 1.5rem; color: ${isFav ? 'var(--accent-color)' : 'rgba(255,255,255,0.3)'};`;
+                favBtn.onclick = () => toggleFavorite(rec);
+                
+                row.appendChild(playBtn);
+                row.appendChild(renameBtn);
+                row.appendChild(monitorBtn);
+                row.appendChild(favBtn);
+                recentRecordingsEl.appendChild(row);
+            });
+        }
+
+        const pinnedRecordingsBtn = document.getElementById('pinned-recordings-btn');
+        const pinnedModal = document.getElementById('pinned-recordings-modal');
+        const pinnedListEl = document.getElementById('pinned-list');
+        const pinnedClose = document.getElementById('pinned-close');
+
+        pinnedRecordingsBtn.addEventListener('click', () => {
+            renderPinnedList();
+            pinnedModal.classList.add('active');
+        });
+        pinnedClose.addEventListener('click', () => pinnedModal.classList.remove('active'));
+        pinnedModal.addEventListener('click', (e) => { if (e.target === pinnedModal) pinnedModal.classList.remove('active'); });
+
+        function renderPinnedList() {
+            pinnedListEl.innerHTML = '';
+            if (myFavorites.length === 0) {
+                pinnedListEl.innerHTML = '<p style="opacity: 0.4; text-align: center; padding: 10px; font-size: 0.9rem;">No pinned recordings.</p>';
+                return;
+            }
+
+            myFavorites.forEach((rec, idx) => {
+                const row = document.createElement('div');
+                row.style.cssText = "display: flex; gap: 8px; margin-bottom: 8px;";
+                
+                const playBtn = document.createElement('button');
+                playBtn.className = 'btn';
+                playBtn.style.cssText = "flex: 1; display: flex; justify-content: space-between; align-items: center; padding: 12px 18px;";
+                const date = new Date(rec.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const label = rec.name || `Recording ${date}`;
+                playBtn.innerHTML = `<span>${label}</span> <span>Send</span>`;
+                playBtn.onclick = () => broadcastVoiceMessage(rec.data);
+                
+                const renameBtn = document.createElement('button');
+                renameBtn.className = 'btn fav-btn';
+                renameBtn.innerHTML = '✎';
+                renameBtn.style.cssText = `width: 50px; font-size: 1.1rem; color: var(--accent-color);`;
+                renameBtn.onclick = () => renameRecording(rec);
+
+                const monitorBtn = document.createElement('button');
+                monitorBtn.className = 'btn fav-btn';
+                monitorBtn.innerHTML = 'M';
+                monitorBtn.style.cssText = `width: 50px; font-size: 1.1rem; color: var(--accent-color);`;
+                monitorBtn.onclick = () => handleVoiceMessage(rec.data);
+
+                const unpinBtn = document.createElement('button');
+                unpinBtn.className = 'btn fav-btn';
+                unpinBtn.innerHTML = '✕';
+                unpinBtn.style.cssText = `width: 50px; font-size: 1.2rem; color: #ff4444;`;
+                unpinBtn.onclick = () => toggleFavorite(rec);
+                
+                row.appendChild(playBtn);
+                row.appendChild(renameBtn);
+                row.appendChild(monitorBtn);
+                row.appendChild(unpinBtn);
+                pinnedListEl.appendChild(row);
+            });
+        }
+
+        function broadcastVoiceMessage(data) {
+            handleVoiceMessage(data);
+
+            if (!repeaterSocket || repeaterSocket.readyState !== WebSocket.OPEN) {
+                return;
+            }
+            repeaterSocket.send(JSON.stringify({
+                type: 'voice_message',
+                clientId: myClientId,
+                audio: data
+            }));
+        }
+
+        async function handleVoiceMessage(base64Data) {
+            try {
+                ensureAudioContext();
+                if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+                const resp = await fetch(base64Data);
+                const arrayBuffer = await resp.arrayBuffer();
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+                const source = audioCtx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(gainNode);
+                source.start(0);
+            } catch (err) {
+                console.error("Failed to play voice message:", err);
+            }
         }
 
         const remoteModal = document.getElementById('remote-modal');
@@ -1614,19 +2222,7 @@
             document.querySelectorAll('#remote-list input[type="checkbox"]').forEach(cb => cb.checked = false);
         });
 
-        document.getElementById('remote-force-volume').addEventListener('click', () => {
-            if (!repeaterSocket || repeaterSocket.readyState !== WebSocket.OPEN) {
-                alert("Repeater is disconnected.");
-                return;
-            }
-            repeaterSocket.send(JSON.stringify({ type: 'force_volume' }));
-            
-            // UI feedback
-            const btn = document.getElementById('remote-force-volume');
-            const originalText = btn.textContent;
-            btn.textContent = 'Command Sent! :3';
-            setTimeout(() => btn.textContent = originalText, 1500);
-        });
+
 
         // Auto-Gain removed — plain gain node used directly.
 
@@ -1706,18 +2302,7 @@
         });
 
         const remoteVolumeCbx = document.getElementById('remote-volume-cbx');
-        const androidVolumeContainer = document.getElementById('android-volume-container');
-        
-        if (window.Android) {
-            androidVolumeContainer.style.display = 'flex';
-        }
 
-        let remoteVolumeEnabled = localStorage.getItem('sillyboard-remote-volume') !== 'false';
-        remoteVolumeCbx.checked = remoteVolumeEnabled;
-        remoteVolumeCbx.addEventListener('change', () => {
-            remoteVolumeEnabled = remoteVolumeCbx.checked;
-            localStorage.setItem('sillyboard-remote-volume', remoteVolumeEnabled);
-        });
 
         // Admin Pitch logic
         const pitchSliderWrap = document.getElementById('pitch-slider-wrap');
@@ -1760,11 +2345,11 @@
         if (repeaterEnabled) initRepeater();
 
         // ── Seguestions ────────────────────────────────────────────────────
-        const segModal      = document.getElementById('seguestions-modal');
-        const segSubmitBtn  = document.getElementById('seg-submit');
-        const segStatusEl   = document.getElementById('seg-status');
-        const segFileInput  = document.getElementById('seg-file-input');
-        const segFilename   = document.getElementById('seg-filename');
+        const segModal = document.getElementById('seguestions-modal');
+        const segSubmitBtn = document.getElementById('seg-submit');
+        const segStatusEl = document.getElementById('seg-status');
+        const segFileInput = document.getElementById('seg-file-input');
+        const segFilename = document.getElementById('seg-filename');
         let selectedSegName = '';
         let segAttachedFile = null;
 
@@ -1832,7 +2417,7 @@
             }
 
             const message = document.getElementById('seg-message').value.trim().slice(0, 500);
-            const link    = document.getElementById('seg-link').value.trim().slice(0, 500);
+            const link = document.getElementById('seg-link').value.trim().slice(0, 500);
 
             let filename = '';
             let filedata = '';
@@ -1878,54 +2463,197 @@
         let isBoardLocked = false;
         let bigIconUnlocked = false;
 
-        // ── Pagination state ────────────────────────────────────────────────────
-        let filteredSoundKeys = [];
-        let SOUNDS_PER_PAGE = 7;
+        // ── Navigation UI state ──────────────────────────────────────────────────
+        let pagesArray = [];
+        let categoryNames = [];
+        let SOUNDS_PER_PAGE = 12;
         let currentPage = 0;
         let audioLoaded = false;
+        let PAGES_DEF = {};
 
-        const boardNavEl   = document.getElementById('board-nav');
-        const prevPageBtn  = document.getElementById('prev-page-btn');
-        const nextPageBtn  = document.getElementById('next-page-btn');
-        const pageIndicator = document.getElementById('page-indicator');
+        const boardNavEl = document.getElementById('board-nav');
+        const prevPageBtn = document.getElementById('prev-page-btn');
+        const nextPageBtn = document.getElementById('next-page-btn');
+        const navAreaEl = document.getElementById('nav-area');
+        const categoryUiEl = document.getElementById('category-ui');
+
+        function buildPages() {
+            pagesArray = [];
+            categoryNames = [];
+            SOUNDS_PER_PAGE = 12;
+
+            const allValidKeys = SOUND_KEYS.filter(k => k !== 'locked' && k !== 'streamables');
+
+            if (navMode === 'hotbar') {
+                categoryNames = ['All'];
+                if (myFavorites.length > 0) categoryNames.unshift('Recordings');
+                
+                if (myFavorites.length > 0) {
+                    pagesArray.push({
+                        category: 'Recordings',
+                        keys: myFavorites.map((f, i) => `_rec_${i}`)
+                    });
+                }
+
+                for (let i = 0; i < allValidKeys.length; i += SOUNDS_PER_PAGE) {
+                    pagesArray.push({
+                        category: 'All',
+                        keys: allValidKeys.slice(i, i + SOUNDS_PER_PAGE)
+                    });
+                }
+            } else {
+                const catKeys = Object.keys(PAGES_DEF);
+                let placedKeys = new Set();
+                
+                if (myFavorites.length > 0) {
+                    categoryNames.push('Recordings');
+                    pagesArray.push({
+                        category: 'Recordings',
+                        keys: myFavorites.map((f, i) => `_rec_${i}`)
+                    });
+                }
+
+                catKeys.forEach(cat => {
+                    const keys = PAGES_DEF[cat].filter(k => allValidKeys.includes(k));
+                    keys.forEach(k => placedKeys.add(k));
+                    if (keys.length > 0) {
+                        categoryNames.push(cat);
+                        for (let i = 0; i < keys.length; i += SOUNDS_PER_PAGE) {
+                            pagesArray.push({
+                                category: cat,
+                                keys: keys.slice(i, i + SOUNDS_PER_PAGE)
+                            });
+                        }
+                    }
+                });
+
+                const unorganized = allValidKeys.filter(k => !placedKeys.has(k));
+                if (unorganized.length > 0) {
+                    categoryNames.push('Unorganized');
+                    for (let i = 0; i < unorganized.length; i += SOUNDS_PER_PAGE) {
+                        pagesArray.push({
+                            category: 'Unorganized',
+                            keys: unorganized.slice(i, i + SOUNDS_PER_PAGE)
+                        });
+                    }
+                }
+            }
+            
+            currentPage = 0;
+            renderCategoryTabs();
+            updateUIMode();
+        }
+
+        function updateUIMode() {
+            if (navMode === 'hotbar') {
+                hotbarEl.style.display = 'flex';
+                categoryUiEl.style.display = 'none';
+                document.getElementById('hotbar-slots-cfg').parentNode.style.display = 'block';
+                renderHotbar();
+            } else {
+                hotbarEl.style.display = 'none';
+                categoryUiEl.style.display = 'block';
+                document.getElementById('hotbar-slots-cfg').parentNode.style.display = 'none';
+                updateCategoryHeader();
+            }
+            renderBoardPage();
+        }
+
+        function updateCategoryHeader() {
+            if (pagesArray.length > 0) {
+                const cat = pagesArray[currentPage].category;
+                document.querySelectorAll('.category-tab').forEach(tab => {
+                    if (tab.dataset.category === cat) {
+                        tab.classList.add('active');
+                        tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+            }
+        }
 
         function updatePageNav() {
-            const totalPages = Math.ceil(filteredSoundKeys.length / SOUNDS_PER_PAGE);
-            pageIndicator.textContent = `${currentPage + 1} / ${totalPages}`;
             prevPageBtn.disabled = currentPage <= 0;
-            nextPageBtn.disabled = currentPage >= totalPages - 1;
+            nextPageBtn.disabled = currentPage >= pagesArray.length - 1;
         }
 
         function renderBoardPage() {
             boardEl.innerHTML = '';
-            // Clear previous button refs for this page
             Object.keys(boardButtons).forEach(k => delete boardButtons[k]);
 
-            const start    = currentPage * SOUNDS_PER_PAGE;
-            const pageKeys = filteredSoundKeys.slice(start, start + SOUNDS_PER_PAGE);
+            if (pagesArray.length === 0) return;
+
+            const pageKeys = pagesArray[currentPage].keys;
 
             pageKeys.forEach(key => {
                 const btn = document.createElement('button');
                 btn.className = 'sound-btn';
                 btn.id = 'btn-' + key;
                 btn.dataset.sound = key;
-                btn.setAttribute('aria-label', 'Play ' + SOUND_DEFS[key].label);
-                btn.innerHTML = '<span class="btn-label">' + SOUND_DEFS[key].label + '</span>';
+                if (key.startsWith('_rec_')) {
+                    const idx = parseInt(key.split('_')[2]);
+                    const rec = myFavorites[idx];
+                    const date = new Date(rec.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const label = rec.name || `Rec ${date}`;
+                    btn.setAttribute('aria-label', 'Play ' + label);
+                    btn.innerHTML = '<span class="btn-label">' + label + '</span>';
+                    btn.onclick = () => broadcastVoiceMessage(rec.data);
+                } else {
+                    btn.setAttribute('aria-label', 'Play ' + SOUND_DEFS[key].label);
+                    btn.innerHTML = '<span class="btn-label">' + SOUND_DEFS[key].label + '</span>';
+                    if (audioLoaded) bindPressEvent(btn, key);
+                }
+
                 boardEl.appendChild(btn);
                 boardButtons[key] = btn;
-                if (audioLoaded) bindPressEvent(btn, key);
+                
+                if (!key.startsWith('_rec_') && clipQueue.filter(c => c.key === key).length > 0) {
+                    btn.classList.add('playing');
+                }
             });
 
             updatePageNav();
+            updateCategoryHeader();
         }
 
         prevPageBtn.addEventListener('click', () => {
-            if (currentPage > 0) { currentPage--; renderBoardPage(); }
+            if (currentPage > 0) { 
+                currentPage--; 
+                renderBoardPage(); 
+            }
         });
         nextPageBtn.addEventListener('click', () => {
-            const total = Math.ceil(filteredSoundKeys.length / SOUNDS_PER_PAGE);
-            if (currentPage < total - 1) { currentPage++; renderBoardPage(); }
+            if (currentPage < pagesArray.length - 1) { 
+                currentPage++; 
+                renderBoardPage(); 
+            }
         });
+
+        // ── Category Tabs Logic ────────────────────────────────────────────────
+
+        function renderCategoryTabs() {
+            categoryUiEl.innerHTML = '';
+            categoryNames.forEach((cat) => {
+                const item = document.createElement('div');
+                item.className = 'category-tab';
+                item.textContent = cat;
+                item.dataset.category = cat;
+                const pageIndex = pagesArray.findIndex(p => p.category === cat);
+                item.dataset.pageIndex = pageIndex;
+                
+                item.addEventListener('click', () => {
+                    const targetPage = parseInt(item.dataset.pageIndex, 10);
+                    if (currentPage !== targetPage) {
+                        currentPage = targetPage;
+                        renderBoardPage();
+                    }
+                });
+                
+                categoryUiEl.appendChild(item);
+            });
+        }
+
 
         function initUIForSounds() {
             // Override check
@@ -1934,8 +2662,8 @@
 
             isBoardLocked = (SOUND_DEFS.locked === 1 || manualLock) && !manualUnlock;
 
-            // Admin button: always hidden on load; shown only when unlocked this session
-            adminBtn.style.display = 'none';
+            // Fun button: always shown now
+            adminBtn.style.display = 'inline-block';
 
             if (isBoardLocked) {
                 renderLockedView();
@@ -1947,16 +2675,9 @@
                 document.getElementById('lock-board-btn').style.display = 'block';
             }
 
-            // Validate saved entries against dynamic JSON keys
             hotbarSlots = hotbarSlots.filter(k => SOUND_DEFS[k] && k !== 'locked' && k !== 'streamables').slice(0, MAX_HOTBAR);
 
-            // Build paginated sound list — half of all sounds per page
-            filteredSoundKeys = SOUND_KEYS.filter(k => k !== 'locked' && k !== 'streamables');
-            SOUNDS_PER_PAGE = Math.ceil(filteredSoundKeys.length / 2);
-            currentPage = 0;
-            boardNavEl.style.display = 'flex';
-            renderBoardPage();
-            renderHotbar();
+            buildPages();
         }
 
         function renderLockedView() {
@@ -2125,6 +2846,15 @@
                 const configRes = await fetch('Soundboard/sounds.json');
                 SOUND_DEFS = await configRes.json();
                 SOUND_KEYS = Object.keys(SOUND_DEFS);
+
+                try {
+                    const pagesRes = await fetch('Soundboard/pages.json');
+                    PAGES_DEF = await pagesRes.json();
+                } catch (e) {
+                    PAGES_DEF = {};
+                    console.warn('No pages.json found', e);
+                }
+
                 initUIForSounds();
 
                 const allFetches = [];
@@ -2281,19 +3011,23 @@
 
         // ── Playback — capped simultaneous instances via AudioBufferSourceNode ──
         const MAX_CLIPS = 8;
-        const clipQueue = []; // { source, btn } in insertion order
-        const playingCount = new Map(); // btn → active clip count
+        const clipQueue = []; // { source, key } in insertion order
 
         function evictOldest() {
             const oldest = clipQueue.shift();
             if (!oldest) return;
             try { oldest.source.stop(); } catch (e) { }
-            const n = (playingCount.get(oldest.btn) || 1) - 1;
-            if (n <= 0) {
-                playingCount.delete(oldest.btn);
-                oldest.btn.classList.remove('playing');
-            } else {
-                playingCount.set(oldest.btn, n);
+            
+            const remaining = clipQueue.filter(c => c.key === oldest.key).length;
+            if (remaining <= 0) {
+                const activeBtn = boardButtons[oldest.key];
+                if (activeBtn) activeBtn.classList.remove('playing');
+                const hotbarBtn = hotbarEl.querySelector(`[data-sound="${oldest.key}"]`);
+                if (hotbarBtn) hotbarBtn.classList.remove('playing');
+
+                if (oldest.key === 'green') {
+                    restoreTheme();
+                }
             }
         }
 
@@ -2350,13 +3084,17 @@
             source.start(playTime);
 
             // 2. Queue tracking
-            const entry = { source, btn, key };
+            const entry = { source, key };
             clipQueue.push(entry);
 
             // 3. UI Updates
-            if (btn) {
-                playingCount.set(btn, (playingCount.get(btn) || 0) + 1);
-                btn.classList.add('playing');
+            const activeBtn = boardButtons[key];
+            if (activeBtn) activeBtn.classList.add('playing');
+            const hotbarBtn = hotbarEl.querySelector(`[data-sound="${key}"]`);
+            if (hotbarBtn) hotbarBtn.classList.add('playing');
+
+            if (key === 'green') {
+                applyThemeNoSave('#00ff00', '#006600');
             }
 
             source.addEventListener('ended', () => {
@@ -2368,13 +3106,15 @@
                     renderStreamables();
                 }
 
-                if (btn) {
-                    const remaining = (playingCount.get(btn) || 1) - 1;
-                    if (remaining <= 0) {
-                        playingCount.delete(btn);
-                        btn.classList.remove('playing');
-                    } else {
-                        playingCount.set(btn, remaining);
+                const remaining = clipQueue.filter(c => c.key === key).length;
+                if (remaining <= 0) {
+                    const currentBtn = boardButtons[key];
+                    if (currentBtn) currentBtn.classList.remove('playing');
+                    const currentHotbarBtn = hotbarEl.querySelector(`[data-sound="${key}"]`);
+                    if (currentHotbarBtn) currentHotbarBtn.classList.remove('playing');
+                    
+                    if (key === 'green') {
+                        restoreTheme();
                     }
                 }
             });
