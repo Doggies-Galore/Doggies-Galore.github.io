@@ -1358,8 +1358,24 @@
             refreshModal.classList.remove('active');
         });
 
-        refreshYe.addEventListener('click', () => {
+        refreshYe.addEventListener('click', async () => {
             localStorage.clear();
+            sessionStorage.clear();
+
+            if ('caches' in window) {
+                try {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                } catch (e) {}
+            }
+
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(registrations.map(reg => reg.unregister()));
+                } catch (e) {}
+            }
+
             location.reload();
         });
 
