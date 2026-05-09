@@ -403,5 +403,55 @@
                 }
             ]
         }
+    },
+    "hitit": {
+        "label": "Hit it",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-HitIt.wav"
+            }
+        ]
+    },
+    "gasstation": {
+        "label": "Gas Station",
+        "variants": [
+            {
+                "src": "Soundboard/Soundboard%20-Gas%20Station.wav",
+                "weight": 90
+            },
+            {
+                "src": "Soundboard/Soundboard%20-Gas%20Station%202.wav",
+                "weight": 10
+            }
+        ]
+    },
+    "fish": {
+        "label": "Fish",
+        "variants": [
+            {
+                "src": "Soundboard/Soundboard%20-Fish.wav",
+                "weight": 90
+            },
+            {
+                "src": "Soundboard/Soundboard%20-Fish%202.wav",
+                "weight": 10
+            }
+        ]
+    },
+    "vine": {
+        "label": "Vine",
+        "variants": [
+            {
+                "src": "Soundboard/Soundboard%20-Vine.wav"
+            }
+        ]
+    },
+    "ted": {
+        "label": "Ted",
+        "variants": [
+            {
+                "src": "Soundboard/Soundboard%20-Ted.wav"
+            }
+        ]
     }
 }
