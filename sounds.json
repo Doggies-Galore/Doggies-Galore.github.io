@@ -1,10 +1,107 @@
 {
     "locked": 0,
+    "sixam": {
+        "label": "6 AM",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-6%20AM.wav"
+            }
+        ]
+    },
+    "sixtyseven": {
+        "label": "67",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-67.wav"
+            }
+        ]
+    },
+    "sixtyseven_a": {
+        "label": "67 (A)",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-67%20%28A%29.wav"
+            }
+        ]
+    },
+    "sixtyseven_s": {
+        "label": "67 (S)",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-67%20%28S%29.wav"
+            }
+        ]
+    },
+    "brown": {
+        "label": "Brown",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Brown.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Brown%202.wav"
+            }
+        ]
+    },
     "buzzer": {
         "label": "Buzzer",
         "variants": [
             {
-                "src": "Soundboard/SoundBoard -Buzzer.wav"
+                "src": "Soundboard/SoundBoard%20-Buzzer.wav"
+            }
+        ]
+    },
+    "catydid": {
+        "label": "Katydid",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Catydid.wav",
+                "weight": 10
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Catydid%202.wav",
+                "weight": 5
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Catydid%203.wav",
+                "weight": 3
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Catydid%204.wav",
+                "weight": 3
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Catydid%205.wav",
+                "weight": 3
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Catydid%206.wav",
+                "weight": 3
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Catydid%207.wav",
+                "weight": 3
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Catydid%208.wav",
+                "weight": 3
+            }
+        ]
+    },
+    "changed": {
+        "label": "Changed",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Changed.wav",
+                "weight": 5
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Changed%202.wav",
+                "weight": 3
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Changed%203.wav",
+                "weight": 3
             }
         ]
     },
@@ -12,90 +109,15 @@
         "label": "Cinema",
         "variants": [
             {
-                "src": "Soundboard/SoundBoard -Cinema.wav"
+                "src": "Soundboard/SoundBoard%20-Cinema.wav"
             }
         ]
     },
-    "lucky": {
-        "label": "Lucky for You",
+    "dracula": {
+        "label": "Dracula",
         "variants": [
             {
-                "src": "Soundboard/SoundBoard -Lucky for You %231.wav"
-            },
-            {
-                "src": "Soundboard/SoundBoard -Lucky for You %232.wav"
-            }
-        ]
-    },
-    "pipe": {
-        "label": "Pipe Fall",
-        "variants": [
-            {
-                "src": "Soundboard/SoundBoard -Pipe Fall.wav"
-            }
-        ]
-    },
-    "riff": {
-        "label": "Riff",
-        "variants": [
-            {
-                "src": "Soundboard/SoundBoard -Riff.wav",
-                "weight": 14
-            },
-            {
-                "src": "Soundboard/SoundBoard -Riff %232.wav",
-                "weight": 1
-            }
-        ]
-    },
-    "rah": {
-        "label": "Rah",
-        "variants": [
-            {
-                "src": "Soundboard/SoundBoard -rahhh.wav",
-                "weight": 14
-            },
-            {
-                "src": "Soundboard/SoundBoard -Rah %232.wav",
-                "weight": 1
-            }
-        ]
-    },
-    "question": {
-        "label": "Question",
-        "variants": [
-            {
-                "src": "Soundboard/SoundBoard -Question.wav"
-            }
-        ]
-    },
-    "whiplash": {
-        "label": "Whiplash",
-        "variants": [
-            {
-                "src": "Soundboard/SoundBoard -Whiplash %231.wav"
-            },
-            {
-                "src": "Soundboard/SoundBoard -Whiplash %232.wav"
-            }
-        ]
-    },
-    "frainbart": {
-        "label": "FrainBart",
-        "variants": [
-            {
-                "src": "Soundboard/SoundBoard -FrainBart.wav"
-            }
-        ]
-    },
-    "sotrue": {
-        "label": "So True",
-        "variants": [
-            {
-                "src": "Soundboard/SoundBoard -So True %231.wav"
-            },
-            {
-                "src": "Soundboard/SoundBoard -So True %232.wav"
+                "src": "Soundboard/SoundBoard%20-Dracula.wav"
             }
         ]
     },
@@ -103,12 +125,39 @@
         "label": "Fahh",
         "variants": [
             {
-                "src": "Soundboard/SoundBoard -Fahh %231.wav",
+                "src": "Soundboard/SoundBoard%20-Fahh%20%231.wav",
                 "weight": 90
             },
             {
-                "src": "Soundboard/SoundBoard -Fahh %232.wav",
+                "src": "Soundboard/SoundBoard%20-Fahh%20%232.wav",
                 "weight": 10
+            }
+        ]
+    },
+    "frainbart": {
+        "label": "FrainBart",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-FrainBart.wav"
+            }
+        ]
+    },
+    "green": {
+        "label": "Green",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Green.wav"
+            }
+        ]
+    },
+    "heynow": {
+        "label": "Hey Now",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Hey%20Now%201.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Hey%20Now%202.wav"
             }
         ]
     },
@@ -116,34 +165,94 @@
         "label": "Jacky",
         "variants": [
             {
-                "src": "Soundboard/SoundBoard -Jacky %231.wav"
+                "src": "Soundboard/SoundBoard%20-Jacky%20%231.wav"
             },
             {
-                "src": "Soundboard/SoundBoard -Jacky %232.wav"
+                "src": "Soundboard/SoundBoard%20-Jacky%20%232.wav"
             },
             {
-                "src": "Soundboard/SoundBoard -Jacky %233.wav"
+                "src": "Soundboard/SoundBoard%20-Jacky%20%233.wav"
             },
             {
-                "src": "Soundboard/SoundBoard -Jacky %234.wav"
+                "src": "Soundboard/SoundBoard%20-Jacky%20%234.wav"
             },
             {
-                "src": "Soundboard/SoundBoard -Jacky %235.wav"
+                "src": "Soundboard/SoundBoard%20-Jacky%20%235.wav"
             },
             {
-                "src": "Soundboard/SoundBoard -Jacky %236.wav"
+                "src": "Soundboard/SoundBoard%20-Jacky%20%236.wav"
             },
             {
-                "src": "Soundboard/SoundBoard -Jacky %237.wav"
+                "src": "Soundboard/SoundBoard%20-Jacky%20%237.wav"
             },
             {
-                "src": "Soundboard/SoundBoard -Jacky %238.wav"
+                "src": "Soundboard/SoundBoard%20-Jacky%20%238.wav"
             },
             {
-                "src": "Soundboard/SoundBoard -Jacky %239.wav"
+                "src": "Soundboard/SoundBoard%20-Jacky%20%239.wav"
             },
             {
-                "src": "Soundboard/SoundBoard -Jacky %2310.wav"
+                "src": "Soundboard/SoundBoard%20-Jacky%20%2310.wav"
+            }
+        ]
+    },
+    "lucky": {
+        "label": "Lucky for You",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Lucky%20for%20You%20%231.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Lucky%20for%20You%20%232.wav"
+            }
+        ]
+    },
+    "mow": {
+        "label": "Mow",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Mow.wav",
+                "weight": 10
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Mow%202.wav",
+                "weight": 5
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Mow%203.wav",
+                "weight": 5
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Mow%204.wav",
+                "weight": 5
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Mow%205.wav",
+                "weight": 5
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Mow%206.wav",
+                "weight": 5
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Mow%207.wav",
+                "weight": 5
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Mow%208.wav",
+                "weight": 5
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Mow%209.wav",
+                "weight": 5
+            }
+        ]
+    },
+    "neigh": {
+        "label": "Neigh",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Neigh.wav"
             }
         ]
     },
@@ -151,16 +260,16 @@
         "label": "No",
         "variants": [
             {
-                "src": "Soundboard/SoundBoard -No %231.wav"
+                "src": "Soundboard/SoundBoard%20-No%20%231.wav"
             },
             {
-                "src": "Soundboard/SoundBoard -No %232.wav"
+                "src": "Soundboard/SoundBoard%20-No%20%232.wav"
             },
             {
-                "src": "Soundboard/SoundBoard -No %233.wav"
+                "src": "Soundboard/SoundBoard%20-No%20%233.wav"
             },
             {
-                "src": "Soundboard/SoundBoard -No %234.wav"
+                "src": "Soundboard/SoundBoard%20-No%20%234.wav"
             }
         ]
     },
@@ -169,17 +278,100 @@
         "cooldownGroupMs": 5000,
         "variants": [
             {
-                "src": "Soundboard/SoundBoard -Nyaa %231.wav",
+                "src": "Soundboard/SoundBoard%20-Nyaa%20%231.wav",
                 "weight": 47
             },
             {
-                "src": "Soundboard/SoundBoard -Nyaa %232.wav",
+                "src": "Soundboard/SoundBoard%20-Nyaa%20%232.wav",
                 "weight": 47
             },
             {
-                "src": "Soundboard/SoundBoard -Nyaa %233.wav",
+                "src": "Soundboard/SoundBoard%20-Nyaa%20%233.wav",
                 "weight": 6,
                 "requiresCooldown": true
+            }
+        ]
+    },
+    "pipe": {
+        "label": "Pipe Fall",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Pipe%20Fall.wav"
+            }
+        ]
+    },
+    "question": {
+        "label": "Question",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Question.wav"
+            }
+        ]
+    },
+    "rah": {
+        "label": "Rah",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-rahhh.wav",
+                "weight": 14
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Rah%20%232.wav",
+                "weight": 1
+            }
+        ]
+    },
+    "riff": {
+        "label": "Riff",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Riff.wav",
+                "weight": 200
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Riff%20%232.wav",
+                "weight": 1
+            }
+        ]
+    },
+    "saystpot": {
+        "label": "Says the Pot",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Says%20the%20Pot.wav"
+            }
+        ]
+    },
+    "sotrue": {
+        "label": "So True",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-So%20True%20%231.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-So%20True%20%232.wav"
+            }
+        ]
+    },
+    "whathapp": {
+        "label": "What the Happ",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-What%20the%20Happ%201.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-What%20the%20Happ%202.wav"
+            }
+        ]
+    },
+    "whiplash": {
+        "label": "Whiplash",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Whiplash%20%231.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Whiplash%20%232.wav"
             }
         ]
     },
@@ -189,13 +381,13 @@
             "parts": 3,
             "variants": [
                 {
-                    "src": "Soundboard/Streamables -VOCO %231.wav"
+                    "src": "Soundboard/Streamables%20-VOCO%20%231.wav"
                 },
                 {
-                    "src": "Soundboard/Streamables -VOCO %232.wav"
+                    "src": "Soundboard/Streamables%20-VOCO%20%232.wav"
                 },
                 {
-                    "src": "Soundboard/Streamables -VOCO %233.wav"
+                    "src": "Soundboard/Streamables%20-VOCO%20%233.wav"
                 }
             ]
         },
@@ -204,12 +396,73 @@
             "parts": 2,
             "variants": [
                 {
-                    "src": "Soundboard/Streamables -VOCO1 Demo 2003 %231.wav"
+                    "src": "Soundboard/Streamables%20-VOCO1%20Demo%202003%20%231.wav"
                 },
                 {
-                    "src": "Soundboard/Streamables -VOCO1 Demo 2003 %232.wav"
+                    "src": "Soundboard/Streamables%20-VOCO1%20Demo%202003%20%232.wav"
                 }
             ]
         }
+    },
+    "hitit": {
+        "label": "Hit it",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-HitIt.wav"
+            }
+        ]
+    },
+    "gasstation": {
+        "label": "Gas Station",
+        "variants": [
+            {
+                "src": "Soundboard/Soundboard%20-Gas%20Station.wav",
+                "weight": 90
+            },
+            {
+                "src": "Soundboard/Soundboard%20-Gas%20Station%202.wav",
+                "weight": 10
+            }
+        ]
+    },
+    "fish": {
+        "label": "Fish",
+        "variants": [
+            {
+                "src": "Soundboard/Soundboard%20-Fish.wav",
+                "weight": 90
+            },
+            {
+                "src": "Soundboard/Soundboard%20-Fish%202.wav",
+                "weight": 10
+            }
+        ]
+    },
+    "vine": {
+        "label": "Vine",
+        "variants": [
+            {
+                "src": "Soundboard/Soundboard%20-Vine.wav"
+            }
+        ]
+    },
+    "ted": {
+        "label": "Ted",
+        "variants": [
+            {
+                "src": "Soundboard/Soundboard%20-Ted.wav"
+            }
+        ]
+    },
+    "fnor": {
+        "label": "Join Us",
+        "variants": [
+            {
+                "src": "Soundboard/Soundboard%20-Fnor.wav"
+            },
+            {
+                "src": "Soundboard/Soundboard%20-Fnor%202.wav"
+            }
+        ]
     }
 }
