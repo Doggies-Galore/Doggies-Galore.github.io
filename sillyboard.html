@@ -1169,8 +1169,8 @@
     <div class="modal-overlay" id="seguestions-modal" role="dialog" aria-modal="true" aria-label="Seguestions Box">
         <div class="modal-content">
             <h2>Seguestions Box</h2>
-            <p style="margin-bottom: 4px; font-size: 0.9rem; opacity: 0.7;">Send a suggestion, request, or just vibe.
-            </p>
+
+
 
             <div class="section-title" style="margin-top: 16px;">Who are you?</div>
             <div class="name-chips">
@@ -1216,8 +1216,35 @@
         <div class="modal-content">
             <h2>Settings</h2>
 
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+                <button class="btn" id="ux-settings-btn">Sillyboard UX</button>
+                <button class="btn" id="theme-settings-btn">Theme</button>
+                <button class="btn" id="audio-settings-btn">Audio</button>
+                <button class="btn" id="accessibility-settings-btn">Accessibility</button>
+                <button class="btn" id="changelog-btn">Changelog</button>
+                <button class="btn" id="seguestions-box-btn">Seguestions Box</button>
+            </div>
+
+            <div style="margin-top: 24px;">
+                <button class="btn" id="refresh-sillyboard-btn"
+                    style="width: 100%; border-color: #ff4444; color: #ff4444;">Refresh Sillyboard</button>
+            </div>
+
+            <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;"
+                class="modal-close-row">
+                <button class="modal-close-btn" id="settings-close">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UX Settings Modal -->
+    <div class="modal-overlay" id="ux-settings-modal" role="dialog" aria-modal="true"
+        aria-label="Sillyboard UX Settings">
+        <div class="modal-content">
+            <h2>Sillyboard UX</h2>
+
             <!-- Navigation UX -->
-            <div class="section-title">Navigation UX</div>
+            <div class="section-title" style="margin-top: 20px;">Navigation UX</div>
             <div class="custom-slider-container"
                 style="flex-direction:row; align-items:center; justify-content: space-between; margin-bottom: 24px;">
                 <label for="nav-mode-cbx"
@@ -1234,7 +1261,19 @@
                 <div class="hotbar-sound-picker" id="hotbar-picker"></div>
             </div>
 
-            <div style="margin-top: clamp(14px,3vw,24px)">
+            <div class="modal-close-row"
+                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="modal-close-btn" id="ux-settings-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Settings Modal -->
+    <div class="modal-overlay" id="theme-settings-modal" role="dialog" aria-modal="true" aria-label="Theme Settings">
+        <div class="modal-content">
+            <h2>Theme</h2>
+
+            <div style="margin-top: 20px;">
                 <div class="section-title">Theme Presets</div>
             </div>
             <div class="theme-grid">
@@ -1258,7 +1297,7 @@
                 <button class="btn" onclick="setTheme('#4b2e2a','#fff3e0')">Cuddlebug</button>
             </div>
 
-            <div class="section-title">Custom Theme</div>
+            <div class="section-title" style="margin-top: 20px;">Custom Theme</div>
             <div class="picker-row">
                 <div class="color-picker-wrap">
                     <span>Background</span>
@@ -1270,8 +1309,20 @@
                 </div>
             </div>
 
+            <div class="modal-close-row"
+                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="modal-close-btn" id="theme-settings-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Settings Modal -->
+    <div class="modal-overlay" id="audio-settings-modal" role="dialog" aria-modal="true" aria-label="Audio Settings">
+        <div class="modal-content">
+            <h2>Audio</h2>
+
             <!-- Amplification -->
-            <div class="amp-section">
+            <div class="amp-section" style="margin-top: 20px;">
                 <div class="section-title">Amplification</div>
                 <div class="amp-slider-row">
                     <input type="range" id="amp-slider" class="amp-slider" min="0" max="300" step="1" value="100"
@@ -1281,22 +1332,48 @@
                 <p class="amp-reset-hint">Double-tap slider to reset to 100%</p>
             </div>
 
-            <!-- Seguestions Box -->
-            <div style="margin-top: clamp(14px,3vw,24px); margin-bottom: 12px;">
-                <button class="btn" id="seguestions-box-btn"
-                    style="width: 100%; font-weight: 900; font-size: clamp(0.95rem,2.5vw,1.1rem);">Seguestions
-                    Box</button>
+            <div class="modal-close-row"
+                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="modal-close-btn" id="audio-settings-close">Back</button>
             </div>
+        </div>
+    </div>
 
-            <div style="margin-bottom: 24px;">
-                <button class="btn" id="refresh-sillyboard-btn"
-                    style="width: 100%; border-color: #ff4444; color: #ff4444;">Refresh Sillyboard</button>
+    <!-- Accessibility Settings Modal -->
+    <div class="modal-overlay" id="accessibility-settings-modal" role="dialog" aria-modal="true" aria-label="Accessibility Settings">
+        <div class="modal-content">
+            <h2>Accessibility</h2>
+
+            <div class="custom-slider-container"
+                style="flex-direction:row; align-items:center; justify-content: space-between; margin-top: 20px; margin-bottom: 8px;">
+                <label for="disable-theme-sound-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    Disable changing theme with sound
+                </label>
+                <input type="checkbox" id="disable-theme-sound-cbx">
             </div>
+            <p style="font-size: 0.85rem; opacity: 0.7; margin-top: 0; margin-bottom: 24px; line-height: 1.4;">
+                When a sound with an associated theme is played, the theme will no longer change for those sounds.
+            </p>
 
-            <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 24px;"></div>
+            <div class="modal-close-row"
+                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="modal-close-btn" id="accessibility-settings-close">Back</button>
+            </div>
+        </div>
+    </div>
 
-            <div class="modal-close-row">
-                <button class="modal-close-btn" id="settings-close">Done</button>
+    <!-- Changelog Modal -->
+    <div class="modal-overlay" id="changelog-modal" role="dialog" aria-modal="true" aria-label="Changelog">
+        <div class="modal-content">
+            <h2>Changelog</h2>
+            <div id="changelog-list"
+                style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px; max-height: 60vh; overflow-y: auto;">
+                <p style="text-align: center; opacity: 0.5;">Loading...</p>
+            </div>
+            <div class="modal-close-row"
+                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="modal-close-btn" id="changelog-close">Back</button>
             </div>
         </div>
     </div>
@@ -1365,6 +1442,108 @@
 
         // ── Settings modal ────────────────────────────────────────────────
         const settingsModal = document.getElementById('settings-modal');
+        const uxSettingsModal = document.getElementById('ux-settings-modal');
+        const themeSettingsModal = document.getElementById('theme-settings-modal');
+        const audioSettingsModal = document.getElementById('audio-settings-modal');
+        const accessibilitySettingsModal = document.getElementById('accessibility-settings-modal');
+        const changelogModal = document.getElementById('changelog-modal');
+
+        document.getElementById('ux-settings-btn').addEventListener('click', () => {
+            renderHotbarConfig();
+            uxSettingsModal.classList.add('active');
+        });
+        document.getElementById('theme-settings-btn').addEventListener('click', () => {
+            syncPickersToTheme();
+            themeSettingsModal.classList.add('active');
+        });
+        document.getElementById('audio-settings-btn').addEventListener('click', () => {
+            updateAmpUI(currentGain);
+            audioSettingsModal.classList.add('active');
+        });
+        document.getElementById('accessibility-settings-btn').addEventListener('click', () => {
+            accessibilitySettingsModal.classList.add('active');
+        });
+        document.getElementById('changelog-btn').addEventListener('click', () => {
+            loadChangelog();
+            changelogModal.classList.add('active');
+        });
+
+        document.getElementById('ux-settings-close').addEventListener('click', () => {
+            uxSettingsModal.classList.remove('active');
+        });
+        document.getElementById('theme-settings-close').addEventListener('click', () => {
+            themeSettingsModal.classList.remove('active');
+        });
+        document.getElementById('audio-settings-close').addEventListener('click', () => {
+            audioSettingsModal.classList.remove('active');
+        });
+        document.getElementById('accessibility-settings-close').addEventListener('click', () => {
+            accessibilitySettingsModal.classList.remove('active');
+        });
+        document.getElementById('changelog-close').addEventListener('click', () => {
+            changelogModal.classList.remove('active');
+        });
+
+        // Close on overlay click
+        uxSettingsModal.addEventListener('click', (e) => {
+            if (e.target === uxSettingsModal) uxSettingsModal.classList.remove('active');
+        });
+        themeSettingsModal.addEventListener('click', (e) => {
+            if (e.target === themeSettingsModal) themeSettingsModal.classList.remove('active');
+        });
+        audioSettingsModal.addEventListener('click', (e) => {
+            if (e.target === audioSettingsModal) audioSettingsModal.classList.remove('active');
+        });
+        accessibilitySettingsModal.addEventListener('click', (e) => {
+            if (e.target === accessibilitySettingsModal) accessibilitySettingsModal.classList.remove('active');
+        });
+        changelogModal.addEventListener('click', (e) => {
+            if (e.target === changelogModal) changelogModal.classList.remove('active');
+        });
+
+        async function loadChangelog() {
+            const listEl = document.getElementById('changelog-list');
+            try {
+                const res = await fetch('Soundboard/changelog.json');
+                const data = await res.json();
+
+                listEl.innerHTML = '';
+                data.forEach(entry => {
+                    const item = document.createElement('div');
+                    item.style.background = 'rgba(255,255,255,0.05)';
+                    item.style.padding = '15px';
+                    item.style.borderRadius = '12px';
+
+                    let html = `<h3 style="margin: 0; font-size: 1.1rem; color: var(--accent-color); margin-bottom: 5px;">${entry.title || 'Update'}</h3>`;
+
+                    if (entry.subtitle) {
+                        html += `<div style="font-size: 0.95rem; font-weight: bold; margin-bottom: 8px; opacity: 0.9;">${entry.subtitle}</div>`;
+                    }
+
+                    let formattedDate = entry.date;
+                    if (entry.date) {
+                        const parts = entry.date.split('-');
+                        if (parts.length === 3) {
+                            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                            formattedDate = `${months[parseInt(parts[1], 10) - 1]} ${parseInt(parts[2], 10)}, ${parts[0]}`;
+                        }
+                    }
+
+                    html += `<div style="font-size: 0.8rem; opacity: 0.6; font-family: monospace; margin-bottom: 10px;">v${entry.version} • ${formattedDate}</div>`;
+
+                    if (entry.description) {
+                        html += `<div style="font-size: 0.9rem; opacity: 0.8; line-height: 1.4;">${entry.description}</div>`;
+                    }
+
+                    item.innerHTML = html;
+                    listEl.appendChild(item);
+                });
+            } catch (err) {
+                listEl.innerHTML = '<p style="text-align: center; color: #ff4444;">Could not load changelog.</p>';
+            }
+        }
+
+
 
         const refreshBtn = document.getElementById('refresh-sillyboard-btn');
         const refreshModal = document.getElementById('refresh-modal');
@@ -1411,17 +1590,21 @@
             buildPages();
         });
 
+        let disableThemeSound = localStorage.getItem('sillyboard-disable-theme-sound') === 'true';
+        const disableThemeSoundCbx = document.getElementById('disable-theme-sound-cbx');
+        disableThemeSoundCbx.checked = disableThemeSound;
+        disableThemeSoundCbx.addEventListener('change', () => {
+            disableThemeSound = disableThemeSoundCbx.checked;
+            localStorage.setItem('sillyboard-disable-theme-sound', disableThemeSound);
+        });
+
         document.getElementById('settings-btn').addEventListener('click', () => {
-            syncPickersToTheme();
-            updateAmpUI(currentGain);
-            renderHotbarConfig();
             settingsModal.classList.add('active');
         });
 
         document.getElementById('settings-close').addEventListener('click', () => {
             settingsModal.classList.remove('active');
         });
-
         settingsModal.addEventListener('click', (e) => {
             if (e.target === settingsModal) settingsModal.classList.remove('active');
         });
@@ -1445,10 +1628,12 @@
 
             // iOS WebKit aggressively suspends idle AudioContexts to save battery,
             // which introduces a 300-500ms hardware wakeup penalty on your next tap.
-            // We prevent this by continuously playing a sub-audible hum (1Hz at 0.001 gain).
+            // We prevent this by continuously playing an inaudible ultrasonic tone.
+            // (Using a 1Hz tone caused a 500ms zero-crossing stutter in CarPlay, and white noise was audible in headphones).
             const silentOsc = audioCtx.createOscillator();
             const silentNode = audioCtx.createGain();
-            silentOsc.frequency.value = 1;
+            silentOsc.type = 'sine';
+            silentOsc.frequency.value = 20000; // 20kHz is ultrasonic (inaudible) but keeps the context fully awake
             silentNode.gain.value = 0.001;
             silentOsc.connect(silentNode);
             silentNode.connect(audioCtx.destination);
@@ -2870,6 +3055,8 @@
                 "Nooeeeee",
                 "Cuddlebug found The Opioids",
                 "Absolute Cinema",
+                "Legitimately want blood",
+                "I'm back in the FUCKING BUILDING AGAIN!",
                 "Consumption :3",
                 "What the happ is fuckening?",
                 "Dr. Yaoi ftw"
@@ -3131,7 +3318,7 @@
             if (hotbarBtn) hotbarBtn.classList.add('playing');
 
             if (key === 'green') {
-                applyThemeNoSave('#00ff00', '#006600');
+                if (!disableThemeSound) applyThemeNoSave('#00ff00', '#006600');
             }
 
             source.addEventListener('ended', () => {
@@ -3151,7 +3338,7 @@
                     if (currentHotbarBtn) currentHotbarBtn.classList.remove('playing');
 
                     if (key === 'green') {
-                        restoreTheme();
+                        if (!disableThemeSound) restoreTheme();
                     }
                 }
             });
@@ -3220,9 +3407,10 @@
 
         // ── Service Worker registration ──────────────────────────────────
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js', { scope: './' })
+            navigator.serviceWorker.register('./sw.js?v=2', { scope: './' })
                 .catch(() => { });
         }
+
 
         // ── Autoplay unlock on first touch ──────────────────────────────
         function _unlockAudio() {

@@ -1,12 +1,13 @@
 'use strict';
 
 // Bump this version string to gracefully wipe out bad caches if breaking changes require it.
-const CACHE = 'sillyboard-dynamic-v1';
+const CACHE = 'sillyboard-dynamic-v2';
 
 // We only rigidly precache the core shell
 const CORE_URLS = [
     './',
-    'sillyboard.html'
+    'sillyboard.html',
+    'index.html'
 ];
 
 self.addEventListener('install', event => {
@@ -29,32 +30,22 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
     if (event.request.method !== 'GET') return;
-    const url = new URL(event.request.url);
 
-    // Dynamic JSON -> Network First, fallback to cache
-    // This allows editing sounds.json without bumping SW version!
-    if (url.pathname.endsWith('sounds.json')) {
-        event.respondWith(
-            fetch(event.request).then(response => {
+    // Network-First Strategy: Try the network first.
+    // This ensures latest files (GUI, sounds.json, wavs) are used if online.
+    // If network fails (offline), fall back to the cache.
+    event.respondWith(
+        fetch(event.request).then(response => {
+            // Update the cache with the fresh version
+            if (response && response.ok) {
                 const clone = response.clone();
                 caches.open(CACHE).then(cache => cache.put(event.request, clone));
-                return response;
-            }).catch(() => caches.match(event.request))
-        );
-        return;
-    }
-
-    // Everything else (.wav files, etc) -> Cache First, fallback to Network (then dynamically cache)
-    event.respondWith(
-        caches.match(event.request).then(cached => {
-            if (cached) return cached;
-            return fetch(event.request).then(response => {
-                if (response && response.ok && response.type === 'basic') {
-                    const clone = response.clone();
-                    caches.open(CACHE).then(cache => cache.put(event.request, clone));
-                }
-                return response;
-            }).catch(() => { });
+            }
+            return response;
+        }).catch(() => {
+            // Offline fallback
+            return caches.match(event.request);
         })
     );
 });
+
