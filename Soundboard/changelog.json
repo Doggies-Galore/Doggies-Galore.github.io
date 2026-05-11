@@ -1,0 +1,9 @@
+[
+  {
+    "version": "0.4.0",
+    "date": "2026-05-10",
+    "title": "What are you doing in my house!?",
+    "subtitle": "Network-First caching before GTA VI?",
+    "description": "I appear to have made an oopsie when designing the loading system, because allthough the sound buttons updated, the actual sounds and UX did not update on refresh- instead prioritizing the local copy, which could be weeks old."
+  }
+]

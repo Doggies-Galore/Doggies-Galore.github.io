@@ -453,5 +453,16 @@
                 "src": "Soundboard/Soundboard%20-Ted.wav"
             }
         ]
+    },
+    "fnor": {
+        "label": "Join Us",
+        "variants": [
+            {
+                "src": "Soundboard/Soundboard%20-Fnor.wav"
+            },
+            {
+                "src": "Soundboard/Soundboard%20-Fnor%202.wav"
+            }
+        ]
     }
 }
