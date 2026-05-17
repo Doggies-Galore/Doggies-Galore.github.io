@@ -83,6 +83,8 @@
 
         html {
             background-color: var(--bg-color);
+            transform: translateZ(0);
+            /* Promote root to own compositing layer for smoother color transitions */
         }
 
         :root {
@@ -98,7 +100,7 @@
                 background-color 0.15s ease,
                 color 0.15s ease,
                 opacity 0.15s ease;
-            will-change: transform, background-color, color;
+            /* will-change removed: permanent GPU layer promotion for ~12 idle buttons wastes VRAM and compositing bandwidth */
         }
 
         .hdr-btn {
@@ -244,6 +246,8 @@
             padding: clamp(8px, 2vmin, 16px) clamp(10px, 3vmin, 24px);
             overflow: hidden;
             touch-action: manipulation;
+            contain: layout style;
+            /* Limit repaint scope during theme transitions */
         }
 
         .sound-btn {
@@ -330,10 +334,14 @@
 
         #loading-bar {
             height: 100%;
-            width: 0%;
+            width: 100%;
             background: var(--accent-color);
             border-radius: 3px;
-            transition: width 0.15s ease;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.15s ease;
+            will-change: transform;
+            /* Only element that actually benefits from permanent GPU promotion */
         }
 
         @keyframes pulse {
@@ -392,12 +400,14 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
-            backdrop-filter: blur(6px);
+            /* backdrop-filter moved to .active — inactive modals no longer allocate blur compositing layers */
         }
 
         .modal-overlay.active {
             opacity: 1;
             pointer-events: auto;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
         }
 
         .modal-content {
@@ -1340,7 +1350,8 @@
     </div>
 
     <!-- Accessibility Settings Modal -->
-    <div class="modal-overlay" id="accessibility-settings-modal" role="dialog" aria-modal="true" aria-label="Accessibility Settings">
+    <div class="modal-overlay" id="accessibility-settings-modal" role="dialog" aria-modal="true"
+        aria-label="Accessibility Settings">
         <div class="modal-content">
             <h2>Accessibility</h2>
 
@@ -1404,6 +1415,9 @@
             document.documentElement.style.setProperty('--accent-color', ac);
             localStorage.setItem('sillyboard-bg', bg);
             localStorage.setItem('sillyboard-accent', ac);
+            
+            // Sync to cloud
+            saveProfileToCloud();
         }
 
         function applyThemeNoSave(bg, ac) {
@@ -1412,10 +1426,38 @@
             document.documentElement.style.setProperty('--accent-color', ac);
         }
 
+        let isEventModeActive = false;
+        let eventModeThemeBg = '';
+        let eventModeThemeAc = '';
+
         function restoreTheme() {
+            if (isEventModeActive && eventModeThemeBg && eventModeThemeAc) {
+                applyThemeNoSave(eventModeThemeBg, eventModeThemeAc);
+                return;
+            }
             const bg = localStorage.getItem('sillyboard-bg') || '#000000';
             const ac = localStorage.getItem('sillyboard-accent') || '#ffffff';
             applyThemeNoSave(bg, ac);
+        }
+
+        function handleEventMode(state) {
+            isEventModeActive = state.active;
+            eventModeThemeBg = state.themeBg;
+            eventModeThemeAc = state.themeAc;
+
+            if (state.active) {
+                if (state.themeBg && state.themeAc) {
+                    applyThemeNoSave(state.themeBg, state.themeAc);
+                }
+                if (state.loadingText) {
+                    const textEl = document.getElementById('loading-text');
+                    if (textEl && document.getElementById('loading-overlay')) {
+                        textEl.textContent = state.loadingText;
+                    }
+                }
+            } else {
+                restoreTheme();
+            }
         }
 
         const bgPicker = document.getElementById('bg-picker');
@@ -1559,9 +1601,12 @@
         });
 
         refreshYe.addEventListener('click', async () => {
+            // Set flag to force cache-busting fetches on next load
+            sessionStorage.setItem('sillyboard-force-refresh', 'true');
+            
             localStorage.clear();
-            sessionStorage.clear();
-
+            // We don't clear sessionStorage here because we need the flag
+            
             if ('caches' in window) {
                 try {
                     const cacheNames = await caches.keys();
@@ -1576,7 +1621,8 @@
                 } catch (e) { }
             }
 
-            location.reload();
+            // Hard reload to bypass browser HTTP cache
+            location.reload(true);
         });
 
 
@@ -1588,6 +1634,7 @@
             navMode = navModeCbx.checked ? 'categories' : 'hotbar';
             localStorage.setItem('sillyboard-nav-mode', navMode);
             buildPages();
+            saveProfileToCloud();
         });
 
         let disableThemeSound = localStorage.getItem('sillyboard-disable-theme-sound') === 'true';
@@ -1596,6 +1643,7 @@
         disableThemeSoundCbx.addEventListener('change', () => {
             disableThemeSound = disableThemeSoundCbx.checked;
             localStorage.setItem('sillyboard-disable-theme-sound', disableThemeSound);
+            saveProfileToCloud();
         });
 
         document.getElementById('settings-btn').addEventListener('click', () => {
@@ -1658,6 +1706,7 @@
             updateAmpUI(currentGain);
             localStorage.setItem('sillyboard-gain', currentGain);
             if (gainNode) gainNode.gain.setTargetAtTime(currentGain, audioCtx.currentTime, 0.01);
+            saveProfileToCloud();
         });
 
         let ampLastTap = 0;
@@ -1666,6 +1715,7 @@
             updateAmpUI(1);
             localStorage.setItem('sillyboard-gain', '1');
             if (gainNode) gainNode.gain.setTargetAtTime(1, audioCtx.currentTime, 0.01);
+            saveProfileToCloud();
         });
         ampSlider.addEventListener('touchend', () => {
             const now = Date.now();
@@ -1674,6 +1724,7 @@
                 updateAmpUI(1);
                 localStorage.setItem('sillyboard-gain', '1');
                 if (gainNode) gainNode.gain.setTargetAtTime(1, audioCtx.currentTime, 0.01);
+                saveProfileToCloud();
             }
             ampLastTap = now;
         }, { passive: true });
@@ -1897,6 +1948,12 @@
                 } else if (data.type === 'voice_message') {
                     if (data.clientId === myClientId) return;
                     handleVoiceMessage(data.audio);
+                } else if (data.type === 'profile_data') {
+                    if (data.profile) {
+                        applyCloudProfile(data.profile);
+                    }
+                } else if (data.type === 'event_mode') {
+                    handleEventMode(data.state);
                 }
             };
 
@@ -1949,6 +2006,83 @@
                 ...info,
                 theme: localStorage.getItem('sillyboard-bg') || 'Default'
             }));
+            
+            // Request cloud profile load
+            requestCloudProfile();
+        }
+
+        async function generateFingerprint() {
+            const info = parseDeviceInfo();
+            const screenInfo = `${window.screen.width}x${window.screen.height}x${window.devicePixelRatio}`;
+            // Include user agent for more entropy, but normalized
+            const raw = `${info.os}|${info.model}|${info.browser}|${screenInfo}|${navigator.platform}`;
+            
+            // SHA-256 hash for privacy ("encryption")
+            const msgBuffer = new TextEncoder().encode(raw);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function requestCloudProfile() {
+            if (!repeaterSocket || repeaterSocket.readyState !== WebSocket.OPEN) return;
+            const fp = await generateFingerprint();
+            repeaterSocket.send(JSON.stringify({
+                type: 'profile_load',
+                fingerprint: fp
+            }));
+        }
+
+        async function saveProfileToCloud() {
+            if (!repeaterEnabled || !repeaterSocket || repeaterSocket.readyState !== WebSocket.OPEN) return;
+            
+            const fp = await generateFingerprint();
+            const profile = {
+                bg: localStorage.getItem('sillyboard-bg'),
+                accent: localStorage.getItem('sillyboard-accent'),
+                navMode: localStorage.getItem('sillyboard-nav-mode'),
+                gain: localStorage.getItem('sillyboard-gain'),
+                hotbar: localStorage.getItem('sillyboard-hotbar'),
+                disableThemeSound: localStorage.getItem('sillyboard-disable-theme-sound')
+            };
+
+            repeaterSocket.send(JSON.stringify({
+                type: 'profile_save',
+                fingerprint: fp,
+                profile: profile
+            }));
+        }
+
+        function applyCloudProfile(p) {
+            // Only apply if we are "fresh" (nothing in localStorage for key things)
+            // This prevents the cloud from overwriting local changes if the user just changed something
+            const isFresh = !localStorage.getItem('sillyboard-bg');
+            
+            if (isFresh) {
+                if (p.bg && p.accent) setTheme(p.bg, p.accent);
+                if (p.navMode) {
+                    localStorage.setItem('sillyboard-nav-mode', p.navMode);
+                    navMode = p.navMode;
+                    navModeCbx.checked = navMode === 'categories';
+                    buildPages();
+                }
+                if (p.gain) {
+                    localStorage.setItem('sillyboard-gain', p.gain);
+                    currentGain = parseFloat(p.gain);
+                    ampSlider.value = currentGain;
+                    ampVal.textContent = currentGain.toFixed(1) + 'x';
+                }
+                if (p.hotbar) {
+                    localStorage.setItem('sillyboard-hotbar', p.hotbar);
+                    hotbarSlots = JSON.parse(p.hotbar);
+                    renderHotbar();
+                }
+                if (p.disableThemeSound) {
+                    localStorage.setItem('sillyboard-disable-theme-sound', p.disableThemeSound);
+                    disableThemeSound = p.disableThemeSound === 'true';
+                    document.getElementById('disable-theme-sound-cbx').checked = disableThemeSound;
+                }
+            }
         }
 
         // ── Voice Messaging ──────────────────────────────────────────────────
@@ -2675,6 +2809,7 @@
 
         function saveHotbar() {
             localStorage.setItem('sillyboard-hotbar', JSON.stringify(hotbarSlots));
+            saveProfileToCloud();
         }
 
         // ── Build board & hotbar (called after JSON load) ──────────────────
@@ -3056,7 +3191,7 @@
                 "Cuddlebug found The Opioids",
                 "Absolute Cinema",
                 "Legitimately want blood",
-                "I'm back in the FUCKING BUILDING AGAIN!",
+                "Back in the FUCKING BUILDING!",
                 "Consumption :3",
                 "What the happ is fuckening?",
                 "Dr. Yaoi ftw"
@@ -3065,14 +3200,20 @@
             const textEl = document.getElementById('loading-text');
             if (textEl) textEl.textContent = randomPhrase;
 
+            let loadingDismissed = false;
+
             try {
                 // Fetch dynamic config
-                const configRes = await fetch('Soundboard/sounds.json');
+                const forceRefresh = sessionStorage.getItem('sillyboard-force-refresh') === 'true';
+                const t = forceRefresh ? `?t=${Date.now()}` : '';
+                if (forceRefresh) sessionStorage.removeItem('sillyboard-force-refresh');
+
+                const configRes = await fetch('Soundboard/sounds.json' + t);
                 SOUND_DEFS = await configRes.json();
                 SOUND_KEYS = Object.keys(SOUND_DEFS);
 
                 try {
-                    const pagesRes = await fetch('Soundboard/pages.json');
+                    const pagesRes = await fetch('Soundboard/pages.json' + t);
                     PAGES_DEF = await pagesRes.json();
                 } catch (e) {
                     PAGES_DEF = {};
@@ -3088,7 +3229,7 @@
                     if (key === 'locked' || key === 'streamables') continue;
                     const def = SOUND_DEFS[key];
                     if (def.variants) {
-                        def.variants.forEach((v, idx) => allFetches.push({ key, src: v.src, idx }));
+                        def.variants.forEach((v, idx) => allFetches.push({ key, src: v.src + t, idx }));
                     }
                 }
 
@@ -3096,68 +3237,111 @@
                 if (SOUND_DEFS.streamables) {
                     Object.keys(SOUND_DEFS.streamables).forEach(key => {
                         const s = SOUND_DEFS.streamables[key];
-                        s.variants.forEach((v, idx) => allFetches.push({ key, src: v.src, idx }));
+                        s.variants.forEach((v, idx) => allFetches.push({ key, src: v.src + t, idx }));
                     });
                 }
 
-                let fetchLoaded = 0;
-                const fetchTotal = allFetches.length;
+                let loaded = 0;
+                const total = allFetches.length;
+
+                // Determine which sounds the current page needs for early-unlock
+                const firstPageKeys = new Set();
+                if (pagesArray.length > 0) {
+                    pagesArray[0].keys.forEach(k => { if (!k.startsWith('_rec_')) firstPageKeys.add(k); });
+                }
+
+                function tryEarlyUnlock() {
+                    if (loadingDismissed) return;
+                    // Check if all first-page sounds have at least one decoded variant
+                    for (const k of firstPageKeys) {
+                        if (!bufferCache[k] || bufferCache[k].length === 0) return;
+                    }
+                    // First page ready — dismiss loading and enable playback immediately
+                    loadingDismissed = true;
+                    audioLoaded = true;
+                    Object.entries(boardButtons).forEach(([key, btn]) => {
+                        if (btn) bindPressEvent(btn, key);
+                    });
+                    loadingOverlay.classList.add('hidden');
+                    setTimeout(() => { if (loadingOverlay.parentNode) loadingOverlay.remove(); }, 400);
+                }
+
+                // Decode-as-you-fetch: each sound decodes immediately when its fetch completes
+                // This parallelizes network I/O with CPU decode work
+                const DECODE_CONCURRENCY = 6;
+                let activeDecodes = 0;
+                const decodeQueue = [];
+
+                function processDecodeQueue() {
+                    while (activeDecodes < DECODE_CONCURRENCY && decodeQueue.length > 0) {
+                        const payload = decodeQueue.shift();
+                        activeDecodes++;
+                        audioCtx.decodeAudioData(payload.arr).then(audioBuffer => {
+                            if (!bufferCache[payload.key]) bufferCache[payload.key] = [];
+                            bufferCache[payload.key].push(audioBuffer);
+
+                            // Peak Analysis for per-sound Auto-Gain
+                            let max = 0;
+                            const channelData = audioBuffer.getChannelData(0);
+                            for (let i = 0; i < channelData.length; i += 100) {
+                                const val = Math.abs(channelData[i]);
+                                if (val > max) max = val;
+                            }
+                            const variantId = `${payload.key}:${bufferCache[payload.key].length - 1}`;
+                            bufferPeaks[variantId] = max || 1.0;
+
+                            tryEarlyUnlock();
+                        }).catch(e => {
+                            console.error("Failed to decode", payload.src, e);
+                        }).finally(() => {
+                            activeDecodes--;
+                            processDecodeQueue();
+                        });
+                    }
+                }
 
                 const fetchPromises = allFetches.map(item =>
                     fetch(item.src)
                         .then(r => r.arrayBuffer())
                         .then(arr => {
-                            fetchLoaded++;
-                            const pct = Math.floor((fetchLoaded / fetchTotal) * 100);
-                            loadingBar.style.width = pct + '%';
-                            return { key: item.key, arr, src: item.src };
+                            loaded++;
+                            loadingBar.style.transform = `scaleX(${loaded / total})`;
+                            // Immediately queue for decode
+                            decodeQueue.push({ key: item.key, arr, src: item.src });
+                            processDecodeQueue();
                         })
                         .catch(err => {
+                            loaded++;
+                            loadingBar.style.transform = `scaleX(${loaded / total})`;
                             console.error("Failed fetching", item.src, err);
-                            return null;
                         })
                 );
 
-                const buffers = await Promise.all(fetchPromises);
+                await Promise.all(fetchPromises);
 
-                loadingBar.style.width = '100%';
-                await new Promise(r => setTimeout(r, 150));
+                // Wait for all remaining decodes to finish
+                await new Promise(resolve => {
+                    const check = () => {
+                        if (activeDecodes === 0 && decodeQueue.length === 0) resolve();
+                        else setTimeout(check, 50);
+                    };
+                    check();
+                });
 
-                for (const payload of buffers) {
-                    if (!payload) continue;
-                    try {
-                        const audioBuffer = await audioCtx.decodeAudioData(payload.arr);
-                        if (!bufferCache[payload.key]) bufferCache[payload.key] = [];
-                        bufferCache[payload.key].push(audioBuffer);
-
-                        // Peak Analysis for per-sound Auto-Gain
-                        let max = 0;
-                        const channelData = audioBuffer.getChannelData(0);
-                        // Sample-based peak (every 100th to save compute)
-                        for (let i = 0; i < channelData.length; i += 100) {
-                            const val = Math.abs(channelData[i]);
-                            if (val > max) max = val;
-                        }
-                        // Store peak for this specific variant
-                        const variantId = `${payload.key}:${bufferCache[payload.key].length - 1}`;
-                        bufferPeaks[variantId] = max || 1.0;
-                    } catch (e) {
-                        console.error("Failed to decode", payload.src, e);
-                    }
-                }
             } catch (err) {
                 console.error('Fatal Error:', err);
                 alert('Fatal Error: Failed to load or decode sounds.');
             } finally {
-                loadingOverlay.classList.add('hidden');
-                setTimeout(() => loadingOverlay.remove(), 400);
+                // Final safety: ensure loading is dismissed even if early unlock didn't fire
+                if (!loadingDismissed) {
+                    audioLoaded = true;
+                    Object.entries(boardButtons).forEach(([key, btn]) => {
+                        if (btn) bindPressEvent(btn, key);
+                    });
+                    loadingOverlay.classList.add('hidden');
+                    setTimeout(() => { if (loadingOverlay.parentNode) loadingOverlay.remove(); }, 400);
+                }
             }
-
-            // Audio ready — bind events for whatever page is currently rendered
-            audioLoaded = true;
-            Object.entries(boardButtons).forEach(([key, btn]) => {
-                if (btn) bindPressEvent(btn, key);
-            });
         }
 
         // ── Variant routing explicitly derived from variants JSON config ──────────────
@@ -3407,7 +3591,7 @@
 
         // ── Service Worker registration ──────────────────────────────────
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js?v=2', { scope: './' })
+            navigator.serviceWorker.register('./sw.js?v=3', { scope: './' })
                 .catch(() => { });
         }
 
