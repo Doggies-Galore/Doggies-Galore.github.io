@@ -138,7 +138,7 @@
         "label": "FrainBart",
         "variants": [
             {
-                "src": "Soundboard/SoundBoard%20-FrainBart.wav"
+                "src": "Soundboard/SoundBoardFrainBart.wav"
             }
         ]
     },
@@ -312,11 +312,11 @@
         "label": "Rah",
         "variants": [
             {
-                "src": "Soundboard/SoundBoard%20-rahhh.wav",
+                "src": "Soundboard/SoundBoardr1.wav",
                 "weight": 14
             },
             {
-                "src": "Soundboard/SoundBoard%20-Rah%20%232.wav",
+                "src": "Soundboard/SoundBoardr2.wav",
                 "weight": 1
             }
         ]
