@@ -282,6 +282,19 @@
             color: var(--bg-color);
         }
 
+        /* Loading state for on-demand fetch */
+        @keyframes sound-btn-pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        .sound-btn.loading {
+            animation: sound-btn-pulse 1s infinite ease-in-out;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-style: dashed;
+        }
+
         /* Only scale on hover/active for non-touch devices to avoid scroll jitter */
         @media (hover: hover) {
 
@@ -774,24 +787,25 @@
             flex-shrink: 0;
             display: flex;
             align-items: center;
-            padding: 12px clamp(10px, 3vmin, 24px) clamp(12px, 3vmin, 24px);
-            border-top: 2px solid var(--accent-color);
-            gap: clamp(6px, 1.5vmin, 12px);
+            padding: 10px 18px;
+            border-top: 3px solid var(--accent-color);
+            gap: 10px;
         }
 
         .nav-btn {
             flex: 1;
             background: transparent;
             color: var(--accent-color);
-            border: 3px solid var(--accent-color);
-            padding: 18px 26px;
-            border-radius: 20px;
-            font-size: clamp(1.5rem, 4vw, 2rem);
-            font-weight: 900;
+            border: 2px solid var(--accent-color);
+            padding: 8px 20px;
+            border-radius: 14px;
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
+            font-weight: bold;
             font-family: inherit;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background 0.15s, color 0.15s, opacity 0.15s;
             touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .nav-btn:hover {
@@ -799,9 +813,14 @@
             color: var(--bg-color);
         }
 
-        .nav-btn:disabled {
-            opacity: 0.2;
-            pointer-events: none;
+        .nav-btn:active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 0.7;
+        }
+
+        .nav-btn:focus {
+            outline: none;
         }
 
         .nav-btn:disabled {
@@ -985,10 +1004,6 @@
                 <button class="btn" id="remote-mode-btn">Remote Device List</button>
             </div>
 
-            <div id="admin-override-section" style="display: none;">
-                <div class="section-title" style="margin-top: 30px;">Board Status</div>
-                <button class="btn" id="lock-board-btn" style="width: 100%;">Override: Close Board</button>
-            </div>
 
             <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;"
                 class="modal-close-row">
@@ -1227,12 +1242,11 @@
             <h2>Settings</h2>
 
             <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
-                <button class="btn" id="ux-settings-btn">Sillyboard UX</button>
-                <button class="btn" id="theme-settings-btn">Theme</button>
-                <button class="btn" id="audio-settings-btn">Audio</button>
+                <button class="btn" id="ux-theme-btn">UX and Theme</button>
                 <button class="btn" id="accessibility-settings-btn">Accessibility</button>
-                <button class="btn" id="changelog-btn">Changelog</button>
+                <button class="btn" id="labs-btn">Labs</button>
                 <button class="btn" id="seguestions-box-btn">Seguestions Box</button>
+                <button class="btn" id="about-btn">About</button>
             </div>
 
             <div style="margin-top: 24px;">
@@ -1247,11 +1261,11 @@
         </div>
     </div>
 
-    <!-- UX Settings Modal -->
-    <div class="modal-overlay" id="ux-settings-modal" role="dialog" aria-modal="true"
-        aria-label="Sillyboard UX Settings">
-        <div class="modal-content">
-            <h2>Sillyboard UX</h2>
+    <!-- UX and Theme Settings Modal -->
+    <div class="modal-overlay" id="ux-theme-modal" role="dialog" aria-modal="true"
+        aria-label="UX and Theme Settings">
+        <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
+            <h2>UX and Theme</h2>
 
             <!-- Navigation UX -->
             <div class="section-title" style="margin-top: 20px;">Navigation UX</div>
@@ -1271,19 +1285,7 @@
                 <div class="hotbar-sound-picker" id="hotbar-picker"></div>
             </div>
 
-            <div class="modal-close-row"
-                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                <button class="modal-close-btn" id="ux-settings-close">Back</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Theme Settings Modal -->
-    <div class="modal-overlay" id="theme-settings-modal" role="dialog" aria-modal="true" aria-label="Theme Settings">
-        <div class="modal-content">
-            <h2>Theme</h2>
-
-            <div style="margin-top: 20px;">
+            <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
                 <div class="section-title">Theme Presets</div>
             </div>
             <div class="theme-grid">
@@ -1321,30 +1323,7 @@
 
             <div class="modal-close-row"
                 style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                <button class="modal-close-btn" id="theme-settings-close">Back</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Audio Settings Modal -->
-    <div class="modal-overlay" id="audio-settings-modal" role="dialog" aria-modal="true" aria-label="Audio Settings">
-        <div class="modal-content">
-            <h2>Audio</h2>
-
-            <!-- Amplification -->
-            <div class="amp-section" style="margin-top: 20px;">
-                <div class="section-title">Amplification</div>
-                <div class="amp-slider-row">
-                    <input type="range" id="amp-slider" class="amp-slider" min="0" max="300" step="1" value="100"
-                        aria-label="Amplification">
-                    <span class="amp-value" id="amp-value-label">100%</span>
-                </div>
-                <p class="amp-reset-hint">Double-tap slider to reset to 100%</p>
-            </div>
-
-            <div class="modal-close-row"
-                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                <button class="modal-close-btn" id="audio-settings-close">Back</button>
+                <button class="modal-close-btn" id="ux-theme-close">Back</button>
             </div>
         </div>
     </div>
@@ -1367,9 +1346,65 @@
                 When a sound with an associated theme is played, the theme will no longer change for those sounds.
             </p>
 
+            <!-- Amplification (moved from Audio category) -->
+            <div class="amp-section" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <div class="section-title">Amplification</div>
+                <div class="amp-slider-row">
+                    <input type="range" id="amp-slider" class="amp-slider" min="0" max="300" step="1" value="100"
+                        aria-label="Amplification">
+                    <span class="amp-value" id="amp-value-label">100%</span>
+                </div>
+                <p class="amp-reset-hint">Double-tap slider to reset to 100%</p>
+            </div>
+
             <div class="modal-close-row"
                 style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
                 <button class="modal-close-btn" id="accessibility-settings-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Labs Modal -->
+    <div class="modal-overlay" id="labs-modal" role="dialog" aria-modal="true" aria-label="Labs Settings">
+        <div class="modal-content">
+            <h2>Labs</h2>
+            <p style="margin-top: 20px; font-size: 0.95rem; opacity: 0.7; text-align: center; line-height: 1.4;">
+                Experimental features will appear here. Currently, there are no active labs features.
+            </p>
+            <div class="modal-close-row"
+                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="modal-close-btn" id="labs-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Submenu Modal -->
+    <div class="modal-overlay" id="about-modal" role="dialog" aria-modal="true" aria-label="About">
+        <div class="modal-content">
+            <h2>About</h2>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+                <button class="btn" id="about-info-btn">Info</button>
+                <button class="btn" id="about-changelog-btn">Changelog</button>
+            </div>
+            <div class="modal-close-row"
+                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="modal-close-btn" id="about-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="modal-overlay" id="info-modal" role="dialog" aria-modal="true" aria-label="Build Info">
+        <div class="modal-content">
+            <h2 id="info-title">Sillyboard :3</h2>
+            <div id="info-content" style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px; max-height: 50vh; overflow-y: auto; text-align: left;">
+                <p id="info-description" style="font-size: 0.95rem; opacity: 0.9; line-height: 1.4;"></p>
+                <div class="section-title">Credits</div>
+                <p id="info-credits" style="font-size: 0.85rem; opacity: 0.7; line-height: 1.4;"></p>
+            </div>
+            <div class="modal-close-row"
+                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="modal-close-btn" id="info-close">Back</button>
             </div>
         </div>
     </div>
@@ -1484,64 +1519,99 @@
 
         // ── Settings modal ────────────────────────────────────────────────
         const settingsModal = document.getElementById('settings-modal');
-        const uxSettingsModal = document.getElementById('ux-settings-modal');
-        const themeSettingsModal = document.getElementById('theme-settings-modal');
-        const audioSettingsModal = document.getElementById('audio-settings-modal');
+        const uxThemeModal = document.getElementById('ux-theme-modal');
         const accessibilitySettingsModal = document.getElementById('accessibility-settings-modal');
+        const labsModal = document.getElementById('labs-modal');
+        const aboutModal = document.getElementById('about-modal');
+        const infoModal = document.getElementById('info-modal');
         const changelogModal = document.getElementById('changelog-modal');
 
-        document.getElementById('ux-settings-btn').addEventListener('click', () => {
+        document.getElementById('ux-theme-btn').addEventListener('click', () => {
             renderHotbarConfig();
-            uxSettingsModal.classList.add('active');
-        });
-        document.getElementById('theme-settings-btn').addEventListener('click', () => {
             syncPickersToTheme();
-            themeSettingsModal.classList.add('active');
-        });
-        document.getElementById('audio-settings-btn').addEventListener('click', () => {
-            updateAmpUI(currentGain);
-            audioSettingsModal.classList.add('active');
+            uxThemeModal.classList.add('active');
         });
         document.getElementById('accessibility-settings-btn').addEventListener('click', () => {
+            updateAmpUI(currentGain);
             accessibilitySettingsModal.classList.add('active');
         });
-        document.getElementById('changelog-btn').addEventListener('click', () => {
+        document.getElementById('labs-btn').addEventListener('click', () => {
+            labsModal.classList.add('active');
+        });
+        document.getElementById('about-btn').addEventListener('click', () => {
+            aboutModal.classList.add('active');
+        });
+        document.getElementById('about-changelog-btn').addEventListener('click', () => {
             loadChangelog();
             changelogModal.classList.add('active');
         });
+        document.getElementById('about-info-btn').addEventListener('click', () => {
+            loadInfo();
+            infoModal.classList.add('active');
+        });
 
-        document.getElementById('ux-settings-close').addEventListener('click', () => {
-            uxSettingsModal.classList.remove('active');
-        });
-        document.getElementById('theme-settings-close').addEventListener('click', () => {
-            themeSettingsModal.classList.remove('active');
-        });
-        document.getElementById('audio-settings-close').addEventListener('click', () => {
-            audioSettingsModal.classList.remove('active');
+        document.getElementById('ux-theme-close').addEventListener('click', () => {
+            uxThemeModal.classList.remove('active');
         });
         document.getElementById('accessibility-settings-close').addEventListener('click', () => {
             accessibilitySettingsModal.classList.remove('active');
+        });
+        document.getElementById('labs-close').addEventListener('click', () => {
+            labsModal.classList.remove('active');
+        });
+        document.getElementById('about-close').addEventListener('click', () => {
+            aboutModal.classList.remove('active');
+        });
+        document.getElementById('info-close').addEventListener('click', () => {
+            infoModal.classList.remove('active');
         });
         document.getElementById('changelog-close').addEventListener('click', () => {
             changelogModal.classList.remove('active');
         });
 
         // Close on overlay click
-        uxSettingsModal.addEventListener('click', (e) => {
-            if (e.target === uxSettingsModal) uxSettingsModal.classList.remove('active');
-        });
-        themeSettingsModal.addEventListener('click', (e) => {
-            if (e.target === themeSettingsModal) themeSettingsModal.classList.remove('active');
-        });
-        audioSettingsModal.addEventListener('click', (e) => {
-            if (e.target === audioSettingsModal) audioSettingsModal.classList.remove('active');
+        uxThemeModal.addEventListener('click', (e) => {
+            if (e.target === uxThemeModal) uxThemeModal.classList.remove('active');
         });
         accessibilitySettingsModal.addEventListener('click', (e) => {
             if (e.target === accessibilitySettingsModal) accessibilitySettingsModal.classList.remove('active');
         });
+        labsModal.addEventListener('click', (e) => {
+            if (e.target === labsModal) labsModal.classList.remove('active');
+        });
+        aboutModal.addEventListener('click', (e) => {
+            if (e.target === aboutModal) aboutModal.classList.remove('active');
+        });
+        infoModal.addEventListener('click', (e) => {
+            if (e.target === infoModal) infoModal.classList.remove('active');
+        });
         changelogModal.addEventListener('click', (e) => {
             if (e.target === changelogModal) changelogModal.classList.remove('active');
         });
+
+        async function loadInfo() {
+            const titleEl = document.getElementById('info-title');
+            const descEl = document.getElementById('info-description');
+            const creditsEl = document.getElementById('info-credits');
+            
+            titleEl.textContent = "Loading Info...";
+            descEl.textContent = "";
+            creditsEl.textContent = "";
+            
+            try {
+                const res = await fetch('Soundboard/about.json');
+                const data = await res.json();
+                const info = data[0] || {};
+                
+                titleEl.textContent = info.title || "Sillyboard :3";
+                descEl.textContent = info.description || "";
+                creditsEl.textContent = info.credits || "";
+            } catch (err) {
+                titleEl.textContent = "Error";
+                descEl.innerHTML = '<span style="color: #ff4444;">Could not load build info.</span>';
+                creditsEl.textContent = "";
+            }
+        }
 
         async function loadChangelog() {
             const listEl = document.getElementById('changelog-list');
@@ -2959,7 +3029,7 @@
                 } else {
                     btn.setAttribute('aria-label', 'Play ' + SOUND_DEFS[key].label);
                     btn.innerHTML = '<span class="btn-label">' + SOUND_DEFS[key].label + '</span>';
-                    if (audioLoaded) bindPressEvent(btn, key);
+                    bindPressEvent(btn, key);
                 }
 
                 boardEl.appendChild(btn);
@@ -2979,12 +3049,14 @@
                 currentPage--;
                 renderBoardPage();
             }
+            prevPageBtn.blur();
         });
         nextPageBtn.addEventListener('click', () => {
             if (currentPage < pagesArray.length - 1) {
                 currentPage++;
                 renderBoardPage();
             }
+            nextPageBtn.blur();
         });
 
         // ── Category Tabs Logic ────────────────────────────────────────────────
@@ -3027,10 +3099,6 @@
                 return;
             }
 
-            // Only show Re-Lock button in Admin if the underlying JSON itself is locked
-            if (SOUND_DEFS.locked === 1) {
-                document.getElementById('lock-board-btn').style.display = 'block';
-            }
 
             hotbarSlots = hotbarSlots.filter(k => SOUND_DEFS[k] && k !== 'locked' && k !== 'streamables').slice(0, MAX_HOTBAR);
 
@@ -3082,12 +3150,6 @@
             location.reload();
         }
 
-        // Admin override to re-lock
-        document.getElementById('lock-board-btn').addEventListener('click', () => {
-            localStorage.setItem('sillyboard-manual-lock', 'true');
-            localStorage.removeItem('sillyboard-manual-unlock');
-            location.reload();
-        });
 
         function renderHotbar() {
             hotbarEl.style.display = 'flex';
@@ -3168,23 +3230,63 @@
         }
 
         // ── AudioBuffer pre-decode loading ───────────────────────────────
-        // Fetch each file → decode into an AudioBuffer during the loading
-        // screen. Playback uses AudioBufferSourceNode (zero-latency)
-        // decoded during the loading screen.
-        const bufferCache = {}; // key → AudioBuffer[]
+        // key → AudioBuffer[] (populated lazily per-sound)
+        const bufferCache = {};
         const bufferPeaks = {}; // key:variant → float (0-1 peak amplitude)
+        // Tracks which keys are currently being fetched to avoid duplicate requests
+        const fetchingKeys = new Set();
 
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingBar = document.getElementById('loading-bar');
 
-        // We create the AudioContext eagerly here (inside a script that
-        // runs at parse-time — Chrome allows it before interaction if
-        // the page has no prior audio-policy violation).
-        // If suspended, we'll resume on first touch.
         ensureAudioContext();
 
+        // ── On-demand fetch+decode for a single sound key ────────────────────
+        // Returns a Promise that resolves when at least one variant is ready.
+        // If a fetch is already in progress for this key, the existing promise
+        // is returned so callers share the same network request.
+        const fetchPromisesByKey = {};
+
+        async function fetchAndDecodeKey(key) {
+            if (bufferCache[key] && bufferCache[key].length > 0) return; // already ready
+            if (fetchPromisesByKey[key]) return fetchPromisesByKey[key];  // already in flight
+
+            const def = SOUND_DEFS[key] || (SOUND_DEFS.streamables && SOUND_DEFS.streamables[key]);
+            if (!def || !def.variants) return;
+
+            fetchPromisesByKey[key] = (async () => {
+                for (const v of def.variants) {
+                    try {
+                        const r = await fetch(v.src);
+                        const arr = await r.arrayBuffer();
+                        const audioBuffer = await audioCtx.decodeAudioData(arr);
+                        if (!bufferCache[key]) bufferCache[key] = [];
+                        bufferCache[key].push(audioBuffer);
+
+                        let max = 0;
+                        const channelData = audioBuffer.getChannelData(0);
+                        for (let i = 0; i < channelData.length; i += 100) {
+                            const val = Math.abs(channelData[i]);
+                            if (val > max) max = val;
+                        }
+                        const variantId = `${key}:${bufferCache[key].length - 1}`;
+                        bufferPeaks[variantId] = max || 1.0;
+                    } catch (e) {
+                        console.error('[Sillyboard] On-demand fetch failed for', key, e);
+                    }
+                }
+                delete fetchPromisesByKey[key];
+            })();
+
+            return fetchPromisesByKey[key];
+        }
+
+        // ── Background loader ─────────────────────────────────────────────────
+        // Loads sounds in priority order:
+        //   1. Current page sounds
+        //   2. All remaining regular sounds
+        //   3. "SoundBoard -Riff #2.wav" variants and all Streamables last
         async function decodeAll() {
-            // Restore original random phrase logic
             const phrases = [
                 "So true, so true...",
                 "Nooeeeee",
@@ -3196,14 +3298,10 @@
                 "What the happ is fuckening?",
                 "Dr. Yaoi ftw"
             ];
-            const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
             const textEl = document.getElementById('loading-text');
-            if (textEl) textEl.textContent = randomPhrase;
-
-            let loadingDismissed = false;
+            if (textEl) textEl.textContent = phrases[Math.floor(Math.random() * phrases.length)];
 
             try {
-                // Fetch dynamic config
                 const forceRefresh = sessionStorage.getItem('sillyboard-force-refresh') === 'true';
                 const t = forceRefresh ? `?t=${Date.now()}` : '';
                 if (forceRefresh) sessionStorage.removeItem('sillyboard-force-refresh');
@@ -3222,125 +3320,89 @@
 
                 initUIForSounds();
 
-                const allFetches = [];
+                // ── Dismiss the loading overlay immediately ────────────────────
+                // Users see the board right away; sounds load in the background.
+                audioLoaded = true;
+                Object.entries(boardButtons).forEach(([key, btn]) => {
+                    if (btn) bindPressEvent(btn, key);
+                });
+                loadingOverlay.classList.add('hidden');
+                setTimeout(() => { if (loadingOverlay.parentNode) loadingOverlay.remove(); }, 400);
 
-                // Standard sounds
-                for (const key of SOUND_KEYS) {
-                    if (key === 'locked' || key === 'streamables') continue;
-                    const def = SOUND_DEFS[key];
-                    if (def.variants) {
-                        def.variants.forEach((v, idx) => allFetches.push({ key, src: v.src + t, idx }));
-                    }
-                }
-
-                // Streamable sounds
-                if (SOUND_DEFS.streamables) {
-                    Object.keys(SOUND_DEFS.streamables).forEach(key => {
-                        const s = SOUND_DEFS.streamables[key];
-                        s.variants.forEach((v, idx) => allFetches.push({ key, src: v.src + t, idx }));
-                    });
-                }
-
-                let loaded = 0;
-                const total = allFetches.length;
-
-                // Determine which sounds the current page needs for early-unlock
+                // ── Build prioritised fetch list ──────────────────────────────
+                // Tier 1: sounds on the current visible page
                 const firstPageKeys = new Set();
                 if (pagesArray.length > 0) {
                     pagesArray[0].keys.forEach(k => { if (!k.startsWith('_rec_')) firstPageKeys.add(k); });
                 }
 
-                function tryEarlyUnlock() {
-                    if (loadingDismissed) return;
-                    // Check if all first-page sounds have at least one decoded variant
-                    for (const k of firstPageKeys) {
-                        if (!bufferCache[k] || bufferCache[k].length === 0) return;
-                    }
-                    // First page ready — dismiss loading and enable playback immediately
-                    loadingDismissed = true;
-                    audioLoaded = true;
-                    Object.entries(boardButtons).forEach(([key, btn]) => {
-                        if (btn) bindPressEvent(btn, key);
-                    });
-                    loadingOverlay.classList.add('hidden');
-                    setTimeout(() => { if (loadingOverlay.parentNode) loadingOverlay.remove(); }, 400);
+                // Tier 3 (deferred): Riff #2 src fragment and all streamables
+                const DEFERRED_SRC_FRAGMENT = 'SoundBoard -Riff #2';
+                const deferredKeys = new Set();
+                if (SOUND_DEFS.streamables) {
+                    Object.keys(SOUND_DEFS.streamables).forEach(k => deferredKeys.add('__streamable__' + k));
                 }
-
-                // Decode-as-you-fetch: each sound decodes immediately when its fetch completes
-                // This parallelizes network I/O with CPU decode work
-                const DECODE_CONCURRENCY = 6;
-                let activeDecodes = 0;
-                const decodeQueue = [];
-
-                function processDecodeQueue() {
-                    while (activeDecodes < DECODE_CONCURRENCY && decodeQueue.length > 0) {
-                        const payload = decodeQueue.shift();
-                        activeDecodes++;
-                        audioCtx.decodeAudioData(payload.arr).then(audioBuffer => {
-                            if (!bufferCache[payload.key]) bufferCache[payload.key] = [];
-                            bufferCache[payload.key].push(audioBuffer);
-
-                            // Peak Analysis for per-sound Auto-Gain
-                            let max = 0;
-                            const channelData = audioBuffer.getChannelData(0);
-                            for (let i = 0; i < channelData.length; i += 100) {
-                                const val = Math.abs(channelData[i]);
-                                if (val > max) max = val;
-                            }
-                            const variantId = `${payload.key}:${bufferCache[payload.key].length - 1}`;
-                            bufferPeaks[variantId] = max || 1.0;
-
-                            tryEarlyUnlock();
-                        }).catch(e => {
-                            console.error("Failed to decode", payload.src, e);
-                        }).finally(() => {
-                            activeDecodes--;
-                            processDecodeQueue();
-                        });
+                // Mark regular keys whose variants include the Riff #2 file as deferred
+                for (const key of SOUND_KEYS) {
+                    if (key === 'locked' || key === 'streamables') continue;
+                    const def = SOUND_DEFS[key];
+                    if (def.variants && def.variants.some(v => v.src.includes(DEFERRED_SRC_FRAGMENT))) {
+                        deferredKeys.add(key);
                     }
                 }
 
-                const fetchPromises = allFetches.map(item =>
-                    fetch(item.src)
-                        .then(r => r.arrayBuffer())
-                        .then(arr => {
-                            loaded++;
-                            loadingBar.style.transform = `scaleX(${loaded / total})`;
-                            // Immediately queue for decode
-                            decodeQueue.push({ key: item.key, arr, src: item.src });
-                            processDecodeQueue();
-                        })
-                        .catch(err => {
-                            loaded++;
-                            loadingBar.style.transform = `scaleX(${loaded / total})`;
-                            console.error("Failed fetching", item.src, err);
-                        })
-                );
+                // Build three tiers
+                const tier1 = []; // current page
+                const tier2 = []; // everything else normal
+                const tier3 = []; // riff #2 + streamables
 
-                await Promise.all(fetchPromises);
+                for (const key of SOUND_KEYS) {
+                    if (key === 'locked' || key === 'streamables') continue;
+                    if (deferredKeys.has(key)) { tier3.push(key); continue; }
+                    if (firstPageKeys.has(key)) { tier1.push(key); continue; }
+                    tier2.push(key);
+                }
+                // Streamables go into tier3
+                if (SOUND_DEFS.streamables) {
+                    Object.keys(SOUND_DEFS.streamables).forEach(k => tier3.push('__streamable__' + k));
+                }
 
-                // Wait for all remaining decodes to finish
-                await new Promise(resolve => {
-                    const check = () => {
-                        if (activeDecodes === 0 && decodeQueue.length === 0) resolve();
-                        else setTimeout(check, 50);
-                    };
-                    check();
-                });
+                const CONCURRENCY = 4;
+
+                async function loadTier(keys) {
+                    // Use a pool of concurrent fetches
+                    let i = 0;
+                    async function worker() {
+                        while (i < keys.length) {
+                            const key = keys[i++];
+                            const realKey = key.startsWith('__streamable__') ? key.slice(14) : key;
+                            const defSrc = key.startsWith('__streamable__')
+                                ? SOUND_DEFS.streamables && SOUND_DEFS.streamables[realKey]
+                                : SOUND_DEFS[realKey];
+                            if (!defSrc || !defSrc.variants) continue;
+                            if (bufferCache[realKey] && bufferCache[realKey].length >= defSrc.variants.length) continue;
+                            await fetchAndDecodeKey(realKey);
+                        }
+                    }
+                    const workers = [];
+                    for (let w = 0; w < CONCURRENCY; w++) workers.push(worker());
+                    await Promise.all(workers);
+                }
+
+                // Load tiers sequentially so high-priority sounds get bandwidth first
+                await loadTier(tier1);
+                await loadTier(tier2);
+                await loadTier(tier3);
 
             } catch (err) {
-                console.error('Fatal Error:', err);
-                alert('Fatal Error: Failed to load or decode sounds.');
-            } finally {
-                // Final safety: ensure loading is dismissed even if early unlock didn't fire
-                if (!loadingDismissed) {
-                    audioLoaded = true;
-                    Object.entries(boardButtons).forEach(([key, btn]) => {
-                        if (btn) bindPressEvent(btn, key);
-                    });
-                    loadingOverlay.classList.add('hidden');
-                    setTimeout(() => { if (loadingOverlay.parentNode) loadingOverlay.remove(); }, 400);
-                }
+                console.error('[Sillyboard] Fatal load error:', err);
+                // Still dismiss the loading screen so users aren't stuck
+                audioLoaded = true;
+                Object.entries(boardButtons).forEach(([key, btn]) => {
+                    if (btn) bindPressEvent(btn, key);
+                });
+                loadingOverlay.classList.add('hidden');
+                setTimeout(() => { if (loadingOverlay.parentNode) loadingOverlay.remove(); }, 400);
             }
         }
 
@@ -3441,7 +3503,23 @@
 
         function playSound(key, btn, scheduledTime = null, variantIndex = null) {
             const pool = bufferCache[key];
-            if (!pool || pool.length === 0) return;
+            if (!pool || pool.length === 0) {
+                // Sound not yet decoded — fetch on-demand and play as soon as ready
+                if (!fetchPromisesByKey[key]) {
+                    // Show a subtle loading indicator on the button
+                    const activeBtn = boardButtons[key];
+                    if (activeBtn && !activeBtn.classList.contains('loading')) {
+                        activeBtn.classList.add('loading');
+                    }
+                    fetchAndDecodeKey(key).then(() => {
+                        const activeBtn = boardButtons[key];
+                        if (activeBtn) activeBtn.classList.remove('loading');
+                        // Now play it
+                        playSound(key, btn, scheduledTime, variantIndex);
+                    });
+                }
+                return;
+            }
 
             // If we are the sender and repeater is enabled, notify others
             if (!scheduledTime && repeaterEnabled && repeaterSocket && repeaterSocket.readyState === WebSocket.OPEN) {
@@ -3589,9 +3667,42 @@
             return targetIndex;
         }
 
-        // ── Service Worker registration ──────────────────────────────────
+        // ── Service Worker registration & Self Caching ────────────────────
+        function triggerSelfCaching() {
+            if (navigator.onLine) {
+                const conn = navigator.connection;
+                let isFast = true;
+                if (conn) {
+                    if (conn.saveData || ['slow-2g', '2g', '3g'].includes(conn.effectiveType)) {
+                        isFast = false;
+                    }
+                }
+                if (isFast) {
+                    setTimeout(async () => {
+                        try {
+                            const response = await fetch('sillyboard.html?t=' + Date.now(), { cache: 'reload' });
+                            if (response.ok && 'caches' in window) {
+                                const cache = await caches.open('sillyboard-dynamic-v3');
+                                await cache.put('sillyboard.html', response);
+                                console.log('[Sillyboard] sillyboard.html self-caching completed.');
+                            }
+                        } catch (err) {
+                            console.warn('[Sillyboard] Failed to self-cache sillyboard.html:', err);
+                        }
+                    }, 3000);
+                }
+            }
+        }
+
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js?v=3', { scope: './' })
+                .then(() => {
+                    if (document.readyState === 'complete') {
+                        triggerSelfCaching();
+                    } else {
+                        window.addEventListener('load', triggerSelfCaching);
+                    }
+                })
                 .catch(() => { });
         }
 
