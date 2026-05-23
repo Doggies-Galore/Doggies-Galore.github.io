@@ -56,11 +56,11 @@
         "variants": [
             {
                 "src": "Soundboard/SoundBoard%20-Catydid.wav",
-                "weight": 10
+                "weight": 3
             },
             {
                 "src": "Soundboard/SoundBoard%20-Catydid%202.wav",
-                "weight": 5
+                "weight": 3
             },
             {
                 "src": "Soundboard/SoundBoard%20-Catydid%203.wav",
@@ -93,7 +93,7 @@
         "variants": [
             {
                 "src": "Soundboard/SoundBoard%20-Changed.wav",
-                "weight": 5
+                "weight": 3
             },
             {
                 "src": "Soundboard/SoundBoard%20-Changed%202.wav",
@@ -212,7 +212,7 @@
         "variants": [
             {
                 "src": "Soundboard/SoundBoard%20-Mow.wav",
-                "weight": 10
+                "weight": 1
             },
             {
                 "src": "Soundboard/SoundBoard%20-Mow%202.wav",
@@ -326,7 +326,7 @@
         "variants": [
             {
                 "src": "Soundboard/SoundBoard%20-Riff.wav",
-                "weight": 200
+                "weight": 500
             },
             {
                 "src": "Soundboard/SoundBoard%20-Riff%20%232.wav",

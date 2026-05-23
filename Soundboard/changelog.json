@@ -1,5 +1,11 @@
 [
   {
+    "version": "0.5.0",
+    "date": "2026-05-21",
+    "title": "When she sound on my board till I cache",
+    "subtitle": "Sounds now load on-demand! They surprisingly didn't do that before :3... this wasn't a big issue because everything was *mostly* kept in cache- but it caused issues across multiple platforms where the sounds would hang or fail to start entirely. Also made the UX a little eaiser to use. I've combined some menu items so things are easier to discover, and there's now an 'info' menu that shows credits!"
+  },
+  {
     "version": "0.4.0",
     "date": "2026-05-10",
     "title": "What are you doing in my house!?",
