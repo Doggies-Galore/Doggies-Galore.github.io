@@ -9,6 +9,14 @@
             "category": "Remote"
         },
         {
+            "id": "remote-windows",
+            "name": "Remote Windows",
+            "url": "https://app.jumpdesktop.com/jump#authCreds=true&neuronid=CD-01K3A9JRX7TJPDYHD6S13FWAGZ",
+            "fade": "#f0f0f0",
+            "about": "Remote desktop access to macOS.",
+            "category": "Remote"
+        },
+        {
             "id": "remote-browser",
             "name": "Remote Browser",
             "url": "https://mediastation.tail76b4d2.ts.net/vnc.html?autoconnect=1",
@@ -127,6 +135,14 @@
             "fade": "#ff0000",
             "about": "Stream music from YouTube.",
             "category": "Media"
+        },
+        {
+            "id": "github",
+            "name": "GitHub",
+            "url": "https://github.com",
+            "fade": "#333333",
+            "about": "A hub for Open Source Software.",
+            "category": "Web"
         },
         {
             "id": "vscode",
