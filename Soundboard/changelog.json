@@ -1,5 +1,11 @@
 [
   {
+    "version": "0.5.2",
+    "date": "2026-05-30",
+    "title": "Quality of Life? But I hardly know her!",
+    "subtitle": "Tweaked how the arrow buttons behave, fixed category scrolling on iOS. Fixed broken STOP and HOLD button justification- and gave those buttons the fade treatment, too!"
+  },
+  {
     "version": "0.5.1",
     "date": "2026-05-29",
     "title": "Slidy Slid",
