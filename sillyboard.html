@@ -953,6 +953,15 @@
     <!-- Sound Board (paged grid) -->
     <div id="board" role="main"></div>
 
+    <!-- Bottom Controls -->
+    <div id="bottom-controls" style="display: flex; gap: 10px; padding: 10px 18px; border-top: 3px solid var(--accent-color); flex-shrink: 0;">
+        <button id="quick-stop-btn" style="flex: 0 0 auto; background: transparent; color: var(--accent-color); border: 2px solid var(--accent-color); border-radius: 14px; padding: 8px 36px; font-weight: bold; cursor: pointer; font-family: inherit; font-size: clamp(0.85rem, 2vw, 1.1rem);">STOP</button>
+        <div id="pitch-touch-strip" style="flex: 1; border: 2px dashed var(--accent-color); border-radius: 14px; display: flex; align-items: center; justify-content: center; opacity: 0.7; cursor: ew-resize; user-select: none; font-size: clamp(0.85rem, 2vw, 1.1rem); font-weight: bold; touch-action: none;">
+            Slide to change pitch
+        </div>
+        <button id="pitch-hold-btn" style="flex: 0 0 auto; background: transparent; color: var(--accent-color); border: 2px solid var(--accent-color); border-radius: 14px; padding: 8px 36px; font-weight: bold; cursor: pointer; font-family: inherit; font-size: clamp(0.85rem, 2vw, 1.1rem);">HOLD</button>
+    </div>
+
     <!-- Board Page Navigation -->
     <div id="board-nav">
         <button class="nav-btn" id="prev-page-btn" aria-label="Previous page" disabled>◄</button>
@@ -1841,6 +1850,19 @@
             currentPitch = parseFloat(pitchSlider.value);
             pitchVal.textContent = currentPitch.toFixed(2) + 'x';
             localStorage.setItem('sillyboard-pitch', currentPitch);
+            
+            // Realtime pitch adjustment for currently playing sounds
+            if (typeof clipQueue !== 'undefined') {
+                clipQueue.forEach(c => {
+                    try { 
+                        if (c.source && c.source.playbackRate) {
+                            // Optionally use setTargetAtTime to prevent clicking
+                            // c.source.playbackRate.setTargetAtTime(currentPitch, audioCtx.currentTime, 0.05);
+                            c.source.playbackRate.value = currentPitch; 
+                        }
+                    } catch (e) {}
+                });
+            }
         }
 
         pitchSlider.addEventListener('input', updatePitchUI);
@@ -3562,7 +3584,7 @@
 
             const source = audioCtx.createBufferSource();
             source.buffer = buffer;
-            source.playbackRate.value = currentPitch;
+            source.playbackRate.value = (typeof pitchStripActive !== 'undefined' && (pitchStripActive || pitchHoldActive)) ? tempPitch : currentPitch;
             source.connect(gainNode);
 
             // 1. PLAY at scheduled time or immediately
@@ -3766,6 +3788,100 @@
         document.querySelectorAll('#board .sound-btn').forEach(btn => {
             bindPressEvent(btn, btn.dataset.sound);
         });
+
+        // ── Quick Controls ──────────────────────────────────────────────────
+        document.getElementById('quick-stop-btn').addEventListener('click', () => {
+            // Stop all currently playing sounds
+            [...clipQueue].forEach(c => {
+                try { c.source.stop(); } catch (e) {}
+            });
+            if (activeStreamKey) {
+                activeStreamKey = null;
+                renderStreamables();
+            }
+        });
+
+        const pitchStrip = document.getElementById('pitch-touch-strip');
+        let pitchStripActive = false;
+        let pitchStripStartX = 0;
+        let pitchStripStartPitch = 1;
+        let tempPitch = 1;
+        let pitchHoldActive = false;
+        
+        document.getElementById('pitch-hold-btn').addEventListener('click', () => {
+            pitchHoldActive = !pitchHoldActive;
+            const holdBtn = document.getElementById('pitch-hold-btn');
+            if (pitchHoldActive) {
+                holdBtn.style.background = 'var(--accent-color)';
+                holdBtn.style.color = 'var(--bg-color)';
+            } else {
+                holdBtn.style.background = 'transparent';
+                holdBtn.style.color = 'var(--accent-color)';
+                if (!pitchStripActive) {
+                    tempPitch = currentPitch;
+                    applyTempPitch(currentPitch);
+                }
+            }
+        });
+
+        function startPitchDrag(e) {
+            pitchStripActive = true;
+            pitchStripStartX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            pitchStripStartPitch = pitchHoldActive ? tempPitch : currentPitch;
+            tempPitch = pitchStripStartPitch;
+            pitchStrip.style.opacity = '1';
+            pitchStrip.style.borderStyle = 'solid';
+            if (!e.type.includes('touch')) {
+                document.addEventListener('mousemove', movePitchDrag, { passive: false });
+                document.addEventListener('mouseup', endPitchDrag);
+            }
+        }
+        
+        function applyTempPitch(val) {
+            if (typeof clipQueue !== 'undefined') {
+                clipQueue.forEach(c => {
+                    try { 
+                        if (c.source && c.source.playbackRate) {
+                            c.source.playbackRate.value = val; 
+                        }
+                    } catch (err) {}
+                });
+            }
+        }
+
+        function movePitchDrag(e) {
+            if (!pitchStripActive) return;
+            e.preventDefault(); // Prevent scrolling
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const deltaX = clientX - pitchStripStartX;
+            
+            // Sensitivity: 150px movement = +/- 1x pitch
+            tempPitch = pitchStripStartPitch + (deltaX / 150);
+            tempPitch = Math.max(0.25, Math.min(3, tempPitch));
+            
+            applyTempPitch(tempPitch);
+        }
+
+        function endPitchDrag(e) {
+            pitchStripActive = false;
+            pitchStrip.style.opacity = '0.7';
+            pitchStrip.style.borderStyle = 'dashed';
+            if (!pitchHoldActive) {
+                applyTempPitch(currentPitch); // Revert to global pitch
+            }
+            if (!e || !e.type.includes('touch')) {
+                document.removeEventListener('mousemove', movePitchDrag);
+                document.removeEventListener('mouseup', endPitchDrag);
+            }
+        }
+
+        pitchStrip.addEventListener('touchstart', startPitchDrag, { passive: false });
+        pitchStrip.addEventListener('touchmove', movePitchDrag, { passive: false });
+        pitchStrip.addEventListener('touchend', endPitchDrag);
+        pitchStrip.addEventListener('touchcancel', endPitchDrag);
+        
+        pitchStrip.addEventListener('mousedown', startPitchDrag);
+
     </script>
 </body>
 
