@@ -144,7 +144,14 @@
             display: inline-block;
         }
 
-        .hdr-btn:hover {
+        @media (hover: hover) {
+            .hdr-btn:hover {
+                background: var(--accent-color);
+                color: var(--bg-color);
+            }
+        }
+
+        .hdr-btn:active {
             background: var(--accent-color);
             color: var(--bg-color);
         }
@@ -179,11 +186,13 @@
             text-align: center;
             line-height: 48px;
             overflow-x: auto;
+            overflow-y: hidden;
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
             scroll-snap-type: x mandatory;
             user-select: none;
+            touch-action: pan-x;
         }
 
         #category-ui::-webkit-scrollbar {
@@ -808,9 +817,12 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        .nav-btn:hover {
-            background: var(--accent-color);
-            color: var(--bg-color);
+        /* Only show hover highlight on devices that support hover (not touch screens) */
+        @media (hover: hover) {
+            .nav-btn:hover {
+                background: var(--accent-color);
+                color: var(--bg-color);
+            }
         }
 
         .nav-btn:active {
@@ -955,11 +967,11 @@
 
     <!-- Bottom Controls -->
     <div id="bottom-controls" style="display: flex; gap: 10px; padding: 10px 18px; border-top: 3px solid var(--accent-color); flex-shrink: 0;">
-        <button id="quick-stop-btn" style="flex: 0 0 auto; background: transparent; color: var(--accent-color); border: 2px solid var(--accent-color); border-radius: 14px; padding: 8px 36px; font-weight: bold; cursor: pointer; font-family: inherit; font-size: clamp(0.85rem, 2vw, 1.1rem);">STOP</button>
+        <button id="quick-stop-btn" class="hdr-btn" style="flex: 0 0 calc(25% - 2.5px); padding: 8px 0;">STOP</button>
         <div id="pitch-touch-strip" style="flex: 1; border: 2px dashed var(--accent-color); border-radius: 14px; display: flex; align-items: center; justify-content: center; opacity: 0.7; cursor: ew-resize; user-select: none; font-size: clamp(0.85rem, 2vw, 1.1rem); font-weight: bold; touch-action: none;">
-            Slide to change pitch
+            PITCH
         </div>
-        <button id="pitch-hold-btn" style="flex: 0 0 auto; background: transparent; color: var(--accent-color); border: 2px solid var(--accent-color); border-radius: 14px; padding: 8px 36px; font-weight: bold; cursor: pointer; font-family: inherit; font-size: clamp(0.85rem, 2vw, 1.1rem);">HOLD</button>
+        <button id="pitch-hold-btn" class="hdr-btn" style="flex: 0 0 calc(25% - 2.5px); padding: 8px 0;">HOLD</button>
     </div>
 
     <!-- Board Page Navigation -->
@@ -3790,7 +3802,8 @@
         });
 
         // ── Quick Controls ──────────────────────────────────────────────────
-        document.getElementById('quick-stop-btn').addEventListener('click', () => {
+        const quickStopBtn = document.getElementById('quick-stop-btn');
+        quickStopBtn.addEventListener('click', () => {
             // Stop all currently playing sounds
             [...clipQueue].forEach(c => {
                 try { c.source.stop(); } catch (e) {}
