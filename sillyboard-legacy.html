@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Sillyboard (Legacy Edition)</title>
+    <style type="text/css">
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 10px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #ffffff;
+            padding-bottom: 10px;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .sound-btn {
+            display: inline-block;
+            width: 45%;
+            margin: 5px 1%;
+            padding: 15px 0;
+            border: 3px solid #ffffff;
+            background-color: #000000;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            /* Graceful degradation for modern browsers */
+            border-radius: 15px; 
+            -moz-border-radius: 15px;
+            -webkit-border-radius: 15px;
+        }
+        .sound-btn:hover {
+            background-color: #333333;
+        }
+        .sound-btn:active {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        #loading {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 50px;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 12px;
+            color: #888888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sillyboard :3 (Legacy)</h1>
+        
+        <div id="loading">Loading sounds...</div>
+        
+        <div id="board" style="display:none;">
+            <!-- Buttons will be injected here -->
+        </div>
+
+        <div class="footer">
+            Built for maximum compatibility with Internet Explorer 6+, Windows XP, and vintage browsers.
+        </div>
+    </div>
+    
+    <!-- Audio fallback container -->
+    <div id="audio-container" style="position: absolute; top: -9999px; left: -9999px; width: 1px; height: 1px;"></div>
+
+    <script type="text/javascript">
+        // Polyfill for JSON in IE7 and below
+        function parseJSON(str) {
+            if (window.JSON && window.JSON.parse) {
+                return window.JSON.parse(str);
+            } else {
+                // Fallback for pre-ES5 browsers
+                return eval('(' + str + ')');
+            }
+        }
+
+        // Cross browser event listener (IE8 attachEvent support)
+        function addEvent(element, eventName, handler) {
+            if (element.addEventListener) {
+                element.addEventListener(eventName, handler, false);
+            } else if (element.attachEvent) {
+                element.attachEvent('on' + eventName, handler);
+            } else {
+                element['on' + eventName] = handler;
+            }
+        }
+
+        var soundDefs = {};
+        var boardEl = document.getElementById('board');
+        var loadingEl = document.getElementById('loading');
+        var audioContainer = document.getElementById('audio-container');
+        
+        // Basic detection for old IE to use <bgsound>
+        var isOldIE = false;
+        if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > -1) {
+            isOldIE = true;
+        }
+
+        function playSound(key) {
+            var def = soundDefs[key];
+            if (!def || !def.variants || def.variants.length === 0) return;
+            
+            // Pick a random variant (no weighting support for simplicity in legacy mode)
+            var rnd = Math.floor(Math.random() * def.variants.length);
+            var src = def.variants[rnd].src;
+            
+            // Clear previous audio element to prevent overlapping memory leaks in old browsers
+            audioContainer.innerHTML = ''; 
+            
+            // 1. Try HTML5 Audio (IE9+, Modern Browsers)
+            var audioTest = document.createElement('audio');
+            if (audioTest.canPlayType) {
+                var audio = document.createElement('audio');
+                audio.src = src;
+                audio.autoplay = true;
+                audioContainer.appendChild(audio);
+                if (typeof audio.play === 'function') {
+                    // Try to catch promise rejections in modern browsers to prevent console spam
+                    var playPromise = audio.play();
+                    if (playPromise !== undefined && typeof playPromise.catch === 'function') {
+                        playPromise.catch(function(){});
+                    }
+                }
+            } 
+            // 2. Try <bgsound> (IE6, IE7, IE8)
+            else if (isOldIE) {
+                var bgsound = document.createElement('bgsound');
+                bgsound.src = src;
+                audioContainer.appendChild(bgsound);
+            } 
+            // 3. Fallback to <embed> (Old Netscape/Firefox/Safari)
+            else {
+                var embed = document.createElement('embed');
+                embed.src = src;
+                embed.hidden = true;
+                embed.autostart = true;
+                embed.loop = false;
+                audioContainer.appendChild(embed);
+            }
+        }
+
+        function loadSounds() {
+            var xhr;
+            if (window.XMLHttpRequest) {
+                xhr = new XMLHttpRequest();
+            } else if (window.ActiveXObject) {
+                // IE6 and IE5
+                try {
+                    xhr = new ActiveXObject("Msxml2.XMLHTTP");
+                } catch(e) {
+                    try {
+                        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+                    } catch(e) {}
+                }
+            }
+
+            if (!xhr) {
+                loadingEl.innerHTML = "Error: Your browser does not support XMLHttpRequest.";
+                return;
+            }
+
+            // Cache bust for older browsers
+            var t = new Date().getTime();
+            xhr.open('GET', 'Soundboard/sounds.json?t=' + t, true);
+            
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200 || xhr.status === 304 || xhr.status === 0) {
+                        try {
+                            soundDefs = parseJSON(xhr.responseText);
+                            renderBoard();
+                        } catch (e) {
+                            loadingEl.innerHTML = "Error parsing sounds.json data.";
+                        }
+                    } else {
+                        loadingEl.innerHTML = "Error loading sounds.json. Status: " + xhr.status;
+                    }
+                }
+            };
+            
+            xhr.send(null);
+        }
+
+        function renderBoard() {
+            loadingEl.style.display = 'none';
+            boardEl.style.display = 'block';
+
+            for (var key in soundDefs) {
+                if (!Object.prototype.hasOwnProperty.call(soundDefs, key)) continue;
+                if (key === 'locked' || key === 'streamables') continue;
+
+                var def = soundDefs[key];
+                var btn = document.createElement('button');
+                btn.className = 'sound-btn';
+                btn.innerHTML = def.label || key;
+                
+                // Use a closure to capture the correct key variable
+                (function(capturedKey) {
+                    addEvent(btn, 'click', function(e) {
+                        playSound(capturedKey);
+                    });
+                })(key);
+
+                boardEl.appendChild(btn);
+            }
+        }
+
+        // Initialize the app
+        loadSounds();
+    </script>
+</body>
+</html>
