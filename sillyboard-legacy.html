@@ -270,84 +270,26 @@
             else applyTheme('#000000', '#ffffff');
         } catch(e) { applyTheme('#000000', '#ffffff'); }
 
-        // ── 4-Tier Audio Engine (Extremely Compatible) ──
-        var audioCtx = null;
-        if (window.AudioContext || window.webkitAudioContext) {
-            try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){}
-        }
-
-        var bufferCache = {};
-        var activeSources = [];
-
-        function fetchAndDecode(src, callback) {
-            if (bufferCache[src]) {
-                if (callback) callback(bufferCache[src]);
-                return;
-            }
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', src, true);
-            xhr.responseType = 'arraybuffer';
-            xhr.onload = function() {
-                if ((xhr.status === 200 || xhr.status === 0) && xhr.response) {
-                    audioCtx.decodeAudioData(xhr.response, function(buffer) {
-                        bufferCache[src] = buffer;
-                        if (callback) callback(buffer);
-                    }, function(){});
-                }
-            };
-            xhr.send();
-        }
-
+        // ── 3-Tier Audio Engine (Maximum Basic Compatibility) ──
         function stopAllSounds() {
-            // Stop HTML5 Audio, <bgsound>, <embed>
-            document.getElementById('audio-container').innerHTML = '';
-            
-            // Stop Web Audio API sources
-            for (var i = 0; i < activeSources.length; i++) {
-                try {
-                    if (activeSources[i].stop) activeSources[i].stop(0);
-                    else if (activeSources[i].noteOff) activeSources[i].noteOff(0);
-                    activeSources[i].disconnect();
-                } catch(e) {}
+            var c = document.getElementById('audio-container');
+            if (c) {
+                var els = c.getElementsByTagName('*');
+                for (var i = 0; i < els.length; i++) {
+                    try { if (els[i].pause) els[i].pause(); } catch(e){}
+                    try { if (els[i].stop) els[i].stop(); } catch(e){}
+                }
+                c.innerHTML = '';
             }
-            activeSources = [];
         }
 
         function playSound(src) {
             var audioContainer = document.getElementById('audio-container');
-            
-            // 1. Web Audio API (Fix for Nintendo Switch / Modern Browsers needing raw decode)
-            if (audioCtx) {
-                // Must resume audio context on interaction
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
+            stopAllSounds(); // Clean up previous sounds
 
-                if (bufferCache[src]) {
-                    var source = audioCtx.createBufferSource();
-                    source.buffer = bufferCache[src];
-                    source.connect(audioCtx.destination);
-                    activeSources.push(source);
-                    if (source.start) source.start(0);
-                    else source.noteOn(0);
-                } else {
-                    fetchAndDecode(src, function(buffer) {
-                        var source = audioCtx.createBufferSource();
-                        source.buffer = buffer;
-                        source.connect(audioCtx.destination);
-                        activeSources.push(source);
-                        if (source.start) source.start(0);
-                        else source.noteOn(0);
-                    });
-                }
-                return;
-            }
-
-            audioContainer.innerHTML = ''; 
-
-            // 2. HTML5 Audio (Older modern browsers like IE9/Safari 4)
+            // 1. HTML5 Audio (Modern browsers, mobile, consoles)
             var audioTest = document.createElement('audio');
-            if (audioTest.canPlayType && audioTest.canPlayType('audio/wav') !== '') {
+            if (typeof audioTest.canPlayType === 'function') {
                 var audio = document.createElement('audio');
                 audio.src = src;
                 audio.autoplay = true;
@@ -357,13 +299,13 @@
                     if (p && typeof p.catch === 'function') p.catch(function(){});
                 }
             } 
-            // 3. <bgsound> (IE6/7/8)
+            // 2. <bgsound> (IE6/7/8)
             else if (isOldIE) {
                 var bgsound = document.createElement('bgsound');
                 bgsound.src = src;
                 audioContainer.appendChild(bgsound);
             } 
-            // 4. <embed> (Old Netscape/Firefox/Safari)
+            // 3. <embed> (Old Netscape/Firefox/Safari)
             else {
                 var embed = document.createElement('embed');
                 embed.src = src;
