@@ -4,147 +4,287 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Sillyboard (Legacy Edition)</title>
+    <style id="dynamic-theme" type="text/css"></style>
     <style type="text/css">
         body {
-            background-color: #000000;
-            color: #ffffff;
             font-family: Arial, Helvetica, sans-serif;
             margin: 0;
-            padding: 10px;
+            padding: 0;
             text-align: center;
         }
-        h1 {
-            font-size: 28px;
-            margin-bottom: 20px;
-            border-bottom: 3px solid #ffffff;
-            padding-bottom: 10px;
+        * {
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
         }
-        .container {
+        /* Layouts */
+        #header {
+            padding: 10px;
+            border-bottom: 3px solid;
+            text-align: left;
+            position: relative;
+            zoom: 1;
+        }
+        #header h1 {
+            display: inline-block;
+            *display: inline;
+            zoom: 1;
+            margin: 0;
+            font-size: 24px;
+        }
+        .header-actions {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+        }
+        .hdr-btn {
+            background: transparent;
+            border: 2px solid;
+            padding: 5px 15px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 10px;
+            -moz-border-radius: 10px;
+            -webkit-border-radius: 10px;
+        }
+        #nav-area {
+            border-bottom: 2px solid;
+            overflow: hidden;
+            white-space: nowrap;
+            height: 40px;
+            line-height: 40px;
+        }
+        .category-tab {
+            display: inline-block;
+            *display: inline;
+            zoom: 1;
+            padding: 0 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            opacity: 0.5;
+            filter: alpha(opacity=50);
+        }
+        .category-tab.active {
+            opacity: 1;
+            filter: alpha(opacity=100);
+            font-size: 18px;
+        }
+        #board {
+            padding: 10px;
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
         }
         .sound-btn {
             display: inline-block;
-            width: 45%;
-            margin: 5px 1%;
-            padding: 15px 0;
-            border: 3px solid #ffffff;
-            background-color: #000000;
-            color: #ffffff;
+            *display: inline;
+            zoom: 1;
+            width: 48%;
+            margin: 1%;
+            padding: 15px 5px;
+            border: 3px solid;
+            background: transparent;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            /* Graceful degradation for modern browsers */
-            border-radius: 15px; 
-            -moz-border-radius: 15px;
-            -webkit-border-radius: 15px;
+            border-radius: 20px;
+            -moz-border-radius: 20px;
+            -webkit-border-radius: 20px;
         }
-        .sound-btn:hover {
-            background-color: #333333;
+        #board-nav {
+            padding: 10px;
+            border-top: 3px solid;
+            margin-top: 20px;
         }
-        .sound-btn:active {
-            background-color: #ffffff;
-            color: #000000;
-        }
-        #loading {
-            font-size: 20px;
+        .nav-btn {
+            background: transparent;
+            border: 2px solid;
+            padding: 8px 20px;
             font-weight: bold;
-            margin-top: 50px;
+            cursor: pointer;
+            border-radius: 10px;
+            margin: 0 5px;
         }
-        .footer {
-            margin-top: 40px;
-            font-size: 12px;
-            color: #888888;
+        .nav-btn:disabled {
+            opacity: 0.3;
+            filter: alpha(opacity=30);
+            cursor: default;
+        }
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=); /* 50% black fallback */
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+        }
+        .modal-content {
+            width: 90%;
+            max-width: 500px;
+            margin: 50px auto;
+            border: 4px solid;
+            padding: 20px;
+            border-radius: 20px;
+        }
+        .theme-grid {
+            margin-top: 20px;
+        }
+        .theme-btn {
+            display: inline-block;
+            *display: inline;
+            zoom: 1;
+            margin: 5px;
+            padding: 10px;
+            border: 2px solid;
+            background: transparent;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-btn {
+            margin-top: 20px;
+            padding: 10px 30px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Sillyboard :3 (Legacy)</h1>
-        
-        <div id="loading">Loading sounds...</div>
-        
-        <div id="board" style="display:none;">
-            <!-- Buttons will be injected here -->
+    <div id="loading" style="margin-top: 50px; font-size: 24px; font-weight: bold;">Loading...</div>
+
+    <div id="app" style="display: none;">
+        <div id="header">
+            <h1>Sillyboard :3</h1>
+            <div class="header-actions">
+                <button class="hdr-btn" id="settings-btn">Settings</button>
+            </div>
         </div>
 
-        <div class="footer">
-            Built for maximum compatibility with Internet Explorer 6+, Windows XP, and vintage browsers.
+        <div id="nav-area"></div>
+
+        <div id="board"></div>
+
+        <div id="board-nav">
+            <button class="nav-btn" id="prev-page-btn" disabled>◄ Prev</button>
+            <button class="nav-btn" id="next-page-btn" disabled>Next ►</button>
         </div>
     </div>
-    
-    <!-- Audio fallback container -->
-    <div id="audio-container" style="position: absolute; top: -9999px; left: -9999px; width: 1px; height: 1px;"></div>
+
+    <!-- Audio Fallback -->
+    <div id="audio-container" style="position: absolute; top: -999px; width: 1px; height: 1px;"></div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-content" id="modal-content">
+            <h2>Settings</h2>
+            <div style="margin-top: 20px; text-align: left;">
+                <strong>Theme Presets (Legacy Mode)</strong>
+            </div>
+            <div class="theme-grid" id="theme-grid"></div>
+            <button class="close-btn" id="close-settings-btn">Done</button>
+        </div>
+    </div>
 
     <script type="text/javascript">
-        // Polyfill for JSON in IE7 and below
+        // ── Utilities ──
         function parseJSON(str) {
-            if (window.JSON && window.JSON.parse) {
-                return window.JSON.parse(str);
-            } else {
-                // Fallback for pre-ES5 browsers
-                return eval('(' + str + ')');
-            }
+            if (window.JSON && window.JSON.parse) return window.JSON.parse(str);
+            return eval('(' + str + ')');
         }
 
-        // Cross browser event listener (IE8 attachEvent support)
-        function addEvent(element, eventName, handler) {
-            if (element.addEventListener) {
-                element.addEventListener(eventName, handler, false);
-            } else if (element.attachEvent) {
-                element.attachEvent('on' + eventName, handler);
-            } else {
-                element['on' + eventName] = handler;
-            }
+        function addEvent(el, ev, fn) {
+            if (el.addEventListener) el.addEventListener(ev, fn, false);
+            else if (el.attachEvent) el.attachEvent('on' + ev, fn);
+            else el['on' + ev] = fn;
         }
 
-        var soundDefs = {};
-        var boardEl = document.getElementById('board');
-        var loadingEl = document.getElementById('loading');
-        var audioContainer = document.getElementById('audio-container');
-        
-        // Basic detection for old IE to use <bgsound>
         var isOldIE = false;
         if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > -1) {
             isOldIE = true;
         }
 
-        function playSound(key) {
-            var def = soundDefs[key];
-            if (!def || !def.variants || def.variants.length === 0) return;
+        // ── Dynamic Theme Engine ──
+        var currentBg = '#000000';
+        var currentAc = '#ffffff';
+
+        function applyTheme(bg, ac) {
+            currentBg = bg;
+            currentAc = ac;
             
-            // Pick a random variant (no weighting support for simplicity in legacy mode)
-            var rnd = Math.floor(Math.random() * def.variants.length);
-            var src = def.variants[rnd].src;
+            var css = "body, .modal-content { background-color: " + bg + " !important; color: " + ac + " !important; } " +
+                      "#header, #nav-area, #board-nav { border-color: " + ac + " !important; } " +
+                      ".hdr-btn, .nav-btn, .sound-btn, .theme-btn { border-color: " + ac + " !important; color: " + ac + " !important; } " +
+                      ".hdr-btn:hover, .nav-btn:hover, .sound-btn:hover, .theme-btn:hover { background-color: " + ac + " !important; color: " + bg + " !important; } " +
+                      ".close-btn { background-color: " + ac + " !important; color: " + bg + " !important; } " +
+                      ".category-tab { color: " + ac + " !important; }";
+
+            var styleEl = document.getElementById('dynamic-theme');
+            if (styleEl.styleSheet) {
+                styleEl.styleSheet.cssText = css; // IE8 and below
+            } else {
+                styleEl.innerHTML = css;
+            }
+
+            try { localStorage.setItem('sillyboard-bg', bg); localStorage.setItem('sillyboard-accent', ac); } catch(e){}
+        }
+
+        try {
+            var storedBg = localStorage.getItem('sillyboard-bg');
+            var storedAc = localStorage.getItem('sillyboard-accent');
+            if (storedBg && storedAc) applyTheme(storedBg, storedAc);
+            else applyTheme('#000000', '#ffffff');
+        } catch(e) { applyTheme('#000000', '#ffffff'); }
+
+        // ── 4-Tier Audio Engine ──
+        var audioCtx = null;
+        if (window.AudioContext || window.webkitAudioContext) {
+            try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){}
+        }
+
+        function playSound(src) {
+            var audioContainer = document.getElementById('audio-container');
             
-            // Clear previous audio element to prevent overlapping memory leaks in old browsers
+            // 1. Web Audio API (Fix for Nintendo Switch / Modern Browsers needing raw decode)
+            if (audioCtx) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', src, true);
+                xhr.responseType = 'arraybuffer';
+                xhr.onload = function() {
+                    audioCtx.decodeAudioData(xhr.response, function(buffer) {
+                        var source = audioCtx.createBufferSource();
+                        source.buffer = buffer;
+                        source.connect(audioCtx.destination);
+                        if (source.start) source.start(0);
+                        else source.noteOn(0);
+                    }, function(){});
+                };
+                xhr.send();
+                return;
+            }
+
             audioContainer.innerHTML = ''; 
-            
-            // 1. Try HTML5 Audio (IE9+, Modern Browsers)
+
+            // 2. HTML5 Audio (Older modern browsers like IE9)
             var audioTest = document.createElement('audio');
-            if (audioTest.canPlayType) {
+            if (audioTest.canPlayType && audioTest.canPlayType('audio/wav') !== '') {
                 var audio = document.createElement('audio');
                 audio.src = src;
                 audio.autoplay = true;
                 audioContainer.appendChild(audio);
                 if (typeof audio.play === 'function') {
-                    // Try to catch promise rejections in modern browsers to prevent console spam
-                    var playPromise = audio.play();
-                    if (playPromise !== undefined && typeof playPromise.catch === 'function') {
-                        playPromise.catch(function(){});
-                    }
+                    var p = audio.play();
+                    if (p && typeof p.catch === 'function') p.catch(function(){});
                 }
             } 
-            // 2. Try <bgsound> (IE6, IE7, IE8)
+            // 3. <bgsound> (IE6/7/8)
             else if (isOldIE) {
                 var bgsound = document.createElement('bgsound');
                 bgsound.src = src;
                 audioContainer.appendChild(bgsound);
             } 
-            // 3. Fallback to <embed> (Old Netscape/Firefox/Safari)
+            // 4. <embed> (Old Netscape/Firefox/Safari)
             else {
                 var embed = document.createElement('embed');
                 embed.src = src;
@@ -155,74 +295,219 @@
             }
         }
 
-        function loadSounds() {
-            var xhr;
-            if (window.XMLHttpRequest) {
-                xhr = new XMLHttpRequest();
-            } else if (window.ActiveXObject) {
-                // IE6 and IE5
-                try {
-                    xhr = new ActiveXObject("Msxml2.XMLHTTP");
-                } catch(e) {
-                    try {
-                        xhr = new ActiveXObject("Microsoft.XMLHTTP");
-                    } catch(e) {}
+        // ── Data & State ──
+        var soundDefs = {};
+        var pagesDef = {};
+        var pagesArray = [];
+        var categoryNames = [];
+        var currentPage = 0;
+        var SOUNDS_PER_PAGE = 24;
+
+        function buildPages() {
+            var validKeys = [];
+            for (var k in soundDefs) {
+                if (Object.prototype.hasOwnProperty.call(soundDefs, k) && k !== 'locked' && k !== 'streamables') {
+                    validKeys.push(k);
                 }
             }
 
-            if (!xhr) {
-                loadingEl.innerHTML = "Error: Your browser does not support XMLHttpRequest.";
-                return;
-            }
-
-            // Cache bust for older browsers
-            var t = new Date().getTime();
-            xhr.open('GET', 'Soundboard/sounds.json?t=' + t, true);
-            
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200 || xhr.status === 304 || xhr.status === 0) {
-                        try {
-                            soundDefs = parseJSON(xhr.responseText);
-                            renderBoard();
-                        } catch (e) {
-                            loadingEl.innerHTML = "Error parsing sounds.json data.";
+            var placedKeys = {};
+            for (var cat in pagesDef) {
+                if (!Object.prototype.hasOwnProperty.call(pagesDef, cat)) continue;
+                var keys = [];
+                for (var i=0; i<pagesDef[cat].length; i++) {
+                    var tk = pagesDef[cat][i];
+                    for (var j=0; j<validKeys.length; j++) {
+                        if (validKeys[j] === tk) {
+                            keys.push(tk);
+                            placedKeys[tk] = true;
+                            break;
                         }
-                    } else {
-                        loadingEl.innerHTML = "Error loading sounds.json. Status: " + xhr.status;
                     }
                 }
-            };
+                if (keys.length > 0) {
+                    categoryNames.push(cat);
+                    for (var m=0; m<keys.length; m+=SOUNDS_PER_PAGE) {
+                        pagesArray.push({
+                            category: cat,
+                            keys: keys.slice(m, m + SOUNDS_PER_PAGE)
+                        });
+                    }
+                }
+            }
+
+            var unorganized = [];
+            for (var u=0; u<validKeys.length; u++) {
+                if (!placedKeys[validKeys[u]]) unorganized.push(validKeys[u]);
+            }
+            if (unorganized.length > 0) {
+                categoryNames.push('Unorganized');
+                for (var v=0; v<unorganized.length; v+=SOUNDS_PER_PAGE) {
+                    pagesArray.push({
+                        category: 'Unorganized',
+                        keys: unorganized.slice(v, v + SOUNDS_PER_PAGE)
+                    });
+                }
+            }
             
-            xhr.send(null);
+            // If pages.json failed, just put everything in All
+            if (pagesArray.length === 0) {
+                categoryNames.push('All');
+                for (var w=0; w<validKeys.length; w+=SOUNDS_PER_PAGE) {
+                    pagesArray.push({
+                        category: 'All',
+                        keys: validKeys.slice(w, w + SOUNDS_PER_PAGE)
+                    });
+                }
+            }
         }
 
-        function renderBoard() {
-            loadingEl.style.display = 'none';
-            boardEl.style.display = 'block';
+        function renderTabs() {
+            var nav = document.getElementById('nav-area');
+            nav.innerHTML = '';
+            for (var i=0; i<categoryNames.length; i++) {
+                var cat = categoryNames[i];
+                var span = document.createElement('span');
+                span.className = 'category-tab';
+                span.innerHTML = cat;
+                
+                (function(c) {
+                    addEvent(span, 'click', function() {
+                        for (var p=0; p<pagesArray.length; p++) {
+                            if (pagesArray[p].category === c) {
+                                currentPage = p;
+                                renderPage();
+                                break;
+                            }
+                        }
+                    });
+                })(cat);
+                
+                nav.appendChild(span);
+            }
+        }
 
-            for (var key in soundDefs) {
-                if (!Object.prototype.hasOwnProperty.call(soundDefs, key)) continue;
-                if (key === 'locked' || key === 'streamables') continue;
+        function renderPage() {
+            var board = document.getElementById('board');
+            board.innerHTML = '';
 
+            if (pagesArray.length === 0) return;
+            var page = pagesArray[currentPage];
+            
+            var tabs = document.getElementById('nav-area').getElementsByTagName('span');
+            for (var i=0; i<tabs.length; i++) {
+                if (tabs[i].innerHTML === page.category) {
+                    tabs[i].className = 'category-tab active';
+                } else {
+                    tabs[i].className = 'category-tab';
+                }
+            }
+
+            var keys = page.keys;
+            for (var j=0; j<keys.length; j++) {
+                var key = keys[j];
                 var def = soundDefs[key];
                 var btn = document.createElement('button');
                 btn.className = 'sound-btn';
                 btn.innerHTML = def.label || key;
                 
-                // Use a closure to capture the correct key variable
-                (function(capturedKey) {
+                (function(k) {
                     addEvent(btn, 'click', function(e) {
-                        playSound(capturedKey);
+                        var d = soundDefs[k];
+                        if (d && d.variants && d.variants.length > 0) {
+                            var rnd = Math.floor(Math.random() * d.variants.length);
+                            playSound(d.variants[rnd].src);
+                            if (k === 'green') applyTheme('#00ff00', '#006600');
+                        }
+                        if (e && e.preventDefault) e.preventDefault();
+                        if (window.event) window.event.returnValue = false;
                     });
                 })(key);
-
-                boardEl.appendChild(btn);
+                board.appendChild(btn);
             }
+
+            document.getElementById('prev-page-btn').disabled = (currentPage <= 0);
+            document.getElementById('next-page-btn').disabled = (currentPage >= pagesArray.length - 1);
         }
 
-        // Initialize the app
-        loadSounds();
+        addEvent(document.getElementById('prev-page-btn'), 'click', function() {
+            if (currentPage > 0) { currentPage--; renderPage(); }
+        });
+        addEvent(document.getElementById('next-page-btn'), 'click', function() {
+            if (currentPage < pagesArray.length - 1) { currentPage++; renderPage(); }
+        });
+
+        // ── Fetching Data ──
+        function fetchJSON(url, callback) {
+            var xhr;
+            if (window.XMLHttpRequest) xhr = new XMLHttpRequest();
+            else if (window.ActiveXObject) {
+                try { xhr = new ActiveXObject("Msxml2.XMLHTTP"); } catch(e) {
+                    try { xhr = new ActiveXObject("Microsoft.XMLHTTP"); } catch(e) {}
+                }
+            }
+            if (!xhr) return callback("No XHR support", null);
+            
+            var t = new Date().getTime();
+            xhr.open('GET', url + '?t=' + t, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200 || xhr.status === 304 || xhr.status === 0) {
+                        try { callback(null, parseJSON(xhr.responseText)); }
+                        catch(e) { callback(e, null); }
+                    } else {
+                        callback("HTTP " + xhr.status, null);
+                    }
+                }
+            };
+            xhr.send(null);
+        }
+
+        fetchJSON('Soundboard/sounds.json', function(err, data) {
+            if (err) { document.getElementById('loading').innerHTML = 'Error loading sounds.json'; return; }
+            soundDefs = data;
+            
+            fetchJSON('Soundboard/pages.json', function(err2, data2) {
+                if (!err2) pagesDef = data2;
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                
+                buildPages();
+                renderTabs();
+                renderPage();
+            });
+        });
+
+        // ── Settings & Themes ──
+        var themes = [
+            {n:'IAmAnOLED', b:'#000000', a:'#ffffff'},
+            {n:'Dark Gray', b:'#1a1a1a', a:'#ffffff'},
+            {n:'Light Mode', b:'#ffffff', a:'#000000'},
+            {n:'Midnight', b:'#001524', a:'#ffecd1'},
+            {n:'Purple', b:'#2d1b4e', a:'#d4b8ff'},
+            {n:'Pink', b:'#4a1528', a:'#ffb3c6'},
+            {n:'Orange', b:'#3d1c00', a:'#ffb067'},
+            {n:'Forest', b:'#0b2b1d', a:'#a3ffcc'},
+            {n:'Ocean', b:'#001f3f', a:'#80c4ff'},
+            {n:'Hacker', b:'#0d1117', a:'#00ff00'}
+        ];
+
+        var tgrid = document.getElementById('theme-grid');
+        for (var i=0; i<themes.length; i++) {
+            var tbtn = document.createElement('button');
+            tbtn.className = 'theme-btn';
+            tbtn.innerHTML = themes[i].n;
+            (function(b, a) {
+                addEvent(tbtn, 'click', function() { applyTheme(b, a); });
+            })(themes[i].b, themes[i].a);
+            tgrid.appendChild(tbtn);
+        }
+
+        var sModal = document.getElementById('settings-modal');
+        addEvent(document.getElementById('settings-btn'), 'click', function() { sModal.style.display = 'block'; });
+        addEvent(document.getElementById('close-settings-btn'), 'click', function() { sModal.style.display = 'none'; });
+
     </script>
 </body>
 </html>
