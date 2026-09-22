@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peaking Through the Lenses</title>
+    <meta name="description" content="Select a career to surface a briefing, then apply a lens to see considerations and thoughts on the matter.">
+    <style>
+        :root {
+            --crema-bg: #1a0d0b;
+            --crema-fg: #d4a373;
+            --crema-surface: rgba(255,255,255,0.05);
+            --crema-surface-hover: rgba(255,255,255,0.10);
+            --crema-focus-ring: rgba(212,163,115,0.3);
+            --crema-danger: #ff4c4c;
+            --crema-radius-sm: 10px;
+            --crema-radius-btn: 12px;
+            --crema-radius-md: 14px;
+            --crema-radius-lg: 20px;
+            --crema-radius-xl: 28px;
+            --crema-border-width: 2.5px;
+            --crema-border-width-thick: 3.5px;
+            --crema-ease: cubic-bezier(0.4, 0.0, 0.2, 1);
+            --crema-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --crema-duration-fast: 180ms;
+            --crema-duration-normal: 350ms;
+            --crema-duration-slow: 600ms;
+            --crema-font: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        ::selection { background: var(--crema-fg); color: var(--crema-bg); }
+        html {
+            font-size: 125%;
+        }
+        html, body {
+            width: 100%; height: 100%;
+            background-color: var(--crema-bg);
+            color: var(--crema-fg);
+            font-family: var(--crema-font);
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color var(--crema-duration-slow) var(--crema-ease), color var(--crema-duration-slow) var(--crema-ease);
+        }
+        #app-shell {
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--crema-bg);
+            transition: background-color var(--crema-duration-slow) var(--crema-ease);
+        }
+        #app-frame {
+            position: relative;
+            aspect-ratio: 4/3;
+            width: min(100vw, calc(100vh * 4/3));
+            height: min(100vh, calc(100vw * 3/4));
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .screen {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            opacity: 0; pointer-events: none;
+            visibility: hidden;
+            transition: opacity 350ms var(--crema-ease), visibility 350ms var(--crema-ease);
+        }
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+            visibility: visible;
+            z-index: 10;
+        }
+        .screen.exit {
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
+            z-index: 5;
+        }
+        .screen:not(.active):not(.exit) {
+            display: none !important;
+        }
+        .screen:not(.active),
+        .screen:not(.active) * {
+            pointer-events: none !important;
+        }
+
+        /* Header */
+        .crema-app-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 18px;
+            border-bottom: var(--crema-border-width) solid var(--crema-fg);
+            flex-shrink: 0;
+            transition: border-color var(--crema-duration-slow) var(--crema-ease);
+        }
+        .crema-app-header h1 {
+            font-size: clamp(1rem, 2.5vw, 1.6rem); font-weight: 900; letter-spacing: 0.04em; white-space: nowrap;
+        }
+        .header-actions { display: flex; gap: 8px; align-items: center; }
+        .crema-hdr-btn {
+            background: transparent; color: var(--crema-fg); border: var(--crema-border-width) solid var(--crema-fg);
+            padding: 8px 18px; border-radius: var(--crema-radius-md);
+            font-size: clamp(0.75rem, 1.6vw, 0.95rem); font-weight: 700; font-family: var(--crema-font);
+            cursor: pointer; user-select: none;
+            transition: background 0.15s, color 0.15s, border-color var(--crema-duration-slow) var(--crema-ease);
+        }
+        .crema-hdr-btn:hover { background: var(--crema-fg); color: var(--crema-bg); }
+        .crema-hdr-btn:active { opacity: 0.85; }
+
+        /* Screen body */
+        .screen-body {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: clamp(20px, 4vw, 48px); overflow: hidden;
+        }
+
+        /* Card */
+        .crema-card {
+            background: var(--crema-surface); border: var(--crema-border-width) solid var(--crema-fg);
+            border-radius: var(--crema-radius-lg); padding: clamp(18px, 3vw, 32px);
+            transition: border-color var(--crema-duration-slow) var(--crema-ease); width: 100%;
+        }
+
+        /* Buttons */
+        .crema-btn {
+            padding: 10px 22px; border: var(--crema-border-width) solid var(--crema-fg);
+            color: var(--crema-fg); border-radius: var(--crema-radius-btn);
+            font-size: clamp(0.82rem, 1.7vw, 1rem); cursor: pointer; background: transparent;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color var(--crema-duration-slow) var(--crema-ease);
+            font-weight: 800; font-family: var(--crema-font); user-select: none;
+            display: inline-flex; align-items: center; justify-content: center;
+            line-height: 1; white-space: nowrap;
+        }
+        .crema-btn:hover:not(:disabled) { background-color: var(--crema-fg); color: var(--crema-bg); }
+        .crema-btn:active:not(:disabled) { opacity: 0.85; }
+        .crema-btn:focus-visible { outline: 2.5px solid var(--crema-fg); outline-offset: 4px; }
+        .crema-btn-primary { background: var(--crema-fg); color: var(--crema-bg); }
+        .crema-btn-primary:hover:not(:disabled) { filter: brightness(0.88); }
+        .crema-btn-danger { background: var(--crema-danger); color: white; border-color: var(--crema-danger); }
+        .crema-btn-danger:hover:not(:disabled) { filter: brightness(1.2); }
+        .crema-btn-sm { padding: 8px 18px; font-size: clamp(0.75rem, 1.4vw, 0.9rem); border-radius: var(--crema-radius-sm); }
+
+        /* Checkbox */
+        .crema-check-label {
+            font-size: clamp(0.85rem, 1.6vw, 1rem);
+            display: flex; align-items: center; gap: 10px;
+            cursor: pointer; user-select: none; margin-bottom: 10px;
+        }
+        .crema-check-label input[type="checkbox"] {
+            width: 19px; height: 19px; cursor: pointer;
+            accent-color: var(--crema-fg); flex-shrink: 0;
+        }
+        .crema-muted { opacity: 0.55; }
+
+        /* ─── WELCOME SCREEN ─── */
+        .welcome-card {
+            background: var(--crema-surface); border: var(--crema-border-width) solid var(--crema-fg);
+            border-radius: var(--crema-radius-xl); padding: clamp(28px, 5vw, 48px) clamp(28px, 6vw, 56px);
+            width: 90%; max-width: 480px; text-align: center;
+            transition: border-color var(--crema-duration-slow) var(--crema-ease);
+        }
+        .welcome-title {
+            font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 900; margin-bottom: 24px; letter-spacing: 0.02em;
+        }
+        .welcome-actions { margin-bottom: 24px; }
+        .welcome-checks { text-align: left; }
+
+        /* ─── THEME SCREEN ─── */
+        .theme-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 16px auto 20px; width: 100%; max-width: 780px; }
+        .theme-btn {
+            padding: clamp(9px, 1.6vw, 13px) 12px; border: var(--crema-border-width) solid var(--crema-fg);
+            color: var(--crema-fg); border-radius: var(--crema-radius-btn);
+            font-size: clamp(0.78rem, 1.4vw, 0.9rem); cursor: pointer; background: transparent;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color var(--crema-duration-slow) var(--crema-ease); font-weight: 800; font-family: var(--crema-font);
+            white-space: nowrap; overflow: hidden; text-overflow: clip;
+        }
+        .theme-btn:hover, .theme-btn.selected { background: var(--crema-fg); color: var(--crema-bg); }
+        .theme-note { font-size: clamp(0.75rem, 1.4vw, 0.9rem); opacity: 0.6; line-height: 1.6; max-width: 600px; margin: 0 auto 16px; text-align: center; }
+
+        /* ─── INTRO ─── */
+        .intro-text { font-size: clamp(1rem, 2.2vw, 1.35rem); line-height: 1.65; max-width: 500px; text-align: center; }
+
+        /* ─── MAIN / CAREER LIST & LENS VIEW ─── */
+        .main-body {
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            width: 100%;
+        }
+        .career-view {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.35s var(--crema-ease), transform 0.35s var(--crema-ease), visibility 0.35s var(--crema-ease);
+            pointer-events: auto;
+            visibility: visible;
+        }
+        .career-view.hidden {
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+            visibility: hidden;
+        }
+        .career-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            overflow-y: auto;
+            padding: clamp(12px, 2vw, 24px) clamp(16px, 3vw, 32px);
+        }
+        .career-list::-webkit-scrollbar { width: 5px; }
+        .career-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+        .career-item {
+            padding: clamp(10px, 1.8vw, 14px) clamp(14px, 2.5vw, 22px);
+            border: var(--crema-border-width) solid var(--crema-fg);
+            border-radius: var(--crema-radius-md);
+            font-size: clamp(0.9rem, 2vw, 1.1rem); font-weight: 800; cursor: pointer;
+            background: transparent; color: var(--crema-fg); font-family: var(--crema-font);
+            text-align: center;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color var(--crema-duration-slow) var(--crema-ease), transform 0.1s ease;
+            user-select: none; display: block; width: 100%;
+        }
+        .career-item:hover:not(.selected) { background-color: var(--crema-surface-hover); }
+        .career-item:active { transform: scale(0.985); }
+        .career-item.selected {
+            background: var(--crema-fg) !important;
+            color: var(--crema-bg) !important;
+        }
+
+        /* Centered & smoothly animated prompt */
+        .lens-prompt {
+            text-align: center;
+            padding: 8px clamp(14px, 2.5vw, 26px) 6px;
+            font-size: clamp(0.78rem, 1.4vw, 0.92rem);
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: var(--crema-fg);
+            flex-shrink: 0;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.35s var(--crema-ease), transform 0.35s var(--crema-ease);
+            pointer-events: none;
+            user-select: none;
+        }
+        .lens-prompt.visible {
+            opacity: 0.75;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* ─── LENS DETAIL VIEW ─── */
+        .lens-detail-view {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.35s var(--crema-ease), transform 0.35s var(--crema-ease), visibility 0.35s var(--crema-ease);
+            pointer-events: none;
+            visibility: hidden;
+        }
+        .lens-detail-view.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            visibility: visible;
+        }
+        .lens-content { flex: 1; overflow-y: auto; padding: clamp(14px, 2.5vw, 28px) clamp(16px, 3vw, 32px); }
+        .lens-content::-webkit-scrollbar { width: 5px; }
+        .lens-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+        .lens-section { margin-bottom: 20px; }
+        .lens-section-title {
+            font-size: clamp(0.8rem, 1.6vw, 1rem); font-weight: 900; opacity: 0.75;
+            letter-spacing: 0.05em; margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;
+        }
+        .lens-section-body { font-size: clamp(0.95rem, 1.9vw, 1.15rem); line-height: 1.65; opacity: 0.9; }
+        .lens-stat {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+        }
+        .lens-stat-val { font-weight: 900; font-size: clamp(0.9rem, 1.8vw, 1.1rem); }
+
+        /* ─── LENS BOTTOM BAR ─── */
+        .lens-bar {
+            display: flex;
+            align-items: center;
+            padding: 10px clamp(10px, 2vw, 22px);
+            border-top: var(--crema-border-width) solid var(--crema-fg);
+            flex-shrink: 0;
+            transition: border-color var(--crema-duration-slow) var(--crema-ease);
+            overflow: hidden;
+            box-sizing: border-box;
+            width: 100%;
+        }
+        .lens-tab {
+            flex: 1 1 0%;
+            min-width: 0;
+            max-width: 100%;
+            text-align: center;
+            padding: 8px 10px;
+            margin: 0 4px;
+            border: var(--crema-border-width) solid var(--crema-fg);
+            border-radius: var(--crema-radius-sm);
+            font-size: clamp(0.7rem, 1.4vw, 0.88rem);
+            font-weight: 800;
+            cursor: pointer;
+            background: transparent;
+            color: var(--crema-fg);
+            font-family: var(--crema-font);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            user-select: none;
+            box-sizing: border-box;
+            opacity: 0.35;
+            transition:
+                flex 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+                max-width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+                padding 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+                margin 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+                opacity 0.3s var(--crema-ease),
+                border-color var(--crema-duration-slow) var(--crema-ease),
+                background-color 0.2s ease,
+                color 0.2s ease,
+                transform 0.1s ease;
+        }
+        .lens-tab.is-disabled {
+            cursor: not-allowed;
+            pointer-events: auto;
+        }
+        .lens-tab:hover:not(.is-disabled):not(.selected) {
+            background: var(--crema-surface-hover);
+        }
+        .lens-tab:active:not(.is-disabled) {
+            transform: scale(0.98);
+        }
+        .lens-tab.selected {
+            background: var(--crema-fg) !important;
+            color: var(--crema-bg) !important;
+        }
+        .lens-bar.lens-mode .lens-tab:not(.selected):not(.done-tab) {
+            flex: 0 0 0% !important;
+            max-width: 0 !important;
+            padding: 8px 0 !important;
+            margin: 0 !important;
+            border-left-width: 0 !important;
+            border-right-width: 0 !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+        .lens-bar.lens-mode .lens-tab.selected {
+            flex: 1 1 auto;
+            margin: 0 8px 0 0;
+            text-overflow: clip;
+        }
+        .lens-tab.done-tab {
+            flex: 0 0 0%;
+            max-width: 0;
+            padding: 8px 0;
+            margin: 0;
+            border-left-width: 0;
+            border-right-width: 0;
+            opacity: 0;
+            pointer-events: none;
+            order: 99;
+        }
+        .lens-bar.lens-mode .lens-tab.done-tab {
+            flex: 0 0 auto;
+            max-width: 140px;
+            padding: 8px 24px;
+            margin: 0;
+            border: var(--crema-border-width) solid var(--crema-fg);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .lens-bar.lens-mode .lens-tab.done-tab:hover {
+            background: var(--crema-fg);
+            color: var(--crema-bg);
+        }
+
+        /* ─── MODALS ─── */
+        .crema-modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 2000; opacity: 0; pointer-events: none;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+        }
+        .crema-modal-overlay.crema-active { opacity: 1; pointer-events: auto; visibility: visible; }
+        .crema-modal-overlay:not(.crema-active) { visibility: hidden !important; pointer-events: none !important; }
+        .crema-modal-overlay:not(.crema-active) * { pointer-events: none !important; }
+        .crema-modal {
+            background: var(--crema-bg); border: var(--crema-border-width-thick) solid var(--crema-fg);
+            border-radius: var(--crema-radius-xl); padding: clamp(18px, 3.5vw, 32px);
+            width: 90%; max-width: 620px; max-height: 85vh; overflow-y: auto;
+            transform: scale(0.92);
+            transition: transform 0.28s var(--crema-ease-spring), border-color var(--crema-duration-slow) var(--crema-ease), background-color var(--crema-duration-slow) var(--crema-ease);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+        .crema-modal::-webkit-scrollbar { width: 4px; }
+        .crema-modal::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+        .crema-modal-overlay.crema-active .crema-modal { transform: scale(1); }
+        .crema-modal h2 {
+            font-size: clamp(1rem, 2.4vw, 1.4rem); font-weight: 900;
+            border-bottom: 2px solid var(--crema-fg); padding-bottom: 6px;
+            margin-bottom: 16px;
+            transition: border-color var(--crema-duration-slow) var(--crema-ease);
+        }
+        .crema-modal p { font-size: clamp(0.82rem, 1.6vw, 0.98rem); line-height: 1.65; opacity: 0.9; margin-bottom: 12px; }
+        /* modal-actions: done/close button always bottom-right */
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+        .modal-actions-center { display: flex; justify-content: center; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+        .crema-settings-section {
+            font-size: clamp(0.8rem, 1.6vw, 1rem); font-weight: 900; opacity: 0.75;
+            border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 5px;
+            margin-bottom: 10px; display: block; letter-spacing: 0.05em;
+        }
+        .settings-theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+        .settings-theme-btn {
+            padding: clamp(8px, 1.5vw, 12px) 10px; border: var(--crema-border-width) solid var(--crema-fg); color: var(--crema-fg);
+            border-radius: var(--crema-radius-btn); font-size: clamp(0.82rem, 1.6vw, 1rem); cursor: pointer; background: transparent;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color var(--crema-duration-slow) var(--crema-ease); font-weight: 800; font-family: var(--crema-font);
+        }
+        .settings-theme-btn:hover, .settings-theme-btn.selected { background: var(--crema-fg); color: var(--crema-bg); }
+        .crema-picker-row { display: flex; justify-content: center; gap: 40px; margin: 10px 0 18px; }
+        .crema-picker-wrap { display: flex; flex-direction: column; align-items: center; gap: 7px; font-size: clamp(0.8rem, 1.5vw, 0.95rem); }
+        .crema-picker-wrap input[type="color"] {
+            width: 64px; height: 40px; border: var(--crema-border-width) solid var(--crema-fg);
+            border-radius: var(--crema-radius-btn); padding: 2px; background: none; cursor: pointer;
+        }
+
+        /* ─── SPLASH ─── */
+        #splash {
+            position: fixed; inset: 0; background: var(--crema-bg);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; transition: opacity 0.5s var(--crema-ease), visibility 0.5s var(--crema-ease);
+        }
+        #splash.out { opacity: 0; pointer-events: none; visibility: hidden; }
+        .splash-title {
+            font-size: clamp(1.4rem, 4vw, 2.5rem); font-weight: 900; letter-spacing: 0.04em;
+            border-bottom: 3px solid var(--crema-fg); padding-bottom: 8px;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* ─── STAGGER ─── */
+        .stagger > * { opacity: 0; animation: staggerIn 350ms var(--crema-ease) forwards; }
+        .stagger > *:nth-child(1) { animation-delay: 40ms; }
+        .stagger > *:nth-child(2) { animation-delay: 90ms; }
+        .stagger > *:nth-child(3) { animation-delay: 140ms; }
+        .stagger > *:nth-child(4) { animation-delay: 190ms; }
+        .stagger > *:nth-child(5) { animation-delay: 240ms; }
+        .stagger > *:nth-child(6) { animation-delay: 290ms; }
+        .stagger > *:nth-child(7) { animation-delay: 340ms; }
+        @keyframes staggerIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .one-sec {
+            display: flex; align-items: center; justify-content: center; flex: 1;
+            font-size: clamp(1.2rem, 2.8vw, 1.8rem); font-weight: 900; opacity: 0.45;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+<script>
+(function () {
+    var bg = localStorage.getItem('crema-bg') || '#1a0d0b';
+    var fg = localStorage.getItem('crema-fg') || '#d4a373';
+    document.documentElement.style.setProperty('--crema-bg', bg);
+    document.documentElement.style.setProperty('--crema-fg', fg);
+    function hexToRgb(h) {
+        var r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);
+        return r ? {r: parseInt(r[1],16), g: parseInt(r[2],16), b: parseInt(r[3],16)} : {r:212,g:163,b:115};
+    }
+    var rgb = hexToRgb(fg);
+    document.documentElement.style.setProperty('--crema-focus-ring', 'rgba('+rgb.r+','+rgb.g+','+rgb.b+',0.3)');
+})();
+</script>
+
+<div id="splash"><div class="splash-title">Peaking Through the Lenses</div></div>
+
+<div id="app-shell">
+<div id="app-frame">
+
+<!-- SCREEN 0: WELCOME -->
+<div class="screen" id="screen-welcome">
+    <div class="screen-body">
+        <div class="welcome-card">
+            <div class="welcome-title">Peaking Through the Lenses</div>
+            <div class="welcome-actions">
+                <button class="crema-btn crema-btn-primary" id="btn-get-started" style="padding: 11px 32px; font-size: clamp(0.9rem, 1.9vw, 1.1rem);">Get Started</button>
+            </div>
+            <div class="welcome-checks">
+                <label class="crema-check-label"><input type="checkbox" id="check-larger-font"> Use a larger font-size</label>
+                <label class="crema-check-label"><input type="checkbox" id="check-reduce-motion"> Reduce motion</label>
+                <label class="crema-check-label"><input type="checkbox" id="check-audio"> Use audio cues</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SCREEN 1: THEME PICKER -->
+<div class="screen" id="screen-theme">
+    <div class="crema-app-header"><h1>Peaking Through the Lenses</h1></div>
+    <div class="screen-body" style="overflow-y:auto;align-items:center;justify-content:flex-start;padding-top:clamp(16px,3vw,32px);">
+        <div style="width:100%;max-width:780px;text-align:center;margin:0 auto;">
+            <div style="font-size:clamp(1rem,2.5vw,1.5rem);font-weight:900;margin-bottom:20px;text-align:center;">Pick a theme.</div>
+            <div class="theme-grid stagger" id="theme-grid-setup"></div>
+            <p class="theme-note crema-muted">Additional themes developed by Rainyware Workshop.<br>Cuddlebug's likeness was used with permission.</p>
+            <div style="display:flex;justify-content:flex-end;width:100%;">
+                <button class="crema-btn" id="btn-theme-continue">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SCREEN 2: INTRO -->
+<div class="screen" id="screen-intro">
+    <div class="crema-app-header"><h1>Peaking Through the Lenses</h1></div>
+    <div class="screen-body">
+        <p class="intro-text">Select a career to surface a briefing, then apply a lens to see my considerations and thoughts on the matter.</p>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:10px clamp(14px,3vw,28px);border-top:var(--crema-border-width) solid var(--crema-fg);transition:border-color var(--crema-duration-slow) var(--crema-ease);flex-shrink:0;">
+        <button class="crema-btn crema-btn-sm" id="btn-intro-back">Go Back</button>
+        <button class="crema-btn crema-btn-sm" id="btn-intro-continue">Continue</button>
+    </div>
+</div>
+
+<!-- SCREEN 3: MAIN -->
+<div class="screen" id="screen-main">
+    <div class="crema-app-header">
+        <h1 id="main-title">Peaking Through the Lenses</h1>
+        <div class="header-actions">
+            <button class="crema-hdr-btn" id="btn-about">About</button>
+            <button class="crema-hdr-btn" id="btn-settings">Settings</button>
+        </div>
+    </div>
+    <div class="main-body" id="main-body">
+        <div class="career-view" id="career-view">
+            <div class="career-list" id="career-list"></div>
+            <div id="lens-prompt-main" class="lens-prompt">Now pick a lens</div>
+        </div>
+        <div class="lens-detail-view" id="lens-detail-view">
+            <div class="lens-content" id="lens-content"></div>
+        </div>
+    </div>
+    <div class="lens-bar" id="lens-bar"></div>
+</div>
+
+</div><!-- /#app-frame -->
+</div><!-- /#app-shell -->
+
+<!-- ABOUT MODAL -->
+<div class="crema-modal-overlay" id="about-overlay">
+    <div class="crema-modal">
+        <h2>About the Application</h2>
+        <p>Peaking Through the Lenses is an app developed with the Crema design language, which is designed to be clean, cozy, and easy to use. Sound design by me! :D</p>
+        <p>The source code of this application contains some output of an LLM generation.</p>
+        <p>Some of the additional themes for this app were developed by our nerds over Rainyware Workshop.</p>
+        <p>Cuddlebug &lt;3 OSS</p>
+        <div class="modal-actions"><button class="crema-btn" id="btn-about-close">Done</button></div>
+    </div>
+</div>
+
+<!-- OPTIONS MODAL -->
+<div class="crema-modal-overlay" id="options-overlay">
+    <div class="crema-modal">
+        <h2>Options</h2>
+        <div style="display:flex;flex-direction:column;gap:10px;margin:10px 0 8px;">
+            <button class="crema-btn" id="btn-opt-themes">Themes</button>
+            <button class="crema-btn" id="btn-opt-accessibility">Accessibility</button>
+            <button class="crema-btn" id="btn-opt-reset">Reset Saved Data</button>
+        </div>
+        <div class="modal-actions"><button class="crema-btn" id="btn-options-close">Done</button></div>
+    </div>
+</div>
+
+<!-- THEMES MODAL -->
+<div class="crema-modal-overlay" id="themes-overlay">
+    <div class="crema-modal">
+        <h2>Themes</h2>
+        <span class="crema-settings-section">Theme Presets</span>
+        <div class="settings-theme-grid" id="settings-theme-grid"></div>
+        <span class="crema-settings-section">Custom Theme</span>
+        <div class="crema-picker-row">
+            <div class="crema-picker-wrap"><span>Background</span><input type="color" id="picker-bg"></div>
+            <div class="crema-picker-wrap"><span>Accent</span><input type="color" id="picker-fg"></div>
+        </div>
+        <div class="modal-actions"><button class="crema-btn" id="btn-themes-close">Done</button></div>
+    </div>
+</div>
+
+<!-- ACCESSIBILITY MODAL -->
+<div class="crema-modal-overlay" id="a11y-overlay">
+    <div class="crema-modal">
+        <h2>Accessibility</h2>
+        <div style="margin:10px 0 24px;">
+            <label class="crema-check-label" style="margin-bottom:14px;"><input type="checkbox" id="a11y-larger-font"> Use a larger font-size</label>
+            <label class="crema-check-label" style="margin-bottom:14px;"><input type="checkbox" id="a11y-reduce-motion"> Reduce motion</label>
+            <label class="crema-check-label"><input type="checkbox" id="a11y-audio"> Use audio cues</label>
+        </div>
+        <div class="modal-actions"><button class="crema-btn" id="btn-a11y-close">Done</button></div>
+    </div>
+</div>
+
+<!-- RESET MODAL -->
+<div class="crema-modal-overlay" id="reset-overlay">
+    <div class="crema-modal">
+        <h2>Reset Saved Data</h2>
+        <p style="margin-top:12px;">Yikes! Do you really wanna reset your progress?<br>You will be returned to the initial setup screen.</p>
+        <div style="display:flex;justify-content:space-between;gap:12px;margin-top:20px;flex-wrap:wrap;">
+            <button class="crema-btn crema-btn-danger" id="btn-do-reset">Do Reset</button>
+            <button class="crema-btn" id="btn-no-reset">Do Not Reset</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const CAREERS = [
+    {
+        id: 'prog', name: 'Computer Programmer',
+        lenses: {
+            salary: { title: 'Median Salary', content: { body: '~100K / year' } },
+            art: { title: 'Art and Music?', content: { body: 'This profession has less of a creative outlook than I would prefer. There are outlets and areas where it overlaps (such as game design, designing creative software, etc) but opportunities are limited.' } },
+            experience: { title: 'Previous Experience', content: { body: 'I have relevant experience programming in Python since 2020, and using other scripting languages. I also have some superficial experience with web development.' } },
+            outlook: { title: 'Outlook and Satisfaction', content: { body: 'AI tools are on the rise and expected to reduce the number of workers in the field by around 7% over the next ten years.\n\nFrom my experience in this field, I would be satisfied, but maybe not completely fulfilled.' } }
+        }
+    },
+    {
+        id: 'audio', name: 'Audio Engineer',
+        lenses: {
+            salary: { title: 'Median Salary', content: { body: '~74K / year' } },
+            art: { title: 'Art and Music?', content: { body: 'Audio Engineering has a direct connection to arts. Live sound, for example, is working with incoming audio in realtime. Emerging technologies such as stem-separation and instrument cloning are on the horizon.' } },
+            experience: { title: 'Previous Experience', content: { body: 'I have some superficial experience working in live sound and I have a long history of working in a DAW. I’ve been eager to hop on new tech, like object-based mixing and stem-separation. The models have been getting better and better, and I am excited to see where the technology goes in the future.' } },
+            outlook: { title: 'Outlook and Satisfaction', content: { body: 'There are currently more people wanting to do sound than there are jobs available, and a slow increase in jobs of about 1% over the next ten years provides a less-than-ideal outlook.\n\nBased on my experience, depending on the work I’d be doing (production, mixing, etc) I would be happy.' } }
+        }
+    },
+    {
+        id: 'ux', name: 'UX Designer',
+        lenses: {
+            salary: { title: 'Median Salary', content: { body: '~99K / year' } },
+            art: { title: 'Art and Music?', content: { body: 'I love how art, music, psychology, and technology intersect here. The nuance of UI design and layout of touch-targets and other interactive elements mixed with sound engineering- design language, and accessibility produces an environment that’s really enriching for me.' } },
+            experience: { title: 'Previous Experience', content: { body: 'I have extensive experience in this area, designing games, software, and tools for several years. I also have experience creating unified design languages, such as Crema, that are easy to use. (this app was made in Crema!). I also enjoy developing soundfonts and building musical or percussive ideas into the user experience in a way that’s easy to understand.' } },
+            outlook: { title: 'Outlook and Satisfaction', content: { body: 'AI tools for UX automation are on the rise- but UX is in a unique position because many tools currently struggle to develop high quality and consistent user interfaces. Jobs are expected to grow by around 5% over a ten year period.\n\nGiven my work in this area, I would be really happy.' } }
+        }
+    }
+];
+
+const THEMES = [
+    {name:'IAmAnOLED', bg:'#000000', fg:'#ffffff'},
+    {name:'Dark Gray', bg:'#1a1a1a', fg:'#ffffff'},
+    {name:'Light Mode', bg:'#ffffff', fg:'#000000'},
+    {name:'Midnight', bg:'#001524', fg:'#ffecd1'},
+    {name:'Purple', bg:'#2d1b4e', fg:'#d4b8ff'},
+    {name:'Pink', bg:'#4a1528', fg:'#ffb3c6'},
+    {name:'Orange', bg:'#3d1c00', fg:'#ffb067'},
+    {name:'Forest', bg:'#0b2b1d', fg:'#a3ffcc'},
+    {name:'Ocean', bg:'#001f3f', fg:'#80c4ff'},
+    {name:'Crimson', bg:'#330000', fg:'#ff9999'},
+    {name:'Hacker', bg:'#0d1117', fg:'#00ff00'},
+    {name:'Sunset', bg:'#2d0c18', fg:'#ffcc80'},
+    {name:'Rainyware', bg:'#000000', fg:'#0000ff'},
+    {name:'TIME FOR GREEN!!!!!', bg:'#00ff00', fg:'#006600'},
+    {name:'HellofaBluelightFilter', bg:'#000000', fg:'#ff0000'},
+    {name:'Coffiest', bg:'#1a0d0b', fg:'#d4a373'},
+    {name:'Tux', bg:'#000000', fg:'#f39c12'},
+    {name:'Cuddlebug', bg:'#4b2e2a', fg:'#fff3e0'}
+];
+
+const LENSES_ORDER = ['salary','art','experience','outlook'];
+const LENSES_LABELS = {salary:'Median Salary', art:'Art and Music?', experience:'Previous Experience', outlook:'Outlook and Satisfaction'};
+
+const SOUND_FILES = {
+    welcome: 'Sound/Welcome.wav',
+    checkOn: 'Sound/AccessabilityCheckOn.wav',
+    checkOff: 'Sound/AccessabilityCheckOff.wav',
+    tap: 'Sound/AccessabilityTap.wav',
+    select: 'Sound/AccessabilitySelect.wav',
+    hit: 'Sound/AccessabilityHit.wav',
+    openGallery: 'Sound/OpenGallery.wav',
+    closeGallery: 'Sound/CloseGallery.wav',
+    lock: 'Sound/Lock.wav',
+    unlock: 'Sound/Unlock.wav',
+    openCheckbox: 'Sound/OpenCheckbox.wav'
+};
+
+var audioCtx = null;
+var audioBufferCache = {};
+var htmlAudioCache = {};
+
+function getAudioContext() {
+    if (!audioCtx) {
+        var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+            audioCtx = new AudioContextClass();
+        }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    return audioCtx;
+}
+
+function preloadSound(key) {
+    var url = SOUND_FILES[key];
+    if (!url) return;
+    try {
+        fetch(url)
+            .then(function(res){ return res.arrayBuffer(); })
+            .then(function(buf){
+                var ctx = getAudioContext();
+                if (ctx) {
+                    ctx.decodeAudioData(buf, function(decoded){
+                        audioBufferCache[key] = decoded;
+                    }, function(){});
+                }
+            })
+            .catch(function(){});
+    } catch(e) {}
+    try {
+        var a = new Audio(url);
+        a.preload = 'auto';
+        htmlAudioCache[key] = a;
+    } catch(e) {}
+}
+
+function preloadAllSounds() {
+    Object.keys(SOUND_FILES).forEach(preloadSound);
+}
+
+function playSound(key) {
+    if (localStorage.getItem('pttl-audio') !== '1') return;
+    var ctx = getAudioContext();
+    if (ctx && audioBufferCache[key]) {
+        try {
+            var source = ctx.createBufferSource();
+            source.buffer = audioBufferCache[key];
+            source.connect(ctx.destination);
+            source.start(0);
+            return;
+        } catch(err) {}
+    }
+
+    var src = SOUND_FILES[key];
+    if (!src) return;
+    try {
+        if (!htmlAudioCache[key]) {
+            htmlAudioCache[key] = new Audio(src);
+        }
+        var snd = htmlAudioCache[key];
+        snd.currentTime = 0;
+        var p = snd.play();
+        if (p && p.catch) p.catch(function(){});
+    } catch(e) {}
+}
+
+let currentScreen = null;
+let selectedCareer = null;
+let selectedLens = null;
+let isFirstTime = !localStorage.getItem('pttl-setup-done');
+
+function hexToRgb(h) {
+    var r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);
+    return r ? {r:parseInt(r[1],16),g:parseInt(r[2],16),b:parseInt(r[3],16)} : {r:212,g:163,b:115};
+}
+
+function setTheme(bg, fg) {
+    document.documentElement.style.setProperty('--crema-bg', bg);
+    document.documentElement.style.setProperty('--crema-fg', fg);
+    localStorage.setItem('crema-bg', bg);
+    localStorage.setItem('crema-fg', fg);
+    var rgb = hexToRgb(fg);
+    document.documentElement.style.setProperty('--crema-focus-ring','rgba('+rgb.r+','+rgb.g+','+rgb.b+',0.3)');
+    document.getElementById('app-shell').style.backgroundColor = bg;
+}
+
+function showScreen(id) {
+    var prev = currentScreen;
+    if (prev && prev.id !== id) {
+        prev.classList.remove('active');
+        prev.classList.add('exit');
+        setTimeout(function(){ prev.classList.remove('exit'); }, 450);
+    }
+    var next = document.getElementById(id);
+    if (!next) return;
+    next.classList.remove('exit');
+    currentScreen = next;
+    requestAnimationFrame(function(){ next.classList.add('active'); });
+}
+
+function openModal(id){
+    var el = document.getElementById(id);
+    if (el) {
+        el.classList.add('crema-active');
+        playSound('openGallery');
+    }
+}
+function closeModal(id){
+    var el = document.getElementById(id);
+    if (el) {
+        el.classList.remove('crema-active');
+        playSound('closeGallery');
+    }
+}
+function closeAllModals(){
+    var anyActive = false;
+    document.querySelectorAll('.crema-modal-overlay').forEach(function(o){
+        if (o.classList.contains('crema-active')) anyActive = true;
+        o.classList.remove('crema-active');
+    });
+    if (anyActive) playSound('closeGallery');
+}
+
+document.querySelectorAll('.crema-modal-overlay').forEach(function(overlay){
+    overlay.addEventListener('click', function(e){
+        if(e.target===overlay) {
+            overlay.classList.remove('crema-active');
+            playSound('closeGallery');
+        }
+    });
+});
+document.addEventListener('keydown', function(e){
+    if(e.key==='Escape') closeAllModals();
+});
+
+function buildCareerList() {
+    var list = document.getElementById('career-list');
+    list.innerHTML = '';
+    CAREERS.forEach(function(career){
+        var btn = document.createElement('button');
+        btn.className = 'career-item' + (selectedCareer && selectedCareer.id===career.id ? ' selected' : '');
+        btn.dataset.id = career.id;
+        btn.textContent = career.name;
+        btn.setAttribute('aria-label', 'Select career: '+career.name);
+        btn.addEventListener('click', function(){ selectCareer(career); });
+        list.appendChild(btn);
+    });
+}
+
+function buildLensBar() {
+    var bar = document.getElementById('lens-bar');
+    bar.innerHTML = '';
+    LENSES_ORDER.forEach(function(key){
+        var tab = document.createElement('button');
+        tab.className = 'lens-tab' + (!selectedCareer ? ' is-disabled' : '');
+        tab.dataset.key = key;
+        tab.textContent = LENSES_LABELS[key];
+        tab.style.opacity = selectedCareer ? '1' : '0.35';
+        (function(k){
+            tab.addEventListener('click', function(e){
+                if (!selectedCareer) {
+                    return;
+                }
+                if (selectedLens === k) {
+                    closeLens();
+                } else {
+                    openLens(k);
+                }
+            });
+        })(key);
+        bar.appendChild(tab);
+    });
+
+    var done = document.createElement('button');
+    done.className = 'lens-tab done-tab';
+    done.textContent = 'Done';
+    done.addEventListener('click', closeLens);
+    bar.appendChild(done);
+}
+
+function updateLensBarEnabled(enabled) {
+    document.querySelectorAll('.lens-bar .lens-tab:not(.done-tab)').forEach(function(tab){
+        tab.classList.toggle('is-disabled', !enabled);
+        tab.style.opacity = enabled ? '1' : '0.35';
+    });
+}
+
+function selectCareer(career) {
+    if (selectedCareer && selectedCareer.id === career.id) {
+        selectedCareer = null;
+        document.getElementById('main-title').textContent = 'Peaking Through the Lenses';
+        document.getElementById('lens-prompt-main').classList.remove('visible');
+        updateLensBarEnabled(false);
+        playSound('lock');
+    } else {
+        selectedCareer = career;
+        document.getElementById('main-title').textContent = career.name;
+        document.getElementById('lens-prompt-main').classList.add('visible');
+        updateLensBarEnabled(true);
+    }
+    document.querySelectorAll('.career-item').forEach(function(btn) {
+        btn.classList.toggle('selected', selectedCareer && btn.dataset.id === selectedCareer.id);
+    });
+}
+
+function openLens(lensKey) {
+    if (!selectedCareer) return;
+    selectedLens = lensKey;
+    var career = selectedCareer;
+    var lens = career.lenses[lensKey];
+
+    playSound('unlock');
+
+    var content = document.getElementById('lens-content');
+    content.innerHTML = '';
+
+    var titleEl = document.createElement('div');
+    titleEl.style.cssText = 'font-size:clamp(1.1rem,2.4vw,1.5rem);font-weight:900;margin-bottom:18px;border-bottom:2px solid var(--crema-fg);padding-bottom:6px;display:inline-block;';
+    titleEl.textContent = lens.title;
+    content.appendChild(titleEl);
+
+    var c = lens.content;
+    if (c.stats) {
+        var statsSection = document.createElement('div');
+        statsSection.className = 'lens-section';
+        c.stats.forEach(function(s){
+            var row = document.createElement('div');
+            row.className = 'lens-stat';
+            var lbl = document.createElement('span'); lbl.textContent = s.label;
+            var val = document.createElement('span'); val.className = 'lens-stat-val'; val.textContent = s.value;
+            row.appendChild(lbl); row.appendChild(val);
+            statsSection.appendChild(row);
+        });
+        content.appendChild(statsSection);
+    }
+    if (c.notes) {
+        var noteSection = document.createElement('div');
+        noteSection.className = 'lens-section';
+        noteSection.style.marginTop = '16px';
+        var noteTitle = document.createElement('div'); noteTitle.className = 'lens-section-title'; noteTitle.textContent = 'Notes';
+        var noteBody = document.createElement('div'); noteBody.className = 'lens-section-body'; noteBody.textContent = c.notes;
+        noteSection.appendChild(noteTitle); noteSection.appendChild(noteBody);
+        content.appendChild(noteSection);
+    }
+    if (c.body) {
+        var bodySection = document.createElement('div');
+        bodySection.className = 'lens-section';
+        var bodyEl = document.createElement('div');
+        bodyEl.className = 'lens-section-body'; bodyEl.style.whiteSpace = 'pre-line'; bodyEl.textContent = c.body;
+        bodySection.appendChild(bodyEl);
+        content.appendChild(bodySection);
+    }
+
+    // Update bottom bar tabs
+    document.querySelectorAll('.lens-tab:not(.done-tab)').forEach(function(tab){
+        tab.classList.toggle('selected', tab.dataset.key === lensKey);
+    });
+    document.getElementById('lens-bar').classList.add('lens-mode');
+
+    // Switch view
+    document.getElementById('career-view').classList.add('hidden');
+    document.getElementById('lens-detail-view').classList.add('active');
+    document.getElementById('lens-prompt-main').classList.remove('visible');
+}
+
+function closeLens() {
+    selectedLens = null;
+    playSound('lock');
+    document.getElementById('lens-bar').classList.remove('lens-mode');
+    document.querySelectorAll('.lens-tab:not(.done-tab)').forEach(function(tab){
+        tab.classList.remove('selected');
+    });
+
+    document.getElementById('lens-detail-view').classList.remove('active');
+    document.getElementById('career-view').classList.remove('hidden');
+    if (selectedCareer) {
+        document.getElementById('lens-prompt-main').classList.add('visible');
+    }
+}
+
+function buildThemeGrid(containerId) {
+    var grid = document.getElementById(containerId);
+    if (!grid) return;
+    grid.innerHTML = '';
+    var currentBg = (localStorage.getItem('crema-bg') || '#1a0d0b').toLowerCase();
+    var currentFg = (localStorage.getItem('crema-fg') || '#d4a373').toLowerCase();
+    THEMES.forEach(function(t){
+        var btn = document.createElement('button');
+        var isMatch = (t.bg.toLowerCase() === currentBg && t.fg.toLowerCase() === currentFg);
+        btn.className = 'theme-btn' + (isMatch ? ' selected' : '');
+        btn.textContent = t.name;
+        btn.addEventListener('click', function(){
+            setTheme(t.bg, t.fg);
+            grid.querySelectorAll('.theme-btn').forEach(function(b){ b.classList.remove('selected'); });
+            btn.classList.add('selected');
+        });
+        grid.appendChild(btn);
+    });
+}
+
+function buildSettingsThemeGrid() {
+    var grid = document.getElementById('settings-theme-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    var currentBg = (localStorage.getItem('crema-bg') || '#1a0d0b').toLowerCase();
+    var currentFg = (localStorage.getItem('crema-fg') || '#d4a373').toLowerCase();
+    THEMES.forEach(function(t){
+        var btn = document.createElement('button');
+        var isMatch = (t.bg.toLowerCase() === currentBg && t.fg.toLowerCase() === currentFg);
+        btn.className = 'settings-theme-btn' + (isMatch ? ' selected' : '');
+        btn.textContent = t.name;
+        btn.addEventListener('click', function(){
+            setTheme(t.bg, t.fg);
+            grid.querySelectorAll('.settings-theme-btn').forEach(function(b){ b.classList.remove('selected'); });
+            btn.classList.add('selected');
+            syncPickers();
+        });
+        grid.appendChild(btn);
+    });
+}
+
+function syncPickers() {
+    var bg = localStorage.getItem('crema-bg') || '#1a0d0b';
+    var fg = localStorage.getItem('crema-fg') || '#d4a373';
+    document.getElementById('picker-bg').value = bg;
+    document.getElementById('picker-fg').value = fg;
+}
+
+document.getElementById('picker-bg').addEventListener('input', function(){
+    setTheme(document.getElementById('picker-bg').value, document.getElementById('picker-fg').value);
+});
+document.getElementById('picker-fg').addEventListener('input', function(){
+    setTheme(document.getElementById('picker-bg').value, document.getElementById('picker-fg').value);
+});
+
+function applyA11y() {
+    var largerFont = localStorage.getItem('pttl-larger-font')==='1';
+    var reduceMotion = localStorage.getItem('pttl-reduce-motion')==='1';
+    var audioCues = localStorage.getItem('pttl-audio')==='1';
+
+    var elA11yFont = document.getElementById('a11y-larger-font');
+    var elA11yMotion = document.getElementById('a11y-reduce-motion');
+    var elA11yAudio = document.getElementById('a11y-audio');
+    var elCheckFont = document.getElementById('check-larger-font');
+    var elCheckMotion = document.getElementById('check-reduce-motion');
+    var elCheckAudio = document.getElementById('check-audio');
+
+    if (elA11yFont) elA11yFont.checked = largerFont;
+    if (elA11yMotion) elA11yMotion.checked = reduceMotion;
+    if (elA11yAudio) elA11yAudio.checked = audioCues;
+    if (elCheckFont) elCheckFont.checked = largerFont;
+    if (elCheckMotion) elCheckMotion.checked = reduceMotion;
+    if (elCheckAudio) elCheckAudio.checked = audioCues;
+
+    document.documentElement.style.fontSize = largerFont ? '150%' : '125%';
+    var existing = document.getElementById('reduce-motion-style');
+    if(reduceMotion){
+        if(!existing){
+            var s = document.createElement('style'); s.id='reduce-motion-style';
+            s.textContent='*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}';
+            document.head.appendChild(s);
+        }
+    } else { if(existing) existing.remove(); }
+}
+
+function handleCheckboxSound(isChecked) {
+    playSound(isChecked ? 'checkOn' : 'checkOff');
+}
+
+function saveA11y() {
+    var elA11yFont = document.getElementById('a11y-larger-font');
+    var elA11yMotion = document.getElementById('a11y-reduce-motion');
+    var elA11yAudio = document.getElementById('a11y-audio');
+    if (elA11yFont) localStorage.setItem('pttl-larger-font', elA11yFont.checked?'1':'0');
+    if (elA11yMotion) localStorage.setItem('pttl-reduce-motion', elA11yMotion.checked?'1':'0');
+    if (elA11yAudio) localStorage.setItem('pttl-audio', elA11yAudio.checked?'1':'0');
+    applyA11y();
+}
+document.getElementById('a11y-larger-font').addEventListener('change', function(e){
+    handleCheckboxSound(e.target.checked);
+    saveA11y();
+});
+document.getElementById('a11y-reduce-motion').addEventListener('change', function(e){
+    handleCheckboxSound(e.target.checked);
+    saveA11y();
+});
+document.getElementById('a11y-audio').addEventListener('change', function(e){
+    handleCheckboxSound(e.target.checked);
+    saveA11y();
+});
+
+document.getElementById('check-larger-font').addEventListener('change', function(e){
+    handleCheckboxSound(e.target.checked);
+    localStorage.setItem('pttl-larger-font', e.target.checked?'1':'0');
+    applyA11y();
+});
+document.getElementById('check-reduce-motion').addEventListener('change', function(e){
+    handleCheckboxSound(e.target.checked);
+    localStorage.setItem('pttl-reduce-motion', e.target.checked?'1':'0');
+    applyA11y();
+});
+document.getElementById('check-audio').addEventListener('change', function(e){
+    handleCheckboxSound(e.target.checked);
+    localStorage.setItem('pttl-audio', e.target.checked?'1':'0');
+    applyA11y();
+});
+
+// Wire nav buttons
+document.getElementById('btn-get-started').addEventListener('click', function(){
+    showScreen('screen-theme');
+});
+document.getElementById('btn-theme-continue').addEventListener('click', function(){
+    showScreen('screen-intro');
+});
+document.getElementById('btn-intro-back').addEventListener('click', function(){
+    showScreen('screen-theme');
+});
+document.getElementById('btn-intro-continue').addEventListener('click', function(){
+    localStorage.setItem('pttl-setup-done','1'); isFirstTime=false;
+    var list = document.getElementById('career-list');
+    if (list) {
+        list.classList.add('stagger');
+        setTimeout(function(){ list.classList.remove('stagger'); }, 500);
+    }
+    showScreen('screen-main');
+});
+
+['btn-about','btn-about-lens'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener('click', function(){ openModal('about-overlay'); });
+});
+document.getElementById('btn-about-close').addEventListener('click', function(){ closeModal('about-overlay'); });
+
+['btn-settings','btn-settings-lens'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener('click', function(){ syncPickers(); openModal('options-overlay'); });
+});
+document.getElementById('btn-options-close').addEventListener('click', function(){ closeModal('options-overlay'); });
+
+document.getElementById('btn-opt-themes').addEventListener('click', function(){ closeModal('options-overlay'); syncPickers(); openModal('themes-overlay'); });
+document.getElementById('btn-themes-close').addEventListener('click', function(){ closeModal('themes-overlay'); });
+
+document.getElementById('btn-opt-accessibility').addEventListener('click', function(){
+    closeModal('options-overlay');
+    openModal('a11y-overlay');
+});
+document.getElementById('btn-a11y-close').addEventListener('click', function(){ closeModal('a11y-overlay'); });
+
+document.getElementById('btn-opt-reset').addEventListener('click', function(){ closeModal('options-overlay'); openModal('reset-overlay'); });
+document.getElementById('btn-no-reset').addEventListener('click', function(){ closeModal('reset-overlay'); });
+document.getElementById('btn-do-reset').addEventListener('click', function(){
+    closeAllModals();
+    document.getElementById('career-list').innerHTML = '<div class="one-sec">One sec\u2026</div>';
+    document.getElementById('lens-bar').innerHTML = '';
+    document.getElementById('lens-prompt-main').classList.remove('visible');
+    closeLens();
+    setTimeout(function(){
+        localStorage.removeItem('pttl-setup-done');
+        localStorage.removeItem('pttl-larger-font');
+        localStorage.removeItem('pttl-reduce-motion');
+        localStorage.removeItem('pttl-audio');
+        setTheme('#1a0d0b','#d4a373');
+        selectedCareer=null; selectedLens=null; isFirstTime=true;
+        applyA11y();
+        buildThemeGrid('theme-grid-setup');
+        buildSettingsThemeGrid();
+        buildCareerList();
+        buildLensBar();
+        showScreen('screen-welcome');
+    }, 1200);
+});
+
+function initApp(){
+    preloadAllSounds();
+    buildThemeGrid('theme-grid-setup');
+    buildSettingsThemeGrid();
+    buildCareerList();
+    buildLensBar();
+    applyA11y();
+    setTimeout(function(){
+        var splash = document.getElementById('splash');
+        if (splash) {
+            splash.classList.add('out');
+            setTimeout(function(){ if (splash.parentNode) splash.remove(); }, 600);
+        }
+        if (!isFirstTime) {
+            var list = document.getElementById('career-list');
+            if (list) {
+                list.classList.add('stagger');
+                setTimeout(function(){ list.classList.remove('stagger'); }, 500);
+            }
+        }
+        showScreen(isFirstTime ? 'screen-welcome' : 'screen-main');
+    }, 900);
+}
+
+if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
+
+// Unlock WebKit AudioContext immediately on first user interaction
+window.addEventListener('pointerdown', function(){
+    getAudioContext();
+}, { once: true });
+
+// Pointerdown and pointerup ensure zero latency on WebKit / Safari
+window.addEventListener('pointerdown', function(e){
+    var interactive = e.target.closest('button, input, label, a, .theme-btn, .settings-theme-btn, .career-item, .lens-tab');
+    if (!interactive) return;
+    playSound('select');
+});
+
+window.addEventListener('pointerup', function(e){
+    var interactive = e.target.closest('button, input, label, a, .theme-btn, .settings-theme-btn, .career-item, .lens-tab');
+    if (!interactive) return;
+    if (interactive.disabled || interactive.classList.contains('is-disabled') || interactive.getAttribute('aria-disabled') === 'true') {
+        playSound('hit');
+        return;
+    }
+    playSound('tap');
+});
+
+window.addEventListener('storage', function(e){
+    if(e.key==='crema-bg'&&e.newValue){ document.documentElement.style.setProperty('--crema-bg',e.newValue); document.getElementById('app-shell').style.backgroundColor=e.newValue; }
+    if(e.key==='crema-fg'&&e.newValue){
+        document.documentElement.style.setProperty('--crema-fg',e.newValue);
+        var rgb=hexToRgb(e.newValue);
+        document.documentElement.style.setProperty('--crema-focus-ring','rgba('+rgb.r+','+rgb.g+','+rgb.b+',0.3)');
+    }
+});
+</script>
+</body>
+</html>
