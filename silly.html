@@ -1837,13 +1837,13 @@
             silentNode.connect(audioCtx.destination);
             silentOsc.start();
 
-            // ── Weird: B4 censor-beep generator ──────────────────────────────
+            // ── Weird: B5 censor-beep generator ──────────────────────────────
             // The oscillator runs continuously at gain 0 and is only ramped open/shut,
             // so a press costs one AudioParam ramp (no node creation = lowest latency)
             // and the short ramps remove clicks.
             toneOsc = audioCtx.createOscillator();
             toneOsc.type = 'sine';
-            toneOsc.frequency.value = 493.883; // B4
+            toneOsc.frequency.value = 987.767; // B5
             toneGain = audioCtx.createGain();
             toneGain.gain.value = 0;
             toneOsc.connect(toneGain);
@@ -1854,7 +1854,7 @@
         let toneOsc = null;
         let toneGain = null;
         let beepHeld = false;
-        const BEEP_LEVEL = 0.5;
+        const BEEP_LEVEL = 1.0; // 2x the original 0.5
         function beepOn() {
             ensureAudioContext();
             if (audioCtx.state !== 'running') audioCtx.resume();
@@ -3186,8 +3186,8 @@
                     btn.innerHTML = '<span class="btn-label">' + label + '</span>';
                     btn.onclick = () => broadcastVoiceMessage(rec.data);
                 } else if (key === '_tone_beep') {
-                    btn.setAttribute('aria-label', 'Hold to play B4 beep');
-                    btn.innerHTML = '<span class="btn-label">B4 Beep</span>';
+                    btn.setAttribute('aria-label', 'Hold to play the censor beep');
+                    btn.innerHTML = '<span class="btn-label">Censor</span>';
                     bindPressEvent(btn, key);
                     if (beepHeld) btn.classList.add('playing');
                 } else {
