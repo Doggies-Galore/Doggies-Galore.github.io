@@ -15,7 +15,7 @@ const SHELL = [
     'sillyboard.html',
     'silly.html',
     'manifest.webmanifest',
-    'icon.svg',
+    'icon-glyph.png',
     'icon-192.png',
     'icon-512.png'
 ];
