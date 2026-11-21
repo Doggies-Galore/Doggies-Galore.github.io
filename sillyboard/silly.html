@@ -1,0 +1,3938 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Sillyboard</title>
+    <meta name="description" content="Sillyboard - the grooviest soundboard app built for Trump, Stoats, and Dr. Yaoi">
+    <style>
+        :root {
+            --bg-color: #000;
+            --accent-color: #fff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: transparent;
+            color: var(--accent-color);
+            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            width: 100vw;
+            height: 100dvh;
+            min-height: 100dvh;
+            max-height: 100dvh;
+            overflow: hidden;
+            overscroll-behavior: none;
+            touch-action: none;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.4s cubic-bezier(0.4, 0.0, 0.2, 1) forwards !important;
+        }
+
+        @property --bg-color {
+            syntax: '<color>';
+            inherits: true;
+            initial-value: #000000;
+        }
+
+        @property --accent-color {
+            syntax: '<color>';
+            inherits: true;
+            initial-value: #ffffff;
+        }
+
+        html {
+            background-color: var(--bg-color);
+            transform: translateZ(0);
+            /* Promote root to own compositing layer for smoother color transitions */
+        }
+
+        :root {
+            transition:
+                --bg-color 0.6s cubic-bezier(0.4, 0.0, 0.2, 1),
+                --accent-color 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .sound-btn {
+            /* Smooth background fade matching the settings button, but keeping the quick satisfying shrink */
+            transition:
+                transform 0.1s cubic-bezier(0.4, 0.0, 0.2, 1),
+                background-color 0.15s ease,
+                color 0.15s ease,
+                opacity 0.15s ease;
+            /* will-change removed: permanent GPU layer promotion for ~12 idle buttons wastes VRAM and compositing bandwidth */
+        }
+
+        .hdr-btn {
+            transition: opacity 0.2s ease;
+        }
+
+        /* ── Header ─────────────────────────────────────────────────────── */
+        #header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 18px;
+            border-bottom: 3px solid var(--accent-color);
+            flex-shrink: 0;
+        }
+
+        #header h1 {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 900;
+            letter-spacing: 0.04em;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .hdr-btn {
+            background: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            padding: 8px 20px;
+            border-radius: 14px;
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        @media (hover: hover) {
+            .hdr-btn:hover {
+                background: var(--accent-color);
+                color: var(--bg-color);
+            }
+        }
+
+        .hdr-btn:active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .fav-btn {
+            transition: transform 0.1s;
+        }
+
+        .fav-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* ── Hotbar & Categories ────────────────────────────────────────── */
+        #nav-area {
+            position: relative;
+            flex-shrink: 0;
+            min-height: 48px;
+            border-bottom: 2px solid var(--accent-color);
+            z-index: 100;
+        }
+
+        #hotbar {
+            display: flex;
+            gap: clamp(3px, 1vmin, 8px);
+            padding: 6px 8px;
+            width: 100%;
+        }
+
+        #category-ui {
+            display: none;
+            height: 48px;
+            text-align: center;
+            line-height: 48px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            scroll-snap-type: x mandatory;
+            user-select: none;
+            touch-action: pan-x;
+        }
+
+        #category-ui::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-tab {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 0 20px;
+            font-size: clamp(1rem, 3.5vw, 1.3rem);
+            font-weight: 700;
+            color: var(--accent-color);
+            opacity: 0.5;
+            transition: opacity 0.2s, transform 0.2s;
+            cursor: pointer;
+            scroll-snap-align: center;
+        }
+
+        .category-tab.active {
+            opacity: 1;
+            font-weight: 900;
+            transform: scale(1.1);
+        }
+
+        #hotbar .sound-btn {
+            flex: 1;
+            min-height: 40px;
+            height: 52px;
+            border-width: 3px;
+            border-radius: 14px;
+            font-size: clamp(0.95rem, 3vw, 1.5rem);
+            padding: 0;
+            line-height: 0.9;
+        }
+
+        .hotbar-empty {
+            flex: 1;
+            min-height: 38px;
+            height: 42px;
+            border: 3px dashed rgba(128, 128, 128, 0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            opacity: 0.3;
+            user-select: none;
+        }
+
+        /* ── Soundboard grid — 2 columns, fit to height, no scroll ──────── */
+        #board {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-auto-rows: 1fr;
+            gap: clamp(6px, 1.5vmin, 12px);
+            padding: clamp(8px, 2vmin, 16px) clamp(10px, 3vmin, 24px);
+            overflow: hidden;
+            touch-action: manipulation;
+            contain: layout style;
+            /* Limit repaint scope during theme transitions */
+        }
+
+        .sound-btn {
+            width: 100%;
+            min-height: 0;
+            border: 4px solid var(--accent-color);
+            border-radius: 28px;
+            background: transparent;
+            color: var(--accent-color);
+            font-family: inherit;
+            font-size: clamp(0.85rem, 2.5vw, 1.5rem);
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+            padding: 6px 10px;
+            touch-action: manipulation;
+        }
+
+        .sound-btn:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .sound-btn:active,
+        .sound-btn.playing {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        /* Loading state for on-demand fetch */
+        @keyframes sound-btn-pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        .sound-btn.loading {
+            animation: sound-btn-pulse 1s infinite ease-in-out;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.08);
+            border-style: dashed;
+        }
+
+        /* Only scale on hover/active for non-touch devices to avoid scroll jitter */
+        @media (hover: hover) {
+
+            .sound-btn:active,
+            .sound-btn.playing {
+                transform: scale(0.95);
+            }
+        }
+
+        .btn-label {
+            pointer-events: none;
+            text-align: center;
+            line-height: 1.15;
+        }
+
+        /* ── Loading overlay ─────────────────────────────────────────────── */
+        #loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 9999;
+            transition: opacity 0.4s ease;
+        }
+
+        #loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #loading-overlay p {
+            font-size: clamp(1.4rem, 4vw, 2rem);
+            font-weight: 700;
+            opacity: 0.85;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+
+        #loading-progress {
+            width: 60%;
+            max-width: 300px;
+            height: 6px;
+            background: rgba(128, 128, 128, 0.3);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        #loading-bar {
+            height: 100%;
+            width: 100%;
+            background: var(--accent-color);
+            border-radius: 3px;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.15s ease;
+            will-change: transform;
+            /* Only element that actually benefits from permanent GPU promotion */
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* ── Locked View ────────────────────────────────────────────────── */
+        .locked-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .locked-icon {
+            font-size: 120px;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+
+        .locked-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 12px;
+            color: var(--accent-color);
+        }
+
+        .locked-text {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 320px;
+            line-height: 1.5;
+        }
+
+        /* ── Settings overlay ────────────────────────────────────────────── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            /* backdrop-filter moved to .active — inactive modals no longer allocate blur compositing layers */
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
+        .modal-content {
+            background: var(--bg-color);
+            border: 4px solid var(--accent-color);
+            border-radius: 24px;
+            padding: clamp(16px, 4vw, 30px);
+            width: 94%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h2 {
+            font-size: clamp(1.3rem, 4vw, 1.8rem);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 8px;
+            margin-bottom: clamp(12px, 3vw, 20px);
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: clamp(0.95rem, 3vw, 1.2rem);
+            opacity: 0.8;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 6px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(5px, 1.5vw, 8px);
+            margin-bottom: clamp(14px, 3vw, 24px);
+        }
+
+        .btn {
+            padding: clamp(9px, 2vw, 13px) 10px;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            border-radius: 12px;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            cursor: pointer;
+            background: transparent;
+            transition: all 0.2s;
+            font-weight: bold;
+            text-align: center;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .picker-row {
+            display: flex;
+            justify-content: center;
+            gap: clamp(20px, 8vw, 50px);
+            margin-top: 10px;
+        }
+
+        .color-picker-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+        }
+
+        input[type="color"] {
+            width: 70px;
+            height: 44px;
+            border: 2px solid var(--accent-color);
+            border-radius: 12px;
+            padding: 2px;
+            background: none;
+            cursor: pointer;
+        }
+
+        /* Hijack native color picker swatches to lock to current theme variables!
+           (No transition here: the variables themselves are already interpolating flawlessly over 0.6s, 
+           so a secondary transition causes exponential trailing lag!) */
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+            border-radius: 8px;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 8px;
+        }
+
+        #bg-picker::-webkit-color-swatch {
+            background-color: var(--bg-color) !important;
+        }
+
+        #ac-picker::-webkit-color-swatch {
+            background-color: var(--accent-color) !important;
+        }
+
+        input[type="color"]::-moz-color-swatch {
+            border: none;
+            border-radius: 8px;
+        }
+
+        #bg-picker::-moz-color-swatch {
+            background-color: var(--bg-color) !important;
+        }
+
+        #ac-picker::-moz-color-swatch {
+            background-color: var(--accent-color) !important;
+        }
+
+        .modal-close-row {
+            display: flex;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .modal-close-btn {
+            flex: none;
+            padding: 12px 44px;
+            font-size: 1rem;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            transition: opacity 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            opacity: 0.85;
+        }
+
+        /* ── Amplification slider ────────────────────────────────────────── */
+        .amp-section {
+            margin-top: clamp(14px, 3vw, 24px);
+        }
+
+        .amp-slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .amp-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            flex: 1;
+            height: 10px;
+            border-radius: 8px;
+            background: linear-gradient(to right,
+                    var(--accent-color) 0%,
+                    var(--accent-color) var(--amp-pct, 33.3%),
+                    rgba(128, 128, 128, 0.3) var(--amp-pct, 33.3%),
+                    rgba(128, 128, 128, 0.3) 100%);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .amp-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: 3px solid var(--bg-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .amp-slider::-webkit-slider-thumb:active {
+            transform: scale(1.2);
+        }
+
+        .amp-slider::-moz-range-thumb {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            border: 3px solid var(--bg-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+        }
+
+        .amp-value {
+            min-width: 50px;
+            text-align: right;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            font-weight: 700;
+            opacity: 0.9;
+        }
+
+        .amp-reset-hint {
+            font-size: 0.75rem;
+            opacity: 0.4;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        /* ── Standardized Checkboxes ── */
+        input[type="checkbox"] {
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            accent-color: var(--accent-color);
+            -webkit-appearance: checkbox;
+            appearance: checkbox;
+        }
+
+        /* ── Admin / Generic Styled Sliders ──────────────────────────────── */
+        .custom-slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 700;
+            opacity: 0.9;
+        }
+
+        .slider-header span:last-child {
+            color: var(--accent-color);
+            background: rgba(128, 128, 128, 0.15);
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .styled-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 10px;
+            background: rgba(128, 128, 128, 0.25);
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .styled-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--accent-color);
+            border: 3px solid var(--bg-color);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .styled-slider::-webkit-slider-thumb:active {
+            transform: scale(1.15);
+        }
+
+        .styled-slider::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            background: var(--accent-color);
+            border: 3px solid var(--bg-color);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+        }
+
+        /* ── Hotbar arrangement in settings ──────────────────────────────── */
+        .hotbar-config {
+            margin-top: clamp(14px, 3vw, 24px);
+        }
+
+        .hotbar-slots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .hotbar-slot {
+            flex: 1 1 calc(50% - 6px);
+            min-width: 60px;
+            padding: 8px 4px;
+            border: 3px dashed var(--accent-color);
+            border-radius: 12px;
+            text-align: center;
+            font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+            font-weight: 700;
+            font-family: inherit;
+            color: var(--accent-color);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hotbar-slot.filled {
+            border-style: solid;
+            background: rgba(128, 128, 128, 0.1);
+        }
+
+        .hotbar-slot .remove-x {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            color: var(--bg-color);
+            font-size: 13px;
+            font-weight: 900;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            font-family: inherit;
+        }
+
+        .hotbar-sound-picker {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .hotbar-sound-picker .btn {
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            padding: 8px 6px;
+        }
+
+        .hotbar-sound-picker .btn.in-hotbar {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        /* ── Board page navigation ────────────────────────────────────────────── */
+        #board-nav {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            padding: 10px 18px;
+            border-top: 3px solid var(--accent-color);
+            gap: 10px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            background: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            padding: 8px 20px;
+            border-radius: 14px;
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, opacity 0.15s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Only show hover highlight on devices that support hover (not touch screens) */
+        @media (hover: hover) {
+            .nav-btn:hover {
+                background: var(--accent-color);
+                color: var(--bg-color);
+            }
+        }
+
+        .nav-btn:active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            opacity: 0.7;
+        }
+
+        .nav-btn:focus {
+            outline: none;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        /* ── Seguestions form ──────────────────────────────────────────────── */
+        .name-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+            margin-bottom: 16px;
+        }
+
+        .name-chip {
+            padding: 8px 18px;
+            border: 2px solid var(--accent-color);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--accent-color);
+            font-family: inherit;
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s;
+            touch-action: manipulation;
+        }
+
+        .name-chip.selected {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .seg-textarea,
+        .seg-input {
+            width: 100%;
+            background: rgba(128, 128, 128, 0.1);
+            border: 2px solid var(--accent-color);
+            border-radius: 12px;
+            color: var(--accent-color);
+            font-family: inherit;
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            padding: 10px 12px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .seg-textarea {
+            min-height: 80px;
+            resize: vertical;
+            margin-bottom: 12px;
+        }
+
+        .seg-input {
+            margin-bottom: 12px;
+        }
+
+        .seg-textarea::placeholder,
+        .seg-input::placeholder {
+            opacity: 0.4;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Apply theme immediately to avoid flash
+        (function () {
+            const bg = localStorage.getItem('sillyboard-bg') ||
+                localStorage.getItem('launcher-bg') || '#000000';
+            const ac = localStorage.getItem('sillyboard-accent') ||
+                localStorage.getItem('launcher-accent') || '#ffffff';
+            document.documentElement.style.setProperty('--bg-color', bg);
+            if (window.Android) window.Android.updateThemeColor(bg);
+            document.documentElement.style.setProperty('--accent-color', ac);
+        })();
+    </script>
+
+    <!-- Wake Lock keepalive — keeps the screen on -->
+    <script>
+        (async function () {
+            if (!('wakeLock' in navigator)) return;
+            let sentinel = null;
+
+            async function acquireWakeLock() {
+                try {
+                    sentinel = await navigator.wakeLock.request('screen');
+                    sentinel.addEventListener('release', () => {
+                        sentinel = null;
+                        if (document.visibilityState === 'visible') acquireWakeLock();
+                    });
+                } catch (e) { }
+            }
+
+            await acquireWakeLock();
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible' && !sentinel) acquireWakeLock();
+            });
+        })();
+    </script>
+
+    <!-- Loading overlay removed, now handled by parent -->
+
+    <!-- Header -->
+    <div id="header">
+        <h1 id="silly-title" style="cursor: default; user-select: none;" aria-hidden="true">Sillyboard :3</h1>
+        <div class="header-actions">
+            <button class="hdr-btn" id="admin-btn" aria-label="Open Fun">Fun</button>
+            <button class="hdr-btn" id="settings-btn" aria-label="Open Settings">Settings</button>
+        </div>
+    </div>
+
+    <!-- Navigation Area (Hotbar OR Categories) -->
+    <div id="nav-area">
+        <div id="hotbar"></div>
+        <div id="category-ui">
+            <!-- filled dynamically -->
+        </div>
+    </div>
+
+    <!-- Sound Board (paged grid) -->
+    <div id="board" role="main"></div>
+
+    <!-- Bottom Controls -->
+    <div id="bottom-controls" style="display: flex; gap: 10px; padding: 10px 18px; border-top: 3px solid var(--accent-color); flex-shrink: 0;">
+        <button id="quick-stop-btn" class="hdr-btn" style="flex: 0 0 calc(25% - 2.5px); padding: 8px 0;">STOP</button>
+        <div id="pitch-touch-strip" style="flex: 1; border: 2px dashed var(--accent-color); border-radius: 14px; display: flex; align-items: center; justify-content: center; opacity: 0.7; cursor: ew-resize; user-select: none; font-size: clamp(0.85rem, 2vw, 1.1rem); font-weight: bold; touch-action: none;">
+            PITCH
+        </div>
+        <button id="pitch-hold-btn" class="hdr-btn" style="flex: 0 0 calc(25% - 2.5px); padding: 8px 0;">HOLD</button>
+    </div>
+
+    <!-- Board Page Navigation -->
+    <div id="board-nav">
+        <button class="nav-btn" id="prev-page-btn" aria-label="Previous page" disabled>◄</button>
+        <button class="nav-btn" id="next-page-btn" aria-label="Next page" disabled>►</button>
+    </div>
+
+    <!-- Admin Modal -->
+    <div class="modal-overlay" id="admin-modal" role="dialog" aria-modal="true" aria-label="Admin Settings">
+        <div class="modal-content">
+            <h2>SillierBoard!</h2>
+
+            <!-- Playback -->
+            <div class="section-title" style="margin-top: 20px;">Playback</div>
+
+            <div class="custom-slider-container" id="pitch-slider-wrap">
+                <div class="slider-header" style="margin-bottom: 8px;">
+                    <span style="font-size: 0.9rem; opacity: 0.7;">Speed / Pitch</span>
+                    <span id="pitch-val" style="font-size: 0.9rem; font-weight: bold;">1.00x</span>
+                </div>
+                <input type="range" class="styled-slider" id="pitch-slider" min="0.25" max="3" step="0.05" value="1">
+                <p class="amp-reset-hint">Double-tap slider to reset to 1.00x</p>
+            </div>
+
+            <div class="custom-slider-container"
+                style="flex-direction:row; align-items:center; justify-content: space-between; margin-top: 24px; margin-bottom: 12px;">
+                <label for="turbo-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    Turbo Mode
+                </label>
+                <input type="checkbox" id="turbo-cbx">
+            </div>
+
+            <div class="custom-slider-container">
+                <div class="slider-header" style="margin-bottom: 8px;">
+                    <span style="font-size: 0.9rem; opacity: 0.7;">Repeat Rate</span>
+                    <span id="turbo-rate-val" style="font-size: 0.9rem; font-weight: bold;">200ms</span>
+                </div>
+                <input type="range" class="styled-slider" id="turbo-rate" min="30" max="1000" step="10" value="200">
+                <p class="amp-reset-hint">Double-tap slider to reset to 200ms</p>
+            </div>
+
+            <!-- Sync -->
+            <div class="section-title" style="margin-top: 30px;">Network & Sync</div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn" id="repeater-mode-btn">Repeater Mode</button>
+                <button class="btn" id="voice-mode-btn">Send Recording</button>
+                <button class="btn" id="streamables-mode-btn">Streamables</button>
+                <button class="btn" id="pinned-recordings-btn">Pinned Recordings</button>
+                <button class="btn" id="remote-mode-btn">Remote Device List</button>
+            </div>
+
+
+            <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;"
+                class="modal-close-row">
+                <button class="modal-close-btn" id="admin-close">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Repeater Modal -->
+    <div class="modal-overlay" id="repeater-modal" role="dialog" aria-modal="true" aria-label="Repeater Settings">
+        <div class="modal-content">
+            <h2>Repeater Mode</h2>
+            <p style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.7;">Sync sounds across all connected devices
+                using high-precision scheduling.</p>
+
+            <div class="section-title">Configuration</div>
+
+            <div class="custom-slider-container"
+                style="flex-direction:row; align-items:center; justify-content: space-between; margin-bottom: 12px;">
+                <label for="repeater-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    Enable Repeater Mode
+                </label>
+                <input type="checkbox" id="repeater-cbx">
+            </div>
+
+            <div class="custom-slider-container"
+                style="flex-direction:row; align-items:center; justify-content: space-between;">
+                <label for="pitch-global-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    Pitch applies Globally
+                </label>
+                <input type="checkbox" id="pitch-global-cbx">
+            </div>
+
+
+
+            <div id="repeater-status"
+                style="margin-top: 30px; font-size: 0.85rem; font-weight: bold; color: var(--accent-color); opacity: 0.6; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                Status: Disconnected
+            </div>
+
+            <div class="modal-close-row" style="margin-top: 24px;">
+                <button class="modal-close-btn" id="repeater-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remote Modal -->
+    <div class="modal-overlay" id="remote-modal" role="dialog" aria-modal="true" aria-label="Remote Devices">
+        <div class="modal-content">
+            <h2>Remote Dashboard</h2>
+            <p style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.7;">Select targets to trigger sounds on their
+                devices only.</p>
+
+            <div class="section-title">Participants</div>
+
+            <div id="remote-list"
+                style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; background: rgba(255,255,255,0.03); border-radius:12px; padding: 10px;">
+                <!-- Dynamically filled -->
+                <p style="opacity: 0.4; text-align: center; padding: 20px;">No other devices connected...</p>
+            </div>
+
+            <div style="display:flex; gap: 8px;">
+                <button class="btn" id="remote-select-all" style="flex:1; font-size: 0.85rem;">Select All</button>
+                <button class="btn" id="remote-clear" style="flex:1; font-size: 0.85rem;">Clear</button>
+            </div>
+
+            <div class="modal-close-row" style="margin-top: 24px;">
+                <button class="modal-close-btn" id="remote-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Streamables Modal -->
+    <div class="modal-overlay" id="streamables-modal" role="dialog" aria-modal="true" aria-label="Streamable Ensembles">
+        <div class="modal-content">
+            <h2>Streamables</h2>
+            <p style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.7;">Orchestrate multi-part audio experiences
+                across all connected Sillyboards.</p>
+
+            <div class="section-title">Selection</div>
+
+            <div class="custom-slider-container"
+                style="flex-direction:row; align-items:center; justify-content: space-between; margin-bottom: 20px;">
+                <label for="stream-self-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    Use this device (self)
+                </label>
+                <input type="checkbox" id="stream-self-cbx" checked>
+            </div>
+
+            <div id="streamables-list" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                <!-- Filled from config -->
+            </div>
+
+            <div id="stream-status"
+                style="margin-top: 15px; font-size: 0.85rem; font-weight: bold; color: var(--accent-color); opacity: 0.6; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; text-align: center;">
+                Devices: 0
+            </div>
+
+            <div class="modal-close-row" style="margin-top: 24px;">
+                <button class="modal-close-btn" id="streamables-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Voice Message Modal -->
+    <div class="modal-overlay" id="voice-modal" role="dialog" aria-modal="true" aria-label="Voice Message">
+        <div class="modal-content">
+            <!-- Hang On Overlay -->
+            <div id="voice-loading"
+                style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px;">
+                <h2 style="border:none; margin-bottom: 20px;">Hang On...</h2>
+                <div
+                    style="width: 100%; height: 8px; background: rgba(128,128,128,0.2); border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
+                    <div id="voice-loading-bar"
+                        style="width: 0%; height: 100%; background: var(--accent-color); transition: width 0.3s ease;">
+                    </div>
+                </div>
+                <p id="voice-loading-status" style="font-size: 0.9rem; opacity: 0.6;">Initializing...</p>
+                <button class="btn" id="voice-loading-cancel"
+                    style="margin-top: 30px; padding: 8px 24px; font-size: 0.9rem;">Cancel</button>
+            </div>
+
+            <div id="voice-main-ui" style="display: none;">
+                <h2>Send Message</h2>
+                <p style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.7; text-align: center;">Press and hold to
+                    record a message for everyone.</p>
+
+                <div id="record-ui"
+                    style="text-align: center; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                    <div style="display: flex; gap: 15px; width: 100%; justify-content: center;">
+                        <button id="record-btn" class="btn"
+                            style="flex: 1; min-width: 120px; height: 70px; font-size: 1.1rem; transition: all 0.2s; user-select: none; touch-action: none; border-color: #ff4444; color: #ff4444;">Hold
+                            to Record</button>
+                        <button id="monitor-btn" class="btn"
+                            style="flex: 1; min-width: 120px; height: 70px; font-size: 1.1rem; opacity: 0.5;"
+                            disabled>Monitor</button>
+                    </div>
+                    <p id="record-status" style="font-weight: bold; opacity: 0.7;">Ready</p>
+
+                    <!-- Post-recording Processing UI -->
+                    <div id="voice-processing" style="width: 100%; display: none; margin-top: 10px;">
+                        <div
+                            style="width: 100%; height: 6px; background: rgba(128,128,128,0.2); border-radius: 3px; overflow: hidden; margin-bottom: 8px;">
+                            <div id="voice-processing-bar"
+                                style="width: 0%; height: 100%; background: var(--accent-color); transition: width 0.2s ease;">
+                            </div>
+                        </div>
+                        <p id="voice-processing-status" style="font-size: 0.8rem; opacity: 0.6;">Processing...</p>
+                    </div>
+                </div>
+
+                <div class="section-title">Recent Recordings</div>
+                <div id="recent-recordings"
+                    style="display: flex; flex-direction: column; gap: 10px; padding: 5px; overflow: hidden;">
+                    <!-- Filled dynamically -->
+                    <p style="opacity: 0.4; text-align: center; padding: 10px; font-size: 0.9rem;">No recordings yet.
+                    </p>
+                </div>
+
+                <div class="modal-close-row" style="margin-top: 30px;">
+                    <button class="modal-close-btn" id="voice-close">Back</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pinned Recordings Modal -->
+    <div class="modal-overlay" id="pinned-recordings-modal" role="dialog" aria-modal="true"
+        aria-label="Pinned Recordings">
+        <div class="modal-content">
+            <h2>Pinned Recordings</h2>
+            <div id="pinned-list"
+                style="display: flex; flex-direction: column; gap: 10px; padding: 5px; margin-top: 20px;">
+                <!-- Filled dynamically -->
+            </div>
+            <div class="modal-close-row" style="margin-top: 30px;">
+                <button class="modal-close-btn" id="pinned-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seguestions Modal -->
+    <div class="modal-overlay" id="seguestions-modal" role="dialog" aria-modal="true" aria-label="Seguestions Box">
+        <div class="modal-content">
+            <h2>Seguestions Box</h2>
+
+
+
+            <div class="section-title" style="margin-top: 16px;">Who are you?</div>
+            <div class="name-chips">
+                <button class="name-chip" data-name="Opioids">Opioids</button>
+                <button class="name-chip" data-name="So True">So True</button>
+                <button class="name-chip" data-name="Nya">Nya</button>
+                <button class="name-chip" data-name="Yaoi">Yaoi</button>
+                <button class="name-chip" data-name="Shawn">Shawn</button>
+            </div>
+
+            <div class="section-title">Message</div>
+            <textarea id="seg-message" class="seg-textarea" placeholder="Got any sound ideas?" maxlength="500"
+                style="margin-top: 8px;"></textarea>
+
+            <div class="section-title">Link <span style="opacity:0.5; font-weight:400;">(optional)</span></div>
+            <input type="url" id="seg-link" class="seg-input" placeholder="https://..." maxlength="500"
+                style="margin-top: 8px;">
+
+            <div class="section-title">File <span style="opacity:0.5; font-weight:400;">(optional, max 5 MB)</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 8px; margin-bottom: 16px;">
+                <button class="btn" id="seg-file-btn"
+                    style="flex-shrink: 0; padding: 8px 16px; font-size: 0.9rem;">Choose File</button>
+                <span id="seg-filename"
+                    style="font-size: 0.85rem; opacity: 0.55; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">No
+                    file chosen</span>
+                <input type="file" id="seg-file-input" style="display: none;">
+            </div>
+
+            <div id="seg-status"
+                style="min-height: 1.4em; font-size: 0.9rem; font-weight: 700; text-align: center; margin-bottom: 10px;">
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" id="seg-cancel" style="flex: 1;">Cancel</button>
+                <button class="modal-close-btn" id="seg-submit" style="flex: 2;">Send it!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal" role="dialog" aria-modal="true" aria-label="Settings">
+        <div class="modal-content">
+            <h2>Settings</h2>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+                <button class="btn" id="ux-theme-btn">UX and Theme</button>
+                <button class="btn" id="accessibility-settings-btn">Accessibility</button>
+                <button class="btn" id="labs-btn">Labs</button>
+                <button class="btn" id="seguestions-box-btn">Seguestions Box</button>
+                <button class="btn" id="about-btn">About</button>
+                <div id="ux-sounds-settings" style="display: none; flex-direction: column; gap: 5px; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                    <span style="font-size: 0.9rem; opacity: 0.8; text-align: center;">UX Sounds Profile</span>
+                    <select id="ux-sounds-select" class="btn" style="text-align: center; appearance: none; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
+                        <option value="none">None</option>
+                        <option value="tactile">Tactile</option>
+                        <option value="subtle">Subtle</option>
+                        <option value="retro">Retro</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px;">
+                <button class="btn" id="refresh-sillyboard-btn"
+                    style="width: 100%; border-color: #ff4444; color: #ff4444;">Refresh Sillyboard</button>
+            </div>
+
+            <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;"
+                class="modal-close-row">
+                <button class="modal-close-btn" id="settings-close">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UX and Theme Settings Modal -->
+    <div class="modal-overlay" id="ux-theme-modal" role="dialog" aria-modal="true"
+        aria-label="UX and Theme Settings">
+        <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
+            <h2>UX and Theme</h2>
+
+            <!-- Navigation UX -->
+            <div class="section-title" style="margin-top: 20px;">Navigation UX</div>
+            <div class="custom-slider-container"
+                style="flex-direction:row; align-items:center; justify-content: space-between; margin-bottom: 24px;">
+                <label for="nav-mode-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    Use Categories
+                </label>
+                <input type="checkbox" id="nav-mode-cbx">
+            </div>
+
+            <!-- Hotbar arrangement -->
+            <div class="hotbar-config">
+                <div class="section-title">Hotbar</div>
+                <div class="hotbar-slots" id="hotbar-slots-cfg"></div>
+                <div class="hotbar-sound-picker" id="hotbar-picker"></div>
+            </div>
+
+            <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <div class="section-title">Theme Presets</div>
+            </div>
+            <div class="theme-grid">
+                <button class="btn" onclick="setTheme('#000000','#ffffff')">IAmAnOLED</button>
+                <button class="btn" onclick="setTheme('#1a1a1a','#ffffff')">Dark Gray</button>
+                <button class="btn" onclick="setTheme('#ffffff','#000000')">Light Mode</button>
+                <button class="btn" onclick="setTheme('#001524','#ffecd1')">Midnight</button>
+                <button class="btn" onclick="setTheme('#2d1b4e','#d4b8ff')">Purple</button>
+                <button class="btn" onclick="setTheme('#4a1528','#ffb3c6')">Pink</button>
+                <button class="btn" onclick="setTheme('#3d1c00','#ffb067')">Orange</button>
+                <button class="btn" onclick="setTheme('#0b2b1d','#a3ffcc')">Forest</button>
+                <button class="btn" onclick="setTheme('#001f3f','#80c4ff')">Ocean</button>
+                <button class="btn" onclick="setTheme('#330000','#ff9999')">Crimson</button>
+                <button class="btn" onclick="setTheme('#0d1117','#00ff00')">Hacker</button>
+                <button class="btn" onclick="setTheme('#2d0c18','#ffcc80')">Sunset</button>
+                <button class="btn" onclick="setTheme('#000000','#0000ff')">Rainyware</button>
+                <button class="btn" onclick="setTheme('#00ff00','#006600')">TIME FOR GREEN!!!!!</button>
+                <button class="btn" onclick="setTheme('#000000','#ff0000')">HellofaBluelightFilter</button>
+                <button class="btn" onclick="setTheme('#1a0d0b','#d4a373')">Coffiest</button>
+                <button class="btn" onclick="setTheme('#000000','#f39c12')">Tux</button>
+                <button class="btn" onclick="setTheme('#4b2e2a','#fff3e0')">Cuddlebug</button>
+            </div>
+
+            <div class="section-title" style="margin-top: 20px;">Custom Theme</div>
+            <div class="picker-row">
+                <div class="color-picker-wrap">
+                    <span>Background</span>
+                    <input type="color" id="bg-picker">
+                </div>
+                <div class="color-picker-wrap">
+                    <span>Accent</span>
+                    <input type="color" id="ac-picker">
+                </div>
+            </div>
+
+            <div class="modal-close-row"
+                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="modal-close-btn" id="ux-theme-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accessibility Settings Modal -->
+    <div class="modal-overlay" id="accessibility-settings-modal" role="dialog" aria-modal="true"
+        aria-label="Accessibility Settings">
+        <div class="modal-content">
+            <h2>Accessibility</h2>
+
+            <div class="custom-slider-container"
+                style="flex-direction:row; align-items:center; justify-content: space-between; margin-top: 20px; margin-bottom: 8px;">
+                <label for="disable-theme-sound-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    Disable changing theme with sound
+                </label>
+                <input type="checkbox" id="disable-theme-sound-cbx">
+            </div>
+            <p style="font-size: 0.85rem; opacity: 0.7; margin-top: 0; margin-bottom: 24px; line-height: 1.4;">
+                When a sound with an associated theme is played, the theme will no longer change for those sounds.
+            </p>
+
+            <!-- Amplification (moved from Audio category) -->
+            <div class="amp-section" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <div class="section-title">Amplification</div>
+                <div class="amp-slider-row">
+                    <input type="range" id="amp-slider" class="amp-slider" min="0" max="300" step="1" value="100"
+                        aria-label="Amplification">
+                    <span class="amp-value" id="amp-value-label">100%</span>
+                </div>
+                <p class="amp-reset-hint">Double-tap slider to reset to 100%</p>
+            </div>
+
+            <div class="modal-close-row"
+                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="modal-close-btn" id="accessibility-settings-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Labs Modal -->
+    <div class="modal-overlay" id="labs-modal" role="dialog" aria-modal="true" aria-label="Labs Settings">
+        <div class="modal-content">
+            <h2>Labs</h2>
+            <div class="custom-slider-container" style="flex-direction:row; align-items:center; justify-content: space-between; margin-top: 20px;">
+                <label for="lab-opus-cbx" style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer;">Opus Audio</label>
+                <input type="checkbox" id="lab-opus-cbx">
+            </div>
+            <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 24px; line-height: 1.4;">On by default. Loads compressed Ogg Opus sounds (cached on your device). Turn off to use WAV.</p>
+
+            <div class="custom-slider-container" style="flex-direction:row; align-items:center; justify-content: space-between;">
+                <label for="lab-uxsounds-cbx" style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer;">UX Sounds</label>
+                <input type="checkbox" id="lab-uxsounds-cbx">
+            </div>
+            <p style="font-size: 0.85rem; opacity: 0.7; margin-bottom: 24px; line-height: 1.4;">Enables UI interaction sounds in settings.</p>
+
+            <div class="modal-close-row"
+                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="modal-close-btn" id="labs-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Submenu Modal -->
+    <div class="modal-overlay" id="about-modal" role="dialog" aria-modal="true" aria-label="About">
+        <div class="modal-content">
+            <h2>About</h2>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+                <button class="btn" id="about-info-btn">Info</button>
+                <button class="btn" id="about-changelog-btn">Changelog</button>
+            </div>
+            <div class="modal-close-row"
+                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="modal-close-btn" id="about-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div class="modal-overlay" id="info-modal" role="dialog" aria-modal="true" aria-label="Build Info">
+        <div class="modal-content">
+            <h2 id="info-title">Sillyboard :3</h2>
+            <div id="info-content" style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px; max-height: 50vh; overflow-y: auto; text-align: left;">
+                <p id="info-description" style="font-size: 0.95rem; opacity: 0.9; line-height: 1.4;"></p>
+                <div class="section-title">Credits</div>
+                <p id="info-credits" style="font-size: 0.85rem; opacity: 0.7; line-height: 1.4;"></p>
+            </div>
+            <div class="modal-close-row"
+                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="modal-close-btn" id="info-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Changelog Modal -->
+    <div class="modal-overlay" id="changelog-modal" role="dialog" aria-modal="true" aria-label="Changelog">
+        <div class="modal-content">
+            <h2>Changelog</h2>
+            <div id="changelog-list"
+                style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px; max-height: 60vh; overflow-y: auto;">
+                <p style="text-align: center; opacity: 0.5;">Loading...</p>
+            </div>
+            <div class="modal-close-row"
+                style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <button class="modal-close-btn" id="changelog-close">Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refresh Confirmation Modal -->
+    <div class="modal-overlay" id="refresh-modal" role="dialog" aria-modal="true" aria-label="Refresh Confirmation">
+        <div class="modal-content" style="text-align: center;">
+            <h2>Reset App?</h2>
+            <p style="margin-bottom: 24px; font-weight: bold; font-size: 1.1rem; opacity: 0.9;">All Content will be
+                re-downloaded. You sure?</p>
+            <div style="display: flex; gap: 15px;">
+                <button class="btn" id="refresh-ye"
+                    style="flex: 1; height: 60px; background: #ff4444; color: white; border-color: #ff4444; font-size: 1.2rem;">Ye!</button>
+                <button class="btn" id="refresh-nvm" style="flex: 1; height: 60px; font-size: 1.2rem;">Nvm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── Sound definitions ─────────────────────────────────────────────
+        let SOUND_DEFS = {};
+        let SOUND_KEYS = [];
+
+        // ── Theme helpers ────────────────────────────────────────────────────
+        function setTheme(bg, ac) {
+            document.documentElement.style.setProperty('--bg-color', bg);
+            if (window.Android) window.Android.updateThemeColor(bg);
+            document.documentElement.style.setProperty('--accent-color', ac);
+            localStorage.setItem('sillyboard-bg', bg);
+            localStorage.setItem('sillyboard-accent', ac);
+            if (typeof notifyParent === 'function') notifyParent({ type: 'set-theme', bg, ac });
+            
+            // Sync to cloud
+            saveProfileToCloud();
+        }
+
+        function applyThemeNoSave(bg, ac) {
+            document.documentElement.style.setProperty('--bg-color', bg);
+            if (window.Android) window.Android.updateThemeColor(bg);
+            document.documentElement.style.setProperty('--accent-color', ac);
+            if (typeof notifyParent === 'function') notifyParent({ type: 'set-theme', bg, ac });
+        }
+
+        let isEventModeActive = false;
+        let eventModeThemeBg = '';
+        let eventModeThemeAc = '';
+
+        function restoreTheme() {
+            if (isEventModeActive && eventModeThemeBg && eventModeThemeAc) {
+                applyThemeNoSave(eventModeThemeBg, eventModeThemeAc);
+                return;
+            }
+            const bg = localStorage.getItem('sillyboard-bg') || '#000000';
+            const ac = localStorage.getItem('sillyboard-accent') || '#ffffff';
+            applyThemeNoSave(bg, ac);
+        }
+
+        function handleEventMode(state) {
+            isEventModeActive = state.active;
+            eventModeThemeBg = state.themeBg;
+            eventModeThemeAc = state.themeAc;
+
+            if (state.active) {
+                if (state.themeBg && state.themeAc) {
+                    applyThemeNoSave(state.themeBg, state.themeAc);
+                }
+                if (state.loadingText) {
+                    if (typeof notifyParent === 'function') {
+                        notifyParent({ type: 'set-loading-text', text: state.loadingText });
+                    }
+                }
+            } else {
+                restoreTheme();
+            }
+        }
+
+        const bgPicker = document.getElementById('bg-picker');
+        const acPicker = document.getElementById('ac-picker');
+
+        function syncPickersToTheme() {
+            bgPicker.value = getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim() || '#000000';
+            acPicker.value = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#ffffff';
+        }
+
+        bgPicker.addEventListener('input', () => {
+            document.documentElement.style.setProperty('--bg-color', bgPicker.value);
+        });
+        bgPicker.addEventListener('change', () => {
+            if (window.Android) window.Android.updateThemeColor(bgPicker.value);
+            localStorage.setItem('sillyboard-bg', bgPicker.value);
+        });
+        acPicker.addEventListener('input', () => {
+            document.documentElement.style.setProperty('--accent-color', acPicker.value);
+        });
+        acPicker.addEventListener('change', () => {
+            localStorage.setItem('sillyboard-accent', acPicker.value);
+        });
+
+        // ── Settings modal ────────────────────────────────────────────────
+        const settingsModal = document.getElementById('settings-modal');
+        const uxThemeModal = document.getElementById('ux-theme-modal');
+        const accessibilitySettingsModal = document.getElementById('accessibility-settings-modal');
+        const labsModal = document.getElementById('labs-modal');
+        const aboutModal = document.getElementById('about-modal');
+        const infoModal = document.getElementById('info-modal');
+        const changelogModal = document.getElementById('changelog-modal');
+
+        document.getElementById('ux-theme-btn').addEventListener('click', () => {
+            renderHotbarConfig();
+            syncPickersToTheme();
+            uxThemeModal.classList.add('active');
+        });
+        document.getElementById('accessibility-settings-btn').addEventListener('click', () => {
+            updateAmpUI(currentGain);
+            accessibilitySettingsModal.classList.add('active');
+        });
+        document.getElementById('labs-btn').addEventListener('click', () => {
+            labsModal.classList.add('active');
+        });
+        document.getElementById('about-btn').addEventListener('click', () => {
+            aboutModal.classList.add('active');
+        });
+        document.getElementById('about-changelog-btn').addEventListener('click', () => {
+            loadChangelog();
+            changelogModal.classList.add('active');
+        });
+        document.getElementById('about-info-btn').addEventListener('click', () => {
+            loadInfo();
+            infoModal.classList.add('active');
+        });
+
+        document.getElementById('ux-theme-close').addEventListener('click', () => {
+            uxThemeModal.classList.remove('active');
+        });
+        document.getElementById('accessibility-settings-close').addEventListener('click', () => {
+            accessibilitySettingsModal.classList.remove('active');
+        });
+        document.getElementById('labs-close').addEventListener('click', () => {
+            labsModal.classList.remove('active');
+        });
+        document.getElementById('about-close').addEventListener('click', () => {
+            aboutModal.classList.remove('active');
+        });
+        document.getElementById('info-close').addEventListener('click', () => {
+            infoModal.classList.remove('active');
+        });
+        document.getElementById('changelog-close').addEventListener('click', () => {
+            changelogModal.classList.remove('active');
+        });
+
+        // Close on overlay click
+        uxThemeModal.addEventListener('click', (e) => {
+            if (e.target === uxThemeModal) uxThemeModal.classList.remove('active');
+        });
+        accessibilitySettingsModal.addEventListener('click', (e) => {
+            if (e.target === accessibilitySettingsModal) accessibilitySettingsModal.classList.remove('active');
+        });
+        labsModal.addEventListener('click', (e) => {
+            if (e.target === labsModal) labsModal.classList.remove('active');
+        });
+
+        // Labs Features Initialization
+        const labOpusCbx = document.getElementById('lab-opus-cbx');
+        const labUxSoundsCbx = document.getElementById('lab-uxsounds-cbx');
+        const uxSoundsSettings = document.getElementById('ux-sounds-settings');
+        const uxSoundsSelect = document.getElementById('ux-sounds-select');
+
+        if (labOpusCbx) {
+            labOpusCbx.checked = localStorage.getItem('sillyboard-lab-opus') !== 'false';
+            labOpusCbx.addEventListener('change', () => {
+                localStorage.setItem('sillyboard-lab-opus', labOpusCbx.checked);
+            });
+        }
+
+        const updateUxSoundsVisibility = () => {
+            if (uxSoundsSettings) {
+                uxSoundsSettings.style.display = localStorage.getItem('sillyboard-lab-uxsounds') === 'true' ? 'flex' : 'none';
+            }
+        };
+
+        if (labUxSoundsCbx) {
+            labUxSoundsCbx.checked = localStorage.getItem('sillyboard-lab-uxsounds') === 'true';
+            updateUxSoundsVisibility();
+            labUxSoundsCbx.addEventListener('change', () => {
+                localStorage.setItem('sillyboard-lab-uxsounds', labUxSoundsCbx.checked);
+                updateUxSoundsVisibility();
+            });
+        }
+
+        if (uxSoundsSelect) {
+            uxSoundsSelect.value = localStorage.getItem('sillyboard-ux-sounds-profile') || 'none';
+            uxSoundsSelect.addEventListener('change', () => {
+                localStorage.setItem('sillyboard-ux-sounds-profile', uxSoundsSelect.value);
+            });
+        }
+        aboutModal.addEventListener('click', (e) => {
+            if (e.target === aboutModal) aboutModal.classList.remove('active');
+        });
+        infoModal.addEventListener('click', (e) => {
+            if (e.target === infoModal) infoModal.classList.remove('active');
+        });
+        changelogModal.addEventListener('click', (e) => {
+            if (e.target === changelogModal) changelogModal.classList.remove('active');
+        });
+
+        async function loadInfo() {
+            const titleEl = document.getElementById('info-title');
+            const descEl = document.getElementById('info-description');
+            const creditsEl = document.getElementById('info-credits');
+            
+            titleEl.textContent = "Loading Info...";
+            descEl.textContent = "";
+            creditsEl.textContent = "";
+            
+            try {
+                const res = await fetch('Soundboard/about.json');
+                const data = await res.json();
+                const info = data[0] || {};
+                
+                titleEl.textContent = info.title || "Sillyboard :3";
+                descEl.textContent = info.description || "";
+                creditsEl.textContent = info.credits || "";
+            } catch (err) {
+                titleEl.textContent = "Error";
+                descEl.innerHTML = '<span style="color: #ff4444;">Could not load build info.</span>';
+                creditsEl.textContent = "";
+            }
+        }
+
+        async function loadChangelog() {
+            const listEl = document.getElementById('changelog-list');
+            try {
+                const res = await fetch('Soundboard/changelog.json');
+                const data = await res.json();
+
+                listEl.innerHTML = '';
+                data.forEach(entry => {
+                    const item = document.createElement('div');
+                    item.style.background = 'rgba(255,255,255,0.05)';
+                    item.style.padding = '15px';
+                    item.style.borderRadius = '12px';
+
+                    let html = `<h3 style="margin: 0; font-size: 1.1rem; color: var(--accent-color); margin-bottom: 5px;">${entry.title || 'Update'}</h3>`;
+
+                    if (entry.subtitle) {
+                        html += `<div style="font-size: 0.95rem; font-weight: bold; margin-bottom: 8px; opacity: 0.9;">${entry.subtitle}</div>`;
+                    }
+
+                    let formattedDate = entry.date;
+                    if (entry.date) {
+                        const parts = entry.date.split('-');
+                        if (parts.length === 3) {
+                            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                            formattedDate = `${months[parseInt(parts[1], 10) - 1]} ${parseInt(parts[2], 10)}, ${parts[0]}`;
+                        }
+                    }
+
+                    html += `<div style="font-size: 0.8rem; opacity: 0.6; font-family: monospace; margin-bottom: 10px;">v${entry.version} • ${formattedDate}</div>`;
+
+                    if (entry.description) {
+                        html += `<div style="font-size: 0.9rem; opacity: 0.8; line-height: 1.4;">${entry.description}</div>`;
+                    }
+
+                    item.innerHTML = html;
+                    listEl.appendChild(item);
+                });
+            } catch (err) {
+                listEl.innerHTML = '<p style="text-align: center; color: #ff4444;">Could not load changelog.</p>';
+            }
+        }
+
+
+
+        const refreshBtn = document.getElementById('refresh-sillyboard-btn');
+        const refreshModal = document.getElementById('refresh-modal');
+        const refreshYe = document.getElementById('refresh-ye');
+        const refreshNvm = document.getElementById('refresh-nvm');
+
+        refreshBtn.addEventListener('click', () => {
+            refreshModal.classList.add('active');
+        });
+
+        refreshNvm.addEventListener('click', () => {
+            refreshModal.classList.remove('active');
+        });
+
+        refreshYe.addEventListener('click', async () => {
+            // Set flag to force cache-busting fetches on next load
+            sessionStorage.setItem('sillyboard-force-refresh', 'true');
+            
+            localStorage.clear();
+            // We don't clear sessionStorage here because we need the flag
+            
+            if ('caches' in window) {
+                try {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                } catch (e) { }
+            }
+
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(registrations.map(reg => reg.unregister()));
+                } catch (e) { }
+            }
+
+            // Hard reload to bypass browser HTTP cache
+            location.reload(true);
+        });
+
+
+
+        let navMode = localStorage.getItem('sillyboard-nav-mode') || 'categories';
+        const navModeCbx = document.getElementById('nav-mode-cbx');
+        navModeCbx.checked = navMode === 'categories';
+        navModeCbx.addEventListener('change', () => {
+            navMode = navModeCbx.checked ? 'categories' : 'hotbar';
+            localStorage.setItem('sillyboard-nav-mode', navMode);
+            buildPages();
+            saveProfileToCloud();
+        });
+
+        let disableThemeSound = localStorage.getItem('sillyboard-disable-theme-sound') === 'true';
+        const disableThemeSoundCbx = document.getElementById('disable-theme-sound-cbx');
+        disableThemeSoundCbx.checked = disableThemeSound;
+        disableThemeSoundCbx.addEventListener('change', () => {
+            disableThemeSound = disableThemeSoundCbx.checked;
+            localStorage.setItem('sillyboard-disable-theme-sound', disableThemeSound);
+            saveProfileToCloud();
+        });
+
+        document.getElementById('settings-btn').addEventListener('click', () => {
+            settingsModal.classList.add('active');
+        });
+
+        document.getElementById('settings-close').addEventListener('click', () => {
+            settingsModal.classList.remove('active');
+        });
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) settingsModal.classList.remove('active');
+        });
+
+        // ── Amplification (Web Audio API GainNode) ────────────────────────
+        let audioCtx = null;
+        let gainNode = null;
+
+        let currentGain = parseFloat(localStorage.getItem('sillyboard-gain') || '1');
+        if (isNaN(currentGain) || currentGain < 0) currentGain = 1;
+
+        function ensureAudioContext() {
+            if (audioCtx) return;
+            // Native fallback for Safari, with critical 'interactive' latency hint to force smallest audio buffer
+            const AudioContextParams = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContextParams({ latencyHint: 'interactive' });
+
+            gainNode = audioCtx.createGain();
+            gainNode.gain.value = currentGain;
+            gainNode.connect(audioCtx.destination);
+
+            // iOS WebKit aggressively suspends idle AudioContexts to save battery,
+            // which introduces a 300-500ms hardware wakeup penalty on your next tap.
+            // We prevent this by continuously playing an inaudible ultrasonic tone.
+            // (Using a 1Hz tone caused a 500ms zero-crossing stutter in CarPlay, and white noise was audible in headphones).
+            const silentOsc = audioCtx.createOscillator();
+            const silentNode = audioCtx.createGain();
+            silentOsc.type = 'sine';
+            silentOsc.frequency.value = 20000; // 20kHz is ultrasonic (inaudible) but keeps the context fully awake
+            silentNode.gain.value = 0.001;
+            silentOsc.connect(silentNode);
+            silentNode.connect(audioCtx.destination);
+            silentOsc.start();
+        }
+
+        const ampSlider = document.getElementById('amp-slider');
+        const ampValueLabel = document.getElementById('amp-value-label');
+
+        function updateAmpUI(val) {
+            const pct = Math.round(val * 100);
+            ampSlider.value = pct;
+            ampValueLabel.textContent = pct + '%';
+            ampSlider.style.setProperty('--amp-pct', ((pct / 300) * 100).toFixed(2) + '%');
+        }
+
+        updateAmpUI(currentGain);
+
+        ampSlider.addEventListener('input', () => {
+            const pct = parseInt(ampSlider.value, 10);
+            currentGain = pct / 100;
+            updateAmpUI(currentGain);
+            localStorage.setItem('sillyboard-gain', currentGain);
+            if (gainNode) gainNode.gain.setTargetAtTime(currentGain, audioCtx.currentTime, 0.01);
+            saveProfileToCloud();
+        });
+
+        let ampLastTap = 0;
+        ampSlider.addEventListener('dblclick', () => {
+            currentGain = 1;
+            updateAmpUI(1);
+            localStorage.setItem('sillyboard-gain', '1');
+            if (gainNode) gainNode.gain.setTargetAtTime(1, audioCtx.currentTime, 0.01);
+            saveProfileToCloud();
+        });
+        ampSlider.addEventListener('touchend', () => {
+            const now = Date.now();
+            if (now - ampLastTap < 320) {
+                currentGain = 1;
+                updateAmpUI(1);
+                localStorage.setItem('sillyboard-gain', '1');
+                if (gainNode) gainNode.gain.setTargetAtTime(1, audioCtx.currentTime, 0.01);
+                saveProfileToCloud();
+            }
+            ampLastTap = now;
+        }, { passive: true });
+
+        // ── Admin Features (Pitch & Turbo) ──────────────────────────────
+        const titleEl = document.getElementById('silly-title');
+        const adminBtn = document.getElementById('admin-btn');
+        const adminModal = document.getElementById('admin-modal');
+
+        let headerLockedClicks = 0;
+        let headerLockedTimer = null;
+
+        // Show fun button by default now
+        adminBtn.style.display = 'inline-block';
+
+        titleEl.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false }); // Prevent mobile text selection
+        titleEl.addEventListener('pointerdown', () => {
+            // Dual-stage unlock Part 2
+            if (bigIconUnlocked) {
+                headerLockedClicks++;
+                clearTimeout(headerLockedTimer);
+                if (headerLockedClicks >= 5) {
+                    unlockBoardManually();
+                } else {
+                    headerLockedTimer = setTimeout(() => { headerLockedClicks = 0; }, 1200);
+                }
+            }
+        });
+
+        adminBtn.addEventListener('click', () => adminModal.classList.add('active'));
+        document.getElementById('admin-close').addEventListener('click', () => adminModal.classList.remove('active'));
+        adminModal.addEventListener('click', (e) => {
+            if (e.target === adminModal) adminModal.classList.remove('active');
+        });
+
+        // Pitch state
+        const pitchSlider = document.getElementById('pitch-slider');
+        const pitchVal = document.getElementById('pitch-val');
+        let currentPitch = parseFloat(localStorage.getItem('sillyboard-pitch')) || 1;
+        pitchSlider.value = currentPitch;
+        pitchVal.textContent = currentPitch.toFixed(2) + 'x';
+
+        function updatePitchUI() {
+            currentPitch = parseFloat(pitchSlider.value);
+            pitchVal.textContent = currentPitch.toFixed(2) + 'x';
+            localStorage.setItem('sillyboard-pitch', currentPitch);
+            
+            // Realtime pitch adjustment for currently playing sounds
+            if (typeof clipQueue !== 'undefined') {
+                clipQueue.forEach(c => {
+                    try { 
+                        if (c.source && c.source.playbackRate) {
+                            // Optionally use setTargetAtTime to prevent clicking
+                            // c.source.playbackRate.setTargetAtTime(currentPitch, audioCtx.currentTime, 0.05);
+                            c.source.playbackRate.value = currentPitch; 
+                        }
+                    } catch (e) {}
+                });
+            }
+        }
+
+        pitchSlider.addEventListener('input', updatePitchUI);
+
+        let pitchLastTap = 0;
+        pitchSlider.addEventListener('dblclick', () => {
+            pitchSlider.value = 1;
+            updatePitchUI();
+        });
+        pitchSlider.addEventListener('touchend', () => {
+            const now = Date.now();
+            if (now - pitchLastTap < 320) {
+                pitchSlider.value = 1;
+                updatePitchUI();
+            }
+            pitchLastTap = now;
+        }, { passive: true });
+
+        // Turbo state
+        const turboCbx = document.getElementById('turbo-cbx');
+        const turboRate = document.getElementById('turbo-rate');
+        const turboRateVal = document.getElementById('turbo-rate-val');
+
+        let turboEnabled = localStorage.getItem('sillyboard-turbo') === 'true';
+        turboCbx.checked = turboEnabled;
+        turboCbx.addEventListener('change', () => {
+            turboEnabled = turboCbx.checked;
+            localStorage.setItem('sillyboard-turbo', turboEnabled);
+        });
+
+        let currentTurboRate = parseInt(localStorage.getItem('sillyboard-turbo-rate'), 10) || 200;
+        turboRate.value = currentTurboRate;
+        turboRateVal.textContent = currentTurboRate + 'ms';
+        turboRate.addEventListener('input', () => {
+            currentTurboRate = parseInt(turboRate.value, 10);
+            turboRateVal.textContent = currentTurboRate + 'ms';
+            localStorage.setItem('sillyboard-turbo-rate', currentTurboRate);
+        });
+
+        let turboLastTap = 0;
+        turboRate.addEventListener('dblclick', () => {
+            turboRate.value = 200;
+            currentTurboRate = 200;
+            turboRateVal.textContent = '200ms';
+            localStorage.setItem('sillyboard-turbo-rate', 200);
+        });
+        turboRate.addEventListener('touchend', () => {
+            const now = Date.now();
+            if (now - turboLastTap < 320) {
+                turboRate.value = 200;
+                currentTurboRate = 200;
+                turboRateVal.textContent = '200ms';
+                localStorage.setItem('sillyboard-turbo-rate', 200);
+            }
+            turboLastTap = now;
+        }, { passive: true });
+
+        // Repeater state
+        const repeaterBtn = document.getElementById('repeater-mode-btn');
+        const repeaterModal = document.getElementById('repeater-modal');
+        const repeaterCbx = document.getElementById('repeater-cbx');
+        const repeaterStatus = document.getElementById('repeater-status');
+
+        // Default repeater to ON unless explicitly disabled
+        let repeaterEnabled = localStorage.getItem('sillyboard-repeater') !== 'false';
+        repeaterCbx.checked = repeaterEnabled;
+
+        let repeaterSocket = null;
+        let serverTimeOffset = 0; // serverTime - localTime (ms)
+        let clientRttMs = 200;    // rolling average RTT to server (ms)
+        const myClientId = Math.random().toString(36).substr(2, 9);
+
+        // ── Multi-sample NTP sync ─────────────────────────────────────────
+        // Fires N rounds of sync messages, averages the offsets & RTTs,
+        // then reports the measured RTT back so the server can schedule accurately.
+        const SYNC_ROUNDS = 4;
+        const SYNC_ROUND_DELAY_MS = 300;
+        let pendingSyncRounds = [];
+        let syncRoundsSent = 0;
+
+        function startSyncRounds() {
+            pendingSyncRounds = [];
+            syncRoundsSent = 0;
+            fireNextSyncRound();
+        }
+
+        function fireNextSyncRound() {
+            if (!repeaterSocket || repeaterSocket.readyState !== WebSocket.OPEN) return;
+            if (syncRoundsSent >= SYNC_ROUNDS) return;
+            syncRoundsSent++;
+            repeaterSocket.send(JSON.stringify({ type: 'sync', clientTime: Date.now() }));
+        }
+
+        function handleSyncReply(data) {
+            const now = Date.now();
+            const rtt = now - data.clientTime;                    // full round-trip ms
+            const offset = data.serverTime - (data.clientTime + rtt / 2); // clock offset
+            pendingSyncRounds.push({ rtt, offset });
+
+            if (syncRoundsSent < SYNC_ROUNDS) {
+                // Schedule next round
+                setTimeout(fireNextSyncRound, SYNC_ROUND_DELAY_MS);
+            } else {
+                // All rounds done — average and commit
+                const avgOffset = pendingSyncRounds.reduce((s, r) => s + r.offset, 0) / pendingSyncRounds.length;
+                const avgRtt = pendingSyncRounds.reduce((s, r) => s + r.rtt, 0) / pendingSyncRounds.length;
+                serverTimeOffset = avgOffset;
+                clientRttMs = avgRtt;
+
+                updateRepeaterStatus(`Connected ✓  RTT ${Math.round(avgRtt)}ms`, 1);
+
+                // Report our RTT to the server so it can adjust stream scheduling
+                repeaterSocket.send(JSON.stringify({ type: 'sync_report', rtt_ms: avgRtt }));
+
+                // Now safe to register
+                sendRegistration();
+            }
+        }
+
+        const REPEATER_URL = "wss://aibostation.tail76b4d2.ts.net/";
+
+        function updateRepeaterStatus(txt, op = 0.6) {
+            repeaterStatus.textContent = 'Status: ' + txt;
+            repeaterStatus.style.opacity = op;
+        }
+
+        function initRepeater() {
+            if (!repeaterEnabled) {
+                if (repeaterSocket) { repeaterSocket.onclose = null; repeaterSocket.close(); repeaterSocket = null; }
+                updateRepeaterStatus('Disconnected');
+                return;
+            }
+
+            updateRepeaterStatus('Connecting...');
+            repeaterSocket = new WebSocket(REPEATER_URL);
+
+            repeaterSocket.onopen = () => {
+                updateRepeaterStatus('Syncing clock...', 0.8);
+                startSyncRounds();
+            };
+
+            repeaterSocket.onmessage = (e) => {
+                let data;
+                try { data = JSON.parse(e.data); } catch { return; }
+
+                if (data.type === 'sync_reply') {
+                    handleSyncReply(data);
+
+                } else if (data.type === 'play') {
+                    // Ignore our own echo
+                    if (data.clientId === myClientId) return;
+
+                    // Honour global pitch override from stream conductor
+                    if (data.pitch !== undefined && pitchGlobal) {
+                        currentPitch = data.pitch;
+                        pitchVal.textContent = currentPitch.toFixed(2) + 'x';
+                        pitchSlider.value = currentPitch;
+                    }
+
+                    scheduleRemotePlayback(data.key, data.targetServerTime, data.variant);
+
+                } else if (data.type === 'stop') {
+                    stopSound(data.key);
+
+                } else if (data.type === 'client_list') {
+                    renderRemoteList(data.clients);
+
+                } else if (data.type === 'seguestion_ack') {
+                    handleSeguestionAck(data);
+
+                } else if (data.type === 'error') {
+                    alert(data.message);
+
+
+                } else if (data.type === 'voice_message') {
+                    if (data.clientId === myClientId) return;
+                    handleVoiceMessage(data.audio);
+                } else if (data.type === 'profile_data') {
+                    if (data.profile) {
+                        applyCloudProfile(data.profile);
+                    }
+                } else if (data.type === 'event_mode') {
+                    handleEventMode(data.state);
+                }
+            };
+
+            repeaterSocket.onclose = () => {
+                updateRepeaterStatus('Disconnected');
+                repeaterSocket = null;
+                if (repeaterEnabled) setTimeout(initRepeater, 4000);
+            };
+
+            repeaterSocket.onerror = () => {
+                updateRepeaterStatus('Connection error', 1);
+            };
+        }
+
+        function parseDeviceInfo() {
+            const ua = navigator.userAgent;
+            let os = "Unknown OS";
+            if (ua.match(/iPhone|iPad|iPod/)) os = "iOS";
+            else if (ua.match(/Android/)) os = "Android";
+            else if (ua.match(/Windows/)) os = "Windows";
+            else if (ua.match(/Macintosh/)) os = "macOS";
+
+            let browser = "Unknown Browser";
+            if (ua.match(/Chrome/)) browser = "Chrome";
+            else if (ua.match(/Safari/)) browser = "Safari";
+            else if (ua.match(/Firefox/)) browser = "Firefox";
+
+            // Mobile model heuristic
+            let model = "Desktop";
+            if (window.Android && typeof window.Android.getDeviceModel === 'function') {
+                model = window.Android.getDeviceModel();
+            } else if (ua.match(/iPhone/)) {
+                model = "iPhone";
+            } else if (ua.match(/iPad/)) {
+                model = "iPad";
+            } else if (ua.match(/Android/)) {
+                const parts = ua.match(/Android [^;]+; ([^;)]+)/);
+                model = parts ? parts[1] : "Android Device";
+            }
+
+            return { os, browser, model };
+        }
+
+        function sendRegistration() {
+            if (!repeaterSocket || repeaterSocket.readyState !== WebSocket.OPEN) return;
+            const info = parseDeviceInfo();
+            repeaterSocket.send(JSON.stringify({
+                type: 'register',
+                id: myClientId,
+                ...info,
+                theme: localStorage.getItem('sillyboard-bg') || 'Default'
+            }));
+            
+            // Request cloud profile load
+            requestCloudProfile();
+        }
+
+        async function generateFingerprint() {
+            const info = parseDeviceInfo();
+            const screenInfo = `${window.screen.width}x${window.screen.height}x${window.devicePixelRatio}`;
+            // Include user agent for more entropy, but normalized
+            const raw = `${info.os}|${info.model}|${info.browser}|${screenInfo}|${navigator.platform}`;
+            
+            // SHA-256 hash for privacy ("encryption")
+            const msgBuffer = new TextEncoder().encode(raw);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function requestCloudProfile() {
+            if (!repeaterSocket || repeaterSocket.readyState !== WebSocket.OPEN) return;
+            const fp = await generateFingerprint();
+            repeaterSocket.send(JSON.stringify({
+                type: 'profile_load',
+                fingerprint: fp
+            }));
+        }
+
+        async function saveProfileToCloud() {
+            if (!repeaterEnabled || !repeaterSocket || repeaterSocket.readyState !== WebSocket.OPEN) return;
+            
+            const fp = await generateFingerprint();
+            const profile = {
+                bg: localStorage.getItem('sillyboard-bg'),
+                accent: localStorage.getItem('sillyboard-accent'),
+                navMode: localStorage.getItem('sillyboard-nav-mode'),
+                gain: localStorage.getItem('sillyboard-gain'),
+                hotbar: localStorage.getItem('sillyboard-hotbar'),
+                disableThemeSound: localStorage.getItem('sillyboard-disable-theme-sound')
+            };
+
+            repeaterSocket.send(JSON.stringify({
+                type: 'profile_save',
+                fingerprint: fp,
+                profile: profile
+            }));
+        }
+
+        function applyCloudProfile(p) {
+            // Only apply if we are "fresh" (nothing in localStorage for key things)
+            // This prevents the cloud from overwriting local changes if the user just changed something
+            const isFresh = !localStorage.getItem('sillyboard-bg');
+            
+            if (isFresh) {
+                if (p.bg && p.accent) setTheme(p.bg, p.accent);
+                if (p.navMode) {
+                    localStorage.setItem('sillyboard-nav-mode', p.navMode);
+                    navMode = p.navMode;
+                    navModeCbx.checked = navMode === 'categories';
+                    buildPages();
+                }
+                if (p.gain) {
+                    localStorage.setItem('sillyboard-gain', p.gain);
+                    currentGain = parseFloat(p.gain);
+                    ampSlider.value = currentGain;
+                    ampVal.textContent = currentGain.toFixed(1) + 'x';
+                }
+                if (p.hotbar) {
+                    localStorage.setItem('sillyboard-hotbar', p.hotbar);
+                    hotbarSlots = JSON.parse(p.hotbar);
+                    renderHotbar();
+                }
+                if (p.disableThemeSound) {
+                    localStorage.setItem('sillyboard-disable-theme-sound', p.disableThemeSound);
+                    disableThemeSound = p.disableThemeSound === 'true';
+                    document.getElementById('disable-theme-sound-cbx').checked = disableThemeSound;
+                }
+            }
+        }
+
+        // ── Voice Messaging ──────────────────────────────────────────────────
+        const voiceModeBtn = document.getElementById('voice-mode-btn');
+        const voiceModal = document.getElementById('voice-modal');
+        const voiceClose = document.getElementById('voice-close');
+        const recordBtn = document.getElementById('record-btn');
+        const monitorBtn = document.getElementById('monitor-btn');
+        const recordStatus = document.getElementById('record-status');
+        const recentRecordingsEl = document.getElementById('recent-recordings');
+        const voiceProcessing = document.getElementById('voice-processing');
+        const voiceProcessingBar = document.getElementById('voice-processing-bar');
+        const voiceProcessingStatus = document.getElementById('voice-processing-status');
+
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isRecording = false;
+        let activeMicStream = null;
+
+        // Local history of recordings
+        let myRecentRecordings = JSON.parse(localStorage.getItem('sillyboard-voice-history') || '[]');
+        let myFavorites = JSON.parse(localStorage.getItem('sillyboard-voice-favorites') || '[]');
+
+        function toggleFavorite(rec) {
+            const idx = myFavorites.findIndex(f => f.ts === rec.ts);
+            if (idx > -1) {
+                myFavorites.splice(idx, 1);
+            } else {
+                if (myFavorites.length >= 12) {
+                    alert('Max 12 favorites reached!');
+                    return;
+                }
+                myFavorites.push(rec);
+            }
+            localStorage.setItem('sillyboard-voice-favorites', JSON.stringify(myFavorites));
+            renderRecentRecordings();
+            renderPinnedList();
+            buildPages();
+        }
+
+        function renameRecording(rec) {
+            const newName = prompt("Rename recording:", rec.name || "");
+            if (newName !== null) {
+                const nameToSet = newName.trim();
+                const histIdx = myRecentRecordings.findIndex(r => r.ts === rec.ts);
+                if (histIdx > -1) myRecentRecordings[histIdx].name = nameToSet;
+                const favIdx = myFavorites.findIndex(f => f.ts === rec.ts);
+                if (favIdx > -1) myFavorites[favIdx].name = nameToSet;
+
+                localStorage.setItem('sillyboard-voice-history', JSON.stringify(myRecentRecordings));
+                localStorage.setItem('sillyboard-voice-favorites', JSON.stringify(myFavorites));
+                renderRecentRecordings();
+                renderPinnedList();
+                buildPages();
+            }
+        }
+
+        function updateMonitorBtn() {
+            if (myRecentRecordings.length > 0) {
+                monitorBtn.disabled = false;
+                monitorBtn.style.opacity = '1';
+                monitorBtn.textContent = 'Monitor';
+            } else {
+                monitorBtn.disabled = true;
+                monitorBtn.style.opacity = '0.5';
+            }
+        }
+
+        async function initMicrophone() {
+            const loading = document.getElementById('voice-loading');
+            const mainUI = document.getElementById('voice-main-ui');
+            const bar = document.getElementById('voice-loading-bar');
+            const status = document.getElementById('voice-loading-status');
+
+            loading.style.display = 'flex';
+            mainUI.style.display = 'none';
+            bar.style.width = '10%';
+            bar.style.background = 'var(--accent-color)';
+
+            try {
+                status.textContent = 'Starting Mic...';
+                activeMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                bar.style.width = '100%';
+
+                if (!voiceModal.classList.contains('active')) {
+                    closeMicrophone();
+                    return;
+                }
+
+                loading.style.display = 'none';
+                mainUI.style.display = 'block';
+                renderRecentRecordings();
+                updateMonitorBtn();
+            } catch (err) {
+                console.error("Microphone access denied:", err);
+                status.textContent = 'Mic Error: Access Denied';
+                bar.style.background = '#ff4444';
+            }
+        }
+
+        function closeMicrophone() {
+            if (activeMicStream) {
+                activeMicStream.getTracks().forEach(t => t.stop());
+                activeMicStream = null;
+            }
+            recordStatus.textContent = 'Ready';
+            recordBtn.textContent = 'Hold to Record';
+            recordBtn.disabled = false;
+            voiceProcessing.style.display = 'none';
+        }
+
+        voiceModeBtn.addEventListener('click', () => {
+            voiceModal.classList.add('active');
+            initMicrophone();
+        });
+
+        const voiceCancel = document.getElementById('voice-loading-cancel');
+        voiceCancel.addEventListener('click', () => {
+            voiceModal.classList.remove('active');
+            closeMicrophone();
+        });
+
+        voiceClose.addEventListener('click', () => {
+            if (isRecording) stopRecording();
+            voiceModal.classList.remove('active');
+            closeMicrophone();
+        });
+
+        voiceModal.addEventListener('click', (e) => {
+            if (e.target === voiceModal) {
+                if (isRecording) stopRecording();
+                voiceModal.classList.remove('active');
+                closeMicrophone();
+            }
+        });
+
+        recordBtn.addEventListener('pointerdown', (e) => {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            startRecording();
+        });
+
+        ['pointerup', 'pointerleave', 'pointercancel'].forEach(evt => {
+            recordBtn.addEventListener(evt, () => {
+                if (isRecording) stopRecording();
+            });
+        });
+
+        monitorBtn.addEventListener('click', () => {
+            if (myRecentRecordings.length > 0) {
+                handleVoiceMessage(myRecentRecordings[0].data);
+            }
+        });
+
+        async function startRecording() {
+            if (!activeMicStream) {
+                await initMicrophone();
+                if (!activeMicStream) return;
+            }
+
+            try {
+                mediaRecorder = new MediaRecorder(activeMicStream, {
+                    mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' :
+                        MediaRecorder.isTypeSupported('audio/ogg;codecs=opus') ? 'audio/ogg;codecs=opus' : ''
+                });
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) audioChunks.push(e.data);
+                };
+
+                mediaRecorder.onstart = () => {
+                    isRecording = true;
+                    recordBtn.textContent = 'Recording';
+                    recordBtn.style.background = '#ff4444';
+                    recordBtn.style.borderColor = '#ff4444';
+                    recordBtn.style.color = '#fff';
+                    recordStatus.textContent = 'Live';
+                    voiceProcessing.style.display = 'none';
+                };
+
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
+                    processRecording(audioBlob);
+                };
+
+                mediaRecorder.start();
+            } catch (err) {
+                console.error("Failed to start recording:", err);
+                recordStatus.textContent = 'Error';
+            }
+        }
+
+        async function processRecording(blob) {
+            voiceProcessing.style.display = 'block';
+            voiceProcessingBar.style.width = '0%';
+            voiceProcessingStatus.textContent = 'Trimming silence...';
+
+            try {
+                ensureAudioContext();
+                const arrayBuffer = await blob.arrayBuffer();
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+                voiceProcessingBar.style.width = '30%';
+
+                const threshold = 0.015;
+                const channelData = audioBuffer.getChannelData(0);
+                let startSample = 0;
+                for (let i = 0; i < channelData.length; i++) {
+                    if (Math.abs(channelData[i]) > threshold) {
+                        startSample = i;
+                        break;
+                    }
+                }
+
+                const leadSamples = Math.floor(0.025 * audioBuffer.sampleRate);
+                const actualStart = Math.max(0, startSample - leadSamples);
+
+                voiceProcessingStatus.textContent = 'Compressing...';
+                voiceProcessingBar.style.width = '60%';
+
+                const trimmedLength = audioBuffer.length - actualStart;
+                const trimmedBuffer = audioCtx.createBuffer(audioBuffer.numberOfChannels, trimmedLength, audioBuffer.sampleRate);
+                for (let c = 0; c < audioBuffer.numberOfChannels; c++) {
+                    trimmedBuffer.copyToChannel(audioBuffer.getChannelData(c).subarray(actualStart), c);
+                }
+
+                const wavData = audioBufferToWav(trimmedBuffer);
+
+                voiceProcessingStatus.textContent = 'Uploading...';
+                voiceProcessingBar.style.width = '90%';
+
+                const reader = new FileReader();
+                reader.readAsDataURL(new Blob([wavData], { type: 'audio/wav' }));
+                reader.onloadend = () => {
+                    const base64data = reader.result;
+                    saveRecording(base64data);
+
+                    voiceProcessingBar.style.width = '100%';
+                    voiceProcessingStatus.textContent = 'Saved!';
+                    setTimeout(() => { voiceProcessing.style.display = 'none'; }, 800);
+                };
+            } catch (err) {
+                console.error("Processing failed:", err);
+                voiceProcessingStatus.textContent = 'Failed';
+            }
+        }
+
+        function audioBufferToWav(buffer) {
+            const numOfChan = buffer.numberOfChannels,
+                length = buffer.length * numOfChan * 2 + 44,
+                bufferArr = new ArrayBuffer(length),
+                view = new DataView(bufferArr);
+            let pos = 0;
+
+            function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
+            function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
+
+            setUint32(0x46464952); // "RIFF"
+            setUint32(length - 8);
+            setUint32(0x45564157); // "WAVE"
+            setUint32(0x20746d66); // "fmt "
+            setUint32(16);
+            setUint16(1); // PCM
+            setUint16(numOfChan);
+            setUint32(buffer.sampleRate);
+            setUint32(buffer.sampleRate * 2 * numOfChan);
+            setUint16(numOfChan * 2);
+            setUint16(16);
+            setUint32(0x61746164); // "data"
+            setUint32(length - 44);
+
+            for (let i = 0; i < buffer.length; i++) {
+                for (let channel = 0; channel < numOfChan; channel++) {
+                    let sample = buffer.getChannelData(channel)[i];
+                    sample = Math.max(-1, Math.min(1, sample));
+                    view.setInt16(pos, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+                    pos += 2;
+                }
+            }
+            return bufferArr;
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                recordBtn.textContent = 'Hold to Record';
+                recordBtn.style.background = 'transparent';
+                recordBtn.style.borderColor = '#ff4444';
+                recordBtn.style.color = '#ff4444';
+                recordStatus.textContent = 'Ready';
+            }
+        }
+
+        function saveRecording(data) {
+            const entry = {
+                ts: Date.now(),
+                data: data
+            };
+            myRecentRecordings.unshift(entry);
+            if (myRecentRecordings.length > 5) myRecentRecordings.pop();
+            localStorage.setItem('sillyboard-voice-history', JSON.stringify(myRecentRecordings));
+            renderRecentRecordings();
+            updateMonitorBtn();
+        }
+
+        function renderRecentRecordings() {
+            recentRecordingsEl.innerHTML = '';
+            if (myRecentRecordings.length === 0) {
+                recentRecordingsEl.innerHTML = '<p style="opacity: 0.4; text-align: center; padding: 10px; font-size: 0.9rem;">No recordings yet.</p>';
+                return;
+            }
+
+            myRecentRecordings.forEach((rec, idx) => {
+                const row = document.createElement('div');
+                row.style.cssText = "display: flex; gap: 8px; margin-bottom: 8px;";
+
+                const playBtn = document.createElement('button');
+                playBtn.className = 'btn';
+                playBtn.style.cssText = "flex: 1; display: flex; justify-content: space-between; align-items: center; padding: 12px 18px;";
+                const date = new Date(rec.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const label = rec.name || `Recording ${date}`;
+                playBtn.innerHTML = `<span>${label}</span> <span>Send</span>`;
+                playBtn.onclick = () => broadcastVoiceMessage(rec.data);
+
+                const renameBtn = document.createElement('button');
+                renameBtn.className = 'btn fav-btn';
+                renameBtn.innerHTML = '✎';
+                renameBtn.style.cssText = `width: 50px; font-size: 1.1rem; color: var(--accent-color);`;
+                renameBtn.onclick = () => renameRecording(rec);
+
+                const monitorBtn = document.createElement('button');
+                monitorBtn.className = 'btn fav-btn';
+                monitorBtn.innerHTML = 'M';
+                monitorBtn.style.cssText = `width: 50px; font-size: 1.1rem; color: var(--accent-color);`;
+                monitorBtn.onclick = () => handleVoiceMessage(rec.data);
+
+                const favBtn = document.createElement('button');
+                favBtn.className = 'btn fav-btn';
+                const isFav = myFavorites.some(f => f.ts === rec.ts);
+                favBtn.innerHTML = isFav ? '★' : '☆';
+                favBtn.style.cssText = `width: 50px; font-size: 1.5rem; color: ${isFav ? 'var(--accent-color)' : 'rgba(255,255,255,0.3)'};`;
+                favBtn.onclick = () => toggleFavorite(rec);
+
+                row.appendChild(playBtn);
+                row.appendChild(renameBtn);
+                row.appendChild(monitorBtn);
+                row.appendChild(favBtn);
+                recentRecordingsEl.appendChild(row);
+            });
+        }
+
+        const pinnedRecordingsBtn = document.getElementById('pinned-recordings-btn');
+        const pinnedModal = document.getElementById('pinned-recordings-modal');
+        const pinnedListEl = document.getElementById('pinned-list');
+        const pinnedClose = document.getElementById('pinned-close');
+
+        pinnedRecordingsBtn.addEventListener('click', () => {
+            renderPinnedList();
+            pinnedModal.classList.add('active');
+        });
+        pinnedClose.addEventListener('click', () => pinnedModal.classList.remove('active'));
+        pinnedModal.addEventListener('click', (e) => { if (e.target === pinnedModal) pinnedModal.classList.remove('active'); });
+
+        function renderPinnedList() {
+            pinnedListEl.innerHTML = '';
+            if (myFavorites.length === 0) {
+                pinnedListEl.innerHTML = '<p style="opacity: 0.4; text-align: center; padding: 10px; font-size: 0.9rem;">No pinned recordings.</p>';
+                return;
+            }
+
+            myFavorites.forEach((rec, idx) => {
+                const row = document.createElement('div');
+                row.style.cssText = "display: flex; gap: 8px; margin-bottom: 8px;";
+
+                const playBtn = document.createElement('button');
+                playBtn.className = 'btn';
+                playBtn.style.cssText = "flex: 1; display: flex; justify-content: space-between; align-items: center; padding: 12px 18px;";
+                const date = new Date(rec.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const label = rec.name || `Recording ${date}`;
+                playBtn.innerHTML = `<span>${label}</span> <span>Send</span>`;
+                playBtn.onclick = () => broadcastVoiceMessage(rec.data);
+
+                const renameBtn = document.createElement('button');
+                renameBtn.className = 'btn fav-btn';
+                renameBtn.innerHTML = '✎';
+                renameBtn.style.cssText = `width: 50px; font-size: 1.1rem; color: var(--accent-color);`;
+                renameBtn.onclick = () => renameRecording(rec);
+
+                const monitorBtn = document.createElement('button');
+                monitorBtn.className = 'btn fav-btn';
+                monitorBtn.innerHTML = 'M';
+                monitorBtn.style.cssText = `width: 50px; font-size: 1.1rem; color: var(--accent-color);`;
+                monitorBtn.onclick = () => handleVoiceMessage(rec.data);
+
+                const unpinBtn = document.createElement('button');
+                unpinBtn.className = 'btn fav-btn';
+                unpinBtn.innerHTML = '✕';
+                unpinBtn.style.cssText = `width: 50px; font-size: 1.2rem; color: #ff4444;`;
+                unpinBtn.onclick = () => toggleFavorite(rec);
+
+                row.appendChild(playBtn);
+                row.appendChild(renameBtn);
+                row.appendChild(monitorBtn);
+                row.appendChild(unpinBtn);
+                pinnedListEl.appendChild(row);
+            });
+        }
+
+        function broadcastVoiceMessage(data) {
+            handleVoiceMessage(data);
+
+            if (!repeaterSocket || repeaterSocket.readyState !== WebSocket.OPEN) {
+                return;
+            }
+            repeaterSocket.send(JSON.stringify({
+                type: 'voice_message',
+                clientId: myClientId,
+                audio: data
+            }));
+        }
+
+        async function handleVoiceMessage(base64Data) {
+            try {
+                ensureAudioContext();
+                if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+                const resp = await fetch(base64Data);
+                const arrayBuffer = await resp.arrayBuffer();
+                const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+                const source = audioCtx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(gainNode);
+                source.start(0);
+            } catch (err) {
+                console.error("Failed to play voice message:", err);
+            }
+        }
+
+        const remoteModal = document.getElementById('remote-modal');
+        const remoteListEl = document.getElementById('remote-list');
+        let selectedRemoteIds = new Set();
+
+        function renderRemoteList(allClients) {
+            totalDeviceCount = allClients.length;
+            streamStatus.textContent = `Devices: ${totalDeviceCount}`;
+            renderStreamables();
+
+            remoteListEl.innerHTML = '';
+            const others = allClients.filter(c => c.id !== myClientId);
+
+            if (others.length === 0) {
+                remoteListEl.innerHTML = '<p style="opacity: 0.4;">No other devices connected...</p>';
+                return;
+            }
+
+            others.forEach(c => {
+                const row = document.createElement('div');
+                row.style.cssText = "display:flex; align-items:center; gap:12px; padding:10px; background:rgba(255,255,255,0.05); border-radius:12px; cursor:pointer;";
+
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.checked = selectedRemoteIds.has(c.id);
+
+                const label = document.createElement('div');
+                label.style.flex = "1";
+                label.innerHTML = `<span style="font-weight:bold;">${c.model}</span> <span style="opacity:0.6; font-size:0.8rem;">(${c.os} • ${c.browser})</span>`;
+
+                row.appendChild(cb);
+                row.appendChild(label);
+
+                row.addEventListener('click', () => {
+                    cb.checked = !cb.checked;
+                    if (cb.checked) selectedRemoteIds.add(c.id);
+                    else selectedRemoteIds.delete(c.id);
+                });
+
+                remoteListEl.appendChild(row);
+            });
+        }
+
+        document.getElementById('remote-mode-btn').addEventListener('click', () => remoteModal.classList.add('active'));
+        document.getElementById('remote-close').addEventListener('click', () => remoteModal.classList.remove('active'));
+        document.getElementById('remote-select-all').addEventListener('click', () => {
+            document.querySelectorAll('#remote-list input[type="checkbox"]').forEach(cb => {
+                cb.parentElement.click(); if (!cb.checked) cb.parentElement.click();
+            });
+        });
+        document.getElementById('remote-clear').addEventListener('click', () => {
+            selectedRemoteIds.clear();
+            document.querySelectorAll('#remote-list input[type="checkbox"]').forEach(cb => cb.checked = false);
+        });
+
+
+
+        // Auto-Gain removed — plain gain node used directly.
+
+        // ── Streamables logic ──────────────────────────────────────────────
+        const streamModal = document.getElementById('streamables-modal');
+        const streamListEl = document.getElementById('streamables-list');
+        const streamStatus = document.getElementById('stream-status');
+        const streamSelfCbx = document.getElementById('stream-self-cbx');
+        let totalDeviceCount = 0;
+        let activeStreamKey = null;
+
+        function renderStreamables() {
+            if (!SOUND_DEFS.streamables) return;
+            streamListEl.innerHTML = '';
+
+            const effectiveCount = totalDeviceCount - (streamSelfCbx.checked ? 0 : 1);
+            streamStatus.textContent = `Devices: ${Math.max(0, effectiveCount)}`;
+
+            Object.keys(SOUND_DEFS.streamables).forEach(key => {
+                const s = SOUND_DEFS.streamables[key];
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                if (activeStreamKey === key) btn.style.background = 'var(--accent-color)';
+                if (activeStreamKey === key) btn.style.color = 'var(--bg-color)';
+                btn.style.width = '100%';
+                btn.innerHTML = `<strong>${s.label}</strong> <span style="font-size:0.7rem; opacity:0.6;">(${s.parts} parts)</span>`;
+
+                if (effectiveCount < s.parts) {
+                    btn.style.opacity = '0.3';
+                    btn.disabled = true;
+                    btn.title = `${s.parts} Devices required`;
+                }
+
+                btn.addEventListener('click', () => {
+                    if (repeaterSocket && repeaterSocket.readyState === WebSocket.OPEN) {
+                        if (activeStreamKey === key) {
+                            // STOP
+                            repeaterSocket.send(JSON.stringify({ type: 'stop', key: key }));
+                            activeStreamKey = null;
+                        } else {
+                            if (activeStreamKey) repeaterSocket.send(JSON.stringify({ type: 'stop', key: activeStreamKey }));
+
+                            activeStreamKey = key;
+                            repeaterSocket.send(JSON.stringify({
+                                type: 'stream_play',
+                                key: key,
+                                parts: s.parts,
+                                includeSender: streamSelfCbx.checked,
+                                pitch: pitchGlobal ? currentPitch : 1.0
+                            }));
+                        }
+                        renderStreamables();
+                    } else {
+                        alert("Please enable Repeater Mode first.");
+                    }
+                });
+
+                streamListEl.appendChild(btn);
+            });
+        }
+
+        streamSelfCbx.addEventListener('change', renderStreamables);
+
+        document.getElementById('streamables-mode-btn').addEventListener('click', () => {
+            renderStreamables();
+            streamModal.classList.add('active');
+        });
+        document.getElementById('streamables-close').addEventListener('click', () => streamModal.classList.remove('active'));
+
+        // Global pitch sync toggle
+        const pitchGlobalCbx = document.getElementById('pitch-global-cbx');
+        let pitchGlobal = localStorage.getItem('sillyboard-pitch-global') === 'true';
+        pitchGlobalCbx.checked = pitchGlobal;
+        pitchGlobalCbx.addEventListener('change', () => {
+            pitchGlobal = pitchGlobalCbx.checked;
+            localStorage.setItem('sillyboard-pitch-global', pitchGlobal);
+        });
+
+        const remoteVolumeCbx = document.getElementById('remote-volume-cbx');
+
+
+        // Admin Pitch logic
+        const pitchSliderWrap = document.getElementById('pitch-slider-wrap');
+        // pitchEnabled logic removed per request, sliders are always available in admin now
+
+        function scheduleRemotePlayback(key, targetServerTime, variantIndex = null) {
+            const now = Date.now();
+            const targetLocalTime = targetServerTime - serverTimeOffset;
+            const delayMs = targetLocalTime - now;
+
+            if (delayMs < -500) return; // Too late
+
+            ensureAudioContext();
+            const audioTargetTime = audioCtx.currentTime + (Math.max(0, delayMs) / 1000);
+
+            // Check if this key is in streamables first
+            playSound(key, null, audioTargetTime, variantIndex);
+        }
+
+        repeaterBtn.addEventListener('click', () => repeaterModal.classList.add('active'));
+        document.getElementById('repeater-close').addEventListener('click', () => repeaterModal.classList.remove('active'));
+        repeaterModal.addEventListener('click', (e) => {
+            if (e.target === repeaterModal) repeaterModal.classList.remove('active');
+        });
+
+        streamModal.addEventListener('click', (e) => {
+            if (e.target === streamModal) streamModal.classList.remove('active');
+        });
+
+        remoteModal.addEventListener('click', (e) => {
+            if (e.target === remoteModal) remoteModal.classList.remove('active');
+        });
+
+        repeaterCbx.addEventListener('change', () => {
+            repeaterEnabled = repeaterCbx.checked;
+            localStorage.setItem('sillyboard-repeater', repeaterEnabled);
+            initRepeater();
+        });
+
+        if (repeaterEnabled) initRepeater();
+
+        // ── Seguestions ────────────────────────────────────────────────────
+        const segModal = document.getElementById('seguestions-modal');
+        const segSubmitBtn = document.getElementById('seg-submit');
+        const segStatusEl = document.getElementById('seg-status');
+        const segFileInput = document.getElementById('seg-file-input');
+        const segFilename = document.getElementById('seg-filename');
+        let selectedSegName = '';
+        let segAttachedFile = null;
+
+        function openSeguestions() {
+            // Close settings if open
+            document.getElementById('settings-modal').classList.remove('active');
+            selectedSegName = '';
+            segAttachedFile = null;
+            document.getElementById('seg-message').value = '';
+            document.getElementById('seg-link').value = '';
+            segFilename.textContent = 'No file chosen';
+            segFileInput.value = '';
+            segStatusEl.textContent = '';
+            document.querySelectorAll('.name-chip').forEach(c => c.classList.remove('selected'));
+            segModal.classList.add('active');
+        }
+
+        document.getElementById('seguestions-box-btn').addEventListener('click', openSeguestions);
+        document.getElementById('seg-cancel').addEventListener('click', () => segModal.classList.remove('active'));
+        segModal.addEventListener('click', e => { if (e.target === segModal) segModal.classList.remove('active'); });
+
+        // Name chips
+        document.querySelectorAll('.name-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('.name-chip').forEach(c => c.classList.remove('selected'));
+                chip.classList.add('selected');
+                selectedSegName = chip.dataset.name;
+            });
+        });
+
+        // File picker
+        document.getElementById('seg-file-btn').addEventListener('click', () => segFileInput.click());
+        segFileInput.addEventListener('change', () => {
+            const file = segFileInput.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                segStatusEl.textContent = '⚠ File too large (max 5 MB).';
+                segFileInput.value = '';
+                return;
+            }
+            segAttachedFile = file;
+            segFilename.textContent = file.name;
+            segStatusEl.textContent = '';
+        });
+
+        // Handle server ack
+        function handleSeguestionAck(data) {
+            if (data.ok) {
+                segStatusEl.textContent = '✓ Sent!';
+                setTimeout(() => segModal.classList.remove('active'), 1000);
+            } else {
+                segStatusEl.textContent = '⚠ Server error: ' + (data.error || 'unknown');
+            }
+        }
+
+        // Submit
+        segSubmitBtn.addEventListener('click', async () => {
+            if (!selectedSegName) {
+                segStatusEl.textContent = '⚠ Pick a name first.';
+                return;
+            }
+            if (!repeaterSocket || repeaterSocket.readyState !== WebSocket.OPEN) {
+                segStatusEl.textContent = '⚠ Not connected to server.';
+                return;
+            }
+
+            const message = document.getElementById('seg-message').value.trim().slice(0, 500);
+            const link = document.getElementById('seg-link').value.trim().slice(0, 500);
+
+            let filename = '';
+            let filedata = '';
+            if (segAttachedFile) {
+                segStatusEl.textContent = 'Encoding file...';
+                const buf = await segAttachedFile.arrayBuffer();
+                const bytes = new Uint8Array(buf);
+                let binary = '';
+                for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+                filedata = btoa(binary);
+                filename = segAttachedFile.name;
+            }
+
+            segStatusEl.textContent = 'Sending...';
+            segSubmitBtn.disabled = true;
+
+            repeaterSocket.send(JSON.stringify({
+                type: 'seguestion',
+                name: selectedSegName,
+                message,
+                link,
+                filename,
+                filedata,
+            }));
+
+            // Re-enable after a moment in case ack never comes
+            setTimeout(() => { segSubmitBtn.disabled = false; }, 5000);
+        });
+
+        // ── Hotbar state ──────────────────────────────────────────────────
+        const MAX_HOTBAR = 4;
+        let hotbarSlots = JSON.parse(localStorage.getItem('sillyboard-hotbar') || '[]');
+
+        function saveHotbar() {
+            localStorage.setItem('sillyboard-hotbar', JSON.stringify(hotbarSlots));
+            saveProfileToCloud();
+        }
+
+        // ── Build board & hotbar (called after JSON load) ──────────────────
+        const boardEl = document.getElementById('board');
+        const hotbarEl = document.getElementById('hotbar');
+        const boardButtons = {};
+
+        let isBoardLocked = false;
+        let bigIconUnlocked = false;
+
+        // ── Navigation UI state ──────────────────────────────────────────────────
+        let pagesArray = [];
+        let categoryNames = [];
+        let SOUNDS_PER_PAGE = 12;
+        let currentPage = 0;
+        let audioLoaded = false;
+        let PAGES_DEF = {};
+
+        const boardNavEl = document.getElementById('board-nav');
+        const prevPageBtn = document.getElementById('prev-page-btn');
+        const nextPageBtn = document.getElementById('next-page-btn');
+        const navAreaEl = document.getElementById('nav-area');
+        const categoryUiEl = document.getElementById('category-ui');
+
+        function buildPages() {
+            pagesArray = [];
+            categoryNames = [];
+            SOUNDS_PER_PAGE = 12;
+
+            const allValidKeys = SOUND_KEYS.filter(k => k !== 'locked' && k !== 'streamables');
+
+            if (navMode === 'hotbar') {
+                categoryNames = ['All'];
+                if (myFavorites.length > 0) categoryNames.unshift('Recordings');
+
+                if (myFavorites.length > 0) {
+                    pagesArray.push({
+                        category: 'Recordings',
+                        keys: myFavorites.map((f, i) => `_rec_${i}`)
+                    });
+                }
+
+                for (let i = 0; i < allValidKeys.length; i += SOUNDS_PER_PAGE) {
+                    pagesArray.push({
+                        category: 'All',
+                        keys: allValidKeys.slice(i, i + SOUNDS_PER_PAGE)
+                    });
+                }
+            } else {
+                const catKeys = Object.keys(PAGES_DEF);
+                let placedKeys = new Set();
+
+                if (myFavorites.length > 0) {
+                    categoryNames.push('Recordings');
+                    pagesArray.push({
+                        category: 'Recordings',
+                        keys: myFavorites.map((f, i) => `_rec_${i}`)
+                    });
+                }
+
+                catKeys.forEach(cat => {
+                    const keys = PAGES_DEF[cat].filter(k => allValidKeys.includes(k));
+                    keys.forEach(k => placedKeys.add(k));
+                    if (keys.length > 0) {
+                        categoryNames.push(cat);
+                        for (let i = 0; i < keys.length; i += SOUNDS_PER_PAGE) {
+                            pagesArray.push({
+                                category: cat,
+                                keys: keys.slice(i, i + SOUNDS_PER_PAGE)
+                            });
+                        }
+                    }
+                });
+
+                const unorganized = allValidKeys.filter(k => !placedKeys.has(k));
+                if (unorganized.length > 0) {
+                    categoryNames.push('Unorganized');
+                    for (let i = 0; i < unorganized.length; i += SOUNDS_PER_PAGE) {
+                        pagesArray.push({
+                            category: 'Unorganized',
+                            keys: unorganized.slice(i, i + SOUNDS_PER_PAGE)
+                        });
+                    }
+                }
+            }
+
+            currentPage = 0;
+            renderCategoryTabs();
+            updateUIMode();
+        }
+
+        function updateUIMode() {
+            if (navMode === 'hotbar') {
+                hotbarEl.style.display = 'flex';
+                categoryUiEl.style.display = 'none';
+                document.getElementById('hotbar-slots-cfg').parentNode.style.display = 'block';
+                renderHotbar();
+            } else {
+                hotbarEl.style.display = 'none';
+                categoryUiEl.style.display = 'block';
+                document.getElementById('hotbar-slots-cfg').parentNode.style.display = 'none';
+                updateCategoryHeader();
+            }
+            renderBoardPage();
+        }
+
+        function updateCategoryHeader() {
+            if (pagesArray.length > 0) {
+                const cat = pagesArray[currentPage].category;
+                document.querySelectorAll('.category-tab').forEach(tab => {
+                    if (tab.dataset.category === cat) {
+                        tab.classList.add('active');
+                        tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+            }
+        }
+
+        function updatePageNav() {
+            prevPageBtn.disabled = currentPage <= 0;
+            nextPageBtn.disabled = currentPage >= pagesArray.length - 1;
+        }
+
+        function renderBoardPage() {
+            boardEl.innerHTML = '';
+            Object.keys(boardButtons).forEach(k => delete boardButtons[k]);
+
+            if (pagesArray.length === 0) return;
+
+            const pageKeys = pagesArray[currentPage].keys;
+
+            pageKeys.forEach(key => {
+                const btn = document.createElement('button');
+                btn.className = 'sound-btn';
+                btn.id = 'btn-' + key;
+                btn.dataset.sound = key;
+                if (key.startsWith('_rec_')) {
+                    const idx = parseInt(key.split('_')[2]);
+                    const rec = myFavorites[idx];
+                    const date = new Date(rec.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const label = rec.name || `Rec ${date}`;
+                    btn.setAttribute('aria-label', 'Play ' + label);
+                    btn.innerHTML = '<span class="btn-label">' + label + '</span>';
+                    btn.onclick = () => broadcastVoiceMessage(rec.data);
+                } else {
+                    btn.setAttribute('aria-label', 'Play ' + SOUND_DEFS[key].label);
+                    btn.innerHTML = '<span class="btn-label">' + SOUND_DEFS[key].label + '</span>';
+                    bindPressEvent(btn, key);
+                }
+
+                boardEl.appendChild(btn);
+                boardButtons[key] = btn;
+
+                if (!key.startsWith('_rec_') && clipQueue.filter(c => c.key === key).length > 0) {
+                    btn.classList.add('playing');
+                }
+            });
+
+            updatePageNav();
+            updateCategoryHeader();
+        }
+
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 0) {
+                currentPage--;
+                renderBoardPage();
+            }
+            prevPageBtn.blur();
+        });
+        nextPageBtn.addEventListener('click', () => {
+            if (currentPage < pagesArray.length - 1) {
+                currentPage++;
+                renderBoardPage();
+            }
+            nextPageBtn.blur();
+        });
+
+        // ── Category Tabs Logic ────────────────────────────────────────────────
+
+        function renderCategoryTabs() {
+            categoryUiEl.innerHTML = '';
+            categoryNames.forEach((cat) => {
+                const item = document.createElement('div');
+                item.className = 'category-tab';
+                item.textContent = cat;
+                item.dataset.category = cat;
+                const pageIndex = pagesArray.findIndex(p => p.category === cat);
+                item.dataset.pageIndex = pageIndex;
+
+                item.addEventListener('click', () => {
+                    const targetPage = parseInt(item.dataset.pageIndex, 10);
+                    if (currentPage !== targetPage) {
+                        currentPage = targetPage;
+                        renderBoardPage();
+                    }
+                });
+
+                categoryUiEl.appendChild(item);
+            });
+        }
+
+
+        function initUIForSounds() {
+            // Override check
+            const manualUnlock = localStorage.getItem('sillyboard-manual-unlock') === 'true';
+            const manualLock = localStorage.getItem('sillyboard-manual-lock') === 'true';
+
+            isBoardLocked = (SOUND_DEFS.locked === 1 || manualLock) && !manualUnlock;
+
+            // Fun button: always shown now
+            adminBtn.style.display = 'inline-block';
+
+            if (isBoardLocked) {
+                renderLockedView();
+                return;
+            }
+
+
+            hotbarSlots = hotbarSlots.filter(k => SOUND_DEFS[k] && k !== 'locked' && k !== 'streamables').slice(0, MAX_HOTBAR);
+
+            buildPages();
+        }
+
+        function renderLockedView() {
+            boardEl.innerHTML = '';
+            hotbarEl.style.display = 'none';
+            boardNavEl.style.display = 'none';
+
+            const container = document.createElement('div');
+            container.className = 'locked-container';
+
+            const icon = document.createElement('div');
+            icon.className = 'locked-icon';
+            icon.textContent = ':3';
+            icon.setAttribute('aria-hidden', 'true');
+
+            let bigClicks = 0;
+            let bigTimer = null;
+            icon.addEventListener('pointerdown', () => {
+                bigClicks++;
+                clearTimeout(bigTimer);
+                if (bigClicks >= 5) {
+                    bigIconUnlocked = true;
+                } else {
+                    bigTimer = setTimeout(() => { bigClicks = 0; }, 1000);
+                }
+            });
+
+            const title = document.createElement('div');
+            title.className = 'locked-title';
+            title.textContent = 'Sillyboard is Closed';
+
+            const txt = document.createElement('div');
+            txt.className = 'locked-text';
+            txt.textContent = 'Sorry, but Sillyboard isn\'t avalible right now. Plz check back later. :D';
+
+            container.appendChild(icon);
+            container.appendChild(title);
+            container.appendChild(txt);
+            boardEl.appendChild(container);
+        }
+
+        function unlockBoardManually() {
+            localStorage.setItem('sillyboard-manual-unlock', 'true');
+            localStorage.removeItem('sillyboard-manual-lock');
+            location.reload();
+        }
+
+
+        function renderHotbar() {
+            hotbarEl.style.display = 'flex';
+            hotbarEl.innerHTML = '';
+            if (hotbarSlots.length === 0) {
+                // Show empty placeholders
+                for (let i = 0; i < MAX_HOTBAR; i++) {
+                    const empty = document.createElement('div');
+                    empty.className = 'hotbar-empty';
+                    hotbarEl.appendChild(empty);
+                }
+                return;
+            }
+            // Fill with assigned sounds
+            for (let i = 0; i < MAX_HOTBAR; i++) {
+                if (i < hotbarSlots.length) {
+                    const key = hotbarSlots[i];
+                    const btn = document.createElement('button');
+                    btn.className = 'sound-btn';
+                    btn.dataset.sound = key;
+                    btn.setAttribute('aria-label', 'Quick ' + SOUND_DEFS[key].label);
+                    btn.innerHTML = '<span class="btn-label">' + SOUND_DEFS[key].label + '</span>';
+                    bindPressEvent(btn, key);
+                    hotbarEl.appendChild(btn);
+                } else {
+                    const empty = document.createElement('div');
+                    empty.className = 'hotbar-empty';
+                    hotbarEl.appendChild(empty);
+                }
+            }
+        }
+
+        // ── Hotbar config in settings ─────────────────────────────────────
+        function renderHotbarConfig() {
+            const slotsEl = document.getElementById('hotbar-slots-cfg');
+            const pickerEl = document.getElementById('hotbar-picker');
+            slotsEl.innerHTML = '';
+            pickerEl.innerHTML = '';
+
+            // Render the 3 slots
+            for (let i = 0; i < MAX_HOTBAR; i++) {
+                const slotDiv = document.createElement('div');
+                slotDiv.className = 'hotbar-slot' + (i < hotbarSlots.length ? ' filled' : '');
+                if (i < hotbarSlots.length) {
+                    slotDiv.textContent = SOUND_DEFS[hotbarSlots[i]].label;
+                    // Remove button
+                    const x = document.createElement('button');
+                    x.className = 'remove-x';
+                    x.textContent = '×';
+                    x.addEventListener('click', () => {
+                        hotbarSlots.splice(i, 1);
+                        saveHotbar();
+                        renderHotbar();
+                        renderHotbarConfig();
+                    });
+                    slotDiv.appendChild(x);
+                } else {
+                    slotDiv.textContent = 'Empty';
+                    slotDiv.style.opacity = '0.4';
+                }
+                slotsEl.appendChild(slotDiv);
+            }
+
+            SOUND_KEYS.filter(k => SOUND_DEFS[k] && SOUND_DEFS[k].label && k !== 'streamables').forEach(key => {
+                const btn = document.createElement('button');
+                btn.className = 'btn' + (hotbarSlots.includes(key) ? ' in-hotbar' : '');
+                btn.textContent = SOUND_DEFS[key].label;
+                btn.addEventListener('click', () => {
+                    if (hotbarSlots.length >= MAX_HOTBAR) return;
+                    if (hotbarSlots.includes(key)) return;
+                    hotbarSlots.push(key);
+                    saveHotbar();
+                    renderHotbar();
+                    renderHotbarConfig();
+                });
+                pickerEl.appendChild(btn);
+            });
+        }
+
+        // ── AudioBuffer pre-decode loading ───────────────────────────────
+        // key → AudioBuffer[] (populated lazily per-sound)
+        const bufferCache = {};
+        const bufferPeaks = {}; // key:variant → float (0-1 peak amplitude)
+        // Tracks which keys are currently being fetched to avoid duplicate requests
+        const fetchingKeys = new Set();
+
+        // Loading UI handled by parent
+        const notifyParent = (msg) => {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage(msg, '*');
+            }
+        };
+
+        ensureAudioContext();
+
+        // ── On-demand fetch+decode for a single sound key ────────────────────
+        // Returns a Promise that resolves when at least one variant is ready.
+        // If a fetch is already in progress for this key, the existing promise
+        // is returned so callers share the same network request.
+        const fetchPromisesByKey = {};
+
+        // Sounds are stored on the device in Cache Storage: after the first download
+        // they load from disk with no network request.
+        const SOUND_CACHE = 'sillyboard-sounds-v1';
+        async function fetchSoundCached(url) {
+            let cache = null;
+            try {
+                if ('caches' in window) {
+                    cache = await caches.open(SOUND_CACHE);
+                    const hit = await cache.match(url);
+                    if (hit) return await hit.arrayBuffer();
+                }
+            } catch (e) { cache = null; }
+            const r = await fetch(url);
+            if (!r.ok) throw new Error('HTTP ' + r.status + ' for ' + url);
+            if (cache) { try { await cache.put(url, r.clone()); } catch (e) { } }
+            return await r.arrayBuffer();
+        }
+
+        async function fetchAndDecodeKey(key) {
+            if (bufferCache[key] && bufferCache[key].length > 0) return; // already ready
+            if (fetchPromisesByKey[key]) return fetchPromisesByKey[key];  // already in flight
+
+            const def = SOUND_DEFS[key] || (SOUND_DEFS.streamables && SOUND_DEFS.streamables[key]);
+            if (!def || !def.variants) return;
+
+            fetchPromisesByKey[key] = (async () => {
+                for (const v of def.variants) {
+                    try {
+                        // Opus (Ogg) is the default; WAV only if the user turned it off in Labs
+                        let srcPath = v.src;
+                        if (localStorage.getItem('sillyboard-lab-opus') !== 'false') {
+                            srcPath = srcPath.replace(/^Soundboard\//, 'SoundboardOpus/');
+                            srcPath = srcPath.replace(/\.(wav|aif|aiff)$/i, '.opus');
+                        }
+                        const arr = await fetchSoundCached(srcPath);
+                        const audioBuffer = await audioCtx.decodeAudioData(arr);
+                        if (!bufferCache[key]) bufferCache[key] = [];
+                        bufferCache[key].push(audioBuffer);
+
+                        let max = 0;
+                        const channelData = audioBuffer.getChannelData(0);
+                        for (let i = 0; i < channelData.length; i += 100) {
+                            const val = Math.abs(channelData[i]);
+                            if (val > max) max = val;
+                        }
+                        const variantId = `${key}:${bufferCache[key].length - 1}`;
+                        bufferPeaks[variantId] = max || 1.0;
+                    } catch (e) {
+                        console.error('[Sillyboard] On-demand fetch failed for', key, e);
+                    }
+                }
+                delete fetchPromisesByKey[key];
+            })();
+
+            return fetchPromisesByKey[key];
+        }
+
+        // ── Background loader ─────────────────────────────────────────────────
+        // Loads sounds in priority order:
+        //   1. Current page sounds
+        //   2. All remaining regular sounds
+        //   3. "SoundBoard -Riff #2.wav" variants and all Streamables last
+        async function decodeAll() {
+            const phrases = [
+                "So true, so true...",
+                "Nooeeeee",
+                "Cuddlebug found The Opioids",
+                "Absolute Cinema",
+                "Legitimately want blood",
+                "Back in the FUCKING BUILDING!",
+                "Consumption :3",
+                "What the happ is fuckening?",
+                "Dr. Yaoi ftw"
+            ];
+            const randomText = phrases[Math.floor(Math.random() * phrases.length)];
+            notifyParent({ type: 'set-loading-text', text: randomText });
+
+            try {
+                const forceRefresh = sessionStorage.getItem('sillyboard-force-refresh') === 'true';
+                const t = forceRefresh ? `?t=${Date.now()}` : '';
+                if (forceRefresh) sessionStorage.removeItem('sillyboard-force-refresh');
+
+                const configRes = await fetch('Soundboard/sounds.json' + t);
+                SOUND_DEFS = await configRes.json();
+                SOUND_KEYS = Object.keys(SOUND_DEFS);
+
+                try {
+                    const pagesRes = await fetch('Soundboard/pages.json' + t);
+                    PAGES_DEF = await pagesRes.json();
+                } catch (e) {
+                    PAGES_DEF = {};
+                    console.warn('No pages.json found', e);
+                }
+
+                initUIForSounds();
+
+                // ── Dismiss the loading overlay immediately ────────────────────
+                // Users see the board right away; sounds load in the background.
+                audioLoaded = true;
+                Object.entries(boardButtons).forEach(([key, btn]) => {
+                    if (btn) bindPressEvent(btn, key);
+                });
+                notifyParent({ type: 'hide-loading' });
+
+                // ── Build prioritised fetch list ──────────────────────────────
+                // Tier 1: sounds on the current visible page
+                const firstPageKeys = new Set();
+                if (pagesArray.length > 0) {
+                    pagesArray[0].keys.forEach(k => { if (!k.startsWith('_rec_')) firstPageKeys.add(k); });
+                }
+
+                // Tier 3 (deferred): Riff #2 src fragment and all streamables
+                const DEFERRED_SRC_FRAGMENT = 'SoundBoard -Riff #2';
+                const deferredKeys = new Set();
+                if (SOUND_DEFS.streamables) {
+                    Object.keys(SOUND_DEFS.streamables).forEach(k => deferredKeys.add('__streamable__' + k));
+                }
+                // Mark regular keys whose variants include the Riff #2 file as deferred
+                for (const key of SOUND_KEYS) {
+                    if (key === 'locked' || key === 'streamables') continue;
+                    const def = SOUND_DEFS[key];
+                    if (def.variants && def.variants.some(v => v.src.includes(DEFERRED_SRC_FRAGMENT))) {
+                        deferredKeys.add(key);
+                    }
+                }
+
+                // Build three tiers
+                const tier1 = []; // current page
+                const tier2 = []; // everything else normal
+                const tier3 = []; // riff #2 + streamables
+
+                for (const key of SOUND_KEYS) {
+                    if (key === 'locked' || key === 'streamables') continue;
+                    if (deferredKeys.has(key)) { tier3.push(key); continue; }
+                    if (firstPageKeys.has(key)) { tier1.push(key); continue; }
+                    tier2.push(key);
+                }
+                // Streamables go into tier3
+                if (SOUND_DEFS.streamables) {
+                    Object.keys(SOUND_DEFS.streamables).forEach(k => tier3.push('__streamable__' + k));
+                }
+
+                const CONCURRENCY = 4;
+
+                async function loadTier(keys) {
+                    // Use a pool of concurrent fetches
+                    let i = 0;
+                    async function worker() {
+                        while (i < keys.length) {
+                            const key = keys[i++];
+                            const realKey = key.startsWith('__streamable__') ? key.slice(14) : key;
+                            const defSrc = key.startsWith('__streamable__')
+                                ? SOUND_DEFS.streamables && SOUND_DEFS.streamables[realKey]
+                                : SOUND_DEFS[realKey];
+                            if (!defSrc || !defSrc.variants) continue;
+                            if (bufferCache[realKey] && bufferCache[realKey].length >= defSrc.variants.length) continue;
+                            await fetchAndDecodeKey(realKey);
+                        }
+                    }
+                    const workers = [];
+                    for (let w = 0; w < CONCURRENCY; w++) workers.push(worker());
+                    await Promise.all(workers);
+                }
+
+                // Load tiers sequentially so high-priority sounds get bandwidth first
+                await loadTier(tier1);
+                await loadTier(tier2);
+                await loadTier(tier3);
+
+            } catch (err) {
+                console.error('[Sillyboard] Fatal load error:', err);
+                // Still dismiss the loading screen so users aren't stuck
+                audioLoaded = true;
+                Object.entries(boardButtons).forEach(([key, btn]) => {
+                    if (btn) bindPressEvent(btn, key);
+                });
+                notifyParent({ type: 'hide-loading' });
+            }
+        }
+
+        // ── Variant routing explicitly derived from variants JSON config ──────────────
+        const lastPlayedIndex = new Map();
+        let lastCooldownGroupTime = {};
+
+        function pickWeightedRandom(pool, key) {
+            const def = SOUND_DEFS[key];
+            if (!def || !def.variants || def.variants.length !== pool.length) {
+                // Fallback to random uniform if config is broken
+                return pool[Math.floor(Math.random() * pool.length)];
+            }
+
+            // Filter available variants (check cooldowns)
+            const now = Date.now();
+            let availableIndexes = [];
+
+            for (let i = 0; i < def.variants.length; i++) {
+                const variant = def.variants[i];
+                if (variant.requiresCooldown && def.cooldownGroupMs) {
+                    const lastTime = lastCooldownGroupTime[key] || 0;
+                    if (now - lastTime < def.cooldownGroupMs) {
+                        continue; // skip this variant
+                    }
+                }
+                availableIndexes.push(i);
+            }
+
+            if (availableIndexes.length === 0) return pool[0];
+
+            // Anti-repeat heuristic 
+            if (availableIndexes.length > 1) {
+                const lastIdx = lastPlayedIndex.get(key);
+                availableIndexes = availableIndexes.filter(i => i !== lastIdx);
+                // If this drops us to 0 (impossible visually, but safe), rollback
+                if (availableIndexes.length === 0) availableIndexes = [0];
+            }
+
+            // Weighted random selection
+            let totalWeight = 0;
+            for (let i of availableIndexes) {
+                totalWeight += def.variants[i].weight !== undefined ? def.variants[i].weight : 1;
+            }
+
+            let rnd = Math.random() * totalWeight;
+            let targetIndex = availableIndexes[0];
+            for (let i of availableIndexes) {
+                const w = def.variants[i].weight !== undefined ? def.variants[i].weight : 1;
+                if (rnd < w) {
+                    targetIndex = i;
+                    break;
+                }
+                rnd -= w;
+            }
+
+            lastPlayedIndex.set(key, targetIndex);
+
+            // Update cooldown tracking if this sound has a group cooldown
+            if (def.cooldownGroupMs) {
+                lastCooldownGroupTime[key] = now;
+            }
+
+            return pool[targetIndex];
+        }
+
+        decodeAll();
+
+        // Safety fallback — hide after 10s no matter what
+        setTimeout(() => {
+            notifyParent({ type: 'hide-loading' });
+        }, 10000);
+
+        // ── Playback — capped simultaneous instances via AudioBufferSourceNode ──
+        const MAX_CLIPS = 8;
+        const clipQueue = []; // { source, key } in insertion order
+
+        function evictOldest() {
+            const oldest = clipQueue.shift();
+            if (!oldest) return;
+            try { oldest.source.stop(); } catch (e) { }
+
+            const remaining = clipQueue.filter(c => c.key === oldest.key).length;
+            if (remaining <= 0) {
+                const activeBtn = boardButtons[oldest.key];
+                if (activeBtn) activeBtn.classList.remove('playing');
+                const hotbarBtn = hotbarEl.querySelector(`[data-sound="${oldest.key}"]`);
+                if (hotbarBtn) hotbarBtn.classList.remove('playing');
+
+                if (oldest.key === 'green') {
+                    restoreTheme();
+                }
+            }
+        }
+
+        function playSound(key, btn, scheduledTime = null, variantIndex = null) {
+            const pool = bufferCache[key];
+            if (!pool || pool.length === 0) {
+                // Sound not yet decoded — fetch on-demand and play as soon as ready
+                if (!fetchPromisesByKey[key]) {
+                    // Show a subtle loading indicator on the button
+                    const activeBtn = boardButtons[key];
+                    if (activeBtn && !activeBtn.classList.contains('loading')) {
+                        activeBtn.classList.add('loading');
+                    }
+                    fetchAndDecodeKey(key).then(() => {
+                        const activeBtn = boardButtons[key];
+                        if (activeBtn) activeBtn.classList.remove('loading');
+                        // Now play it
+                        playSound(key, btn, scheduledTime, variantIndex);
+                    });
+                }
+                return;
+            }
+
+            // If we are the sender and repeater is enabled, notify others
+            if (!scheduledTime && repeaterEnabled && repeaterSocket && repeaterSocket.readyState === WebSocket.OPEN) {
+                // Lead = half our RTT + fixed buffer so others receive it before playback time
+                const leadMs = Math.max(150, clientRttMs * 1.5);
+                const targetServerTime = Date.now() + serverTimeOffset + leadMs;
+
+                if (selectedRemoteIds.size > 0) {
+                    // REMOTE MODE: Only play on selected devices, skip local
+                    repeaterSocket.send(JSON.stringify({
+                        type: 'play_targeted',
+                        key: key,
+                        targetServerTime: targetServerTime,
+                        targetIds: Array.from(selectedRemoteIds),
+                        pitch: pitchGlobal ? currentPitch : 1.0
+                    }));
+                    return; // DO NOT PLAY LOCALLY
+                } else {
+                    // NORMAL REPEATER: Play for everyone including self
+                    repeaterSocket.send(JSON.stringify({
+                        type: 'play',
+                        key: key,
+                        targetServerTime: targetServerTime,
+                        clientId: myClientId,
+                        pitch: pitchGlobal ? currentPitch : 1.0
+                    }));
+                    // Schedule local playback at the same wall-clock moment
+                    scheduledTime = audioCtx.currentTime + (leadMs / 1000);
+                }
+            }
+
+            // Evict oldest if at the cap
+            if (clipQueue.length >= MAX_CLIPS) evictOldest();
+
+            ensureAudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const finalVariantIdx = variantIndex !== null ? variantIndex : calculateTargetIndex(key);
+            const buffer = pool[finalVariantIdx];
+
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            source.playbackRate.value = (typeof pitchStripActive !== 'undefined' && (pitchStripActive || pitchHoldActive)) ? tempPitch : currentPitch;
+            source.connect(gainNode);
+
+            // 1. PLAY at scheduled time or immediately
+            const playTime = scheduledTime || audioCtx.currentTime;
+            source.start(playTime);
+
+            // 2. Queue tracking
+            const entry = { source, key };
+            clipQueue.push(entry);
+
+            // 3. UI Updates
+            const activeBtn = boardButtons[key];
+            if (activeBtn) activeBtn.classList.add('playing');
+            const hotbarBtn = hotbarEl.querySelector(`[data-sound="${key}"]`);
+            if (hotbarBtn) hotbarBtn.classList.add('playing');
+
+            if (key === 'green') {
+                if (!disableThemeSound) applyThemeNoSave('#00ff00', '#006600');
+            }
+
+            source.addEventListener('ended', () => {
+                const idx = clipQueue.indexOf(entry);
+                if (idx !== -1) clipQueue.splice(idx, 1);
+
+                if (key === activeStreamKey) {
+                    activeStreamKey = null;
+                    renderStreamables();
+                }
+
+                const remaining = clipQueue.filter(c => c.key === key).length;
+                if (remaining <= 0) {
+                    const currentBtn = boardButtons[key];
+                    if (currentBtn) currentBtn.classList.remove('playing');
+                    const currentHotbarBtn = hotbarEl.querySelector(`[data-sound="${key}"]`);
+                    if (currentHotbarBtn) currentHotbarBtn.classList.remove('playing');
+
+                    if (key === 'green') {
+                        if (!disableThemeSound) restoreTheme();
+                    }
+                }
+            });
+        }
+
+        function stopSound(key) {
+            clipQueue.filter(c => c.key === key).forEach(c => {
+                try { c.source.stop(); } catch (e) { }
+            });
+            if (activeStreamKey === key) {
+                activeStreamKey = null;
+                renderStreamables();
+            }
+        }
+
+        function calculateTargetIndex(key) {
+            const def = SOUND_DEFS[key] || (SOUND_DEFS.streamables && SOUND_DEFS.streamables[key]);
+            if (!def) return 0;
+            const pool = bufferCache[key];
+            if (!pool || pool.length <= 1) return 0;
+
+            const now = Date.now();
+            let availableIndexes = [];
+
+            for (let i = 0; i < def.variants.length; i++) {
+                const variant = def.variants[i];
+                if (variant.requiresCooldown && def.cooldownGroupMs) {
+                    const lastTime = lastCooldownGroupTime[key] || 0;
+                    if (now - lastTime < def.cooldownGroupMs) {
+                        continue; // skip this variant
+                    }
+                }
+                availableIndexes.push(i);
+            }
+
+            if (availableIndexes.length === 0) return 0;
+
+            // Anti-repeat heuristic 
+            if (availableIndexes.length > 1) {
+                const lastIdx = lastPlayedIndex.get(key);
+                availableIndexes = availableIndexes.filter(i => i !== lastIdx);
+                if (availableIndexes.length === 0) availableIndexes = [0];
+            }
+
+            // Weighted random selection
+            let totalWeight = 0;
+            for (let i of availableIndexes) {
+                totalWeight += def.variants[i].weight !== undefined ? def.variants[i].weight : 1;
+            }
+
+            let rnd = Math.random() * totalWeight;
+            let targetIndex = availableIndexes[0];
+            for (let i of availableIndexes) {
+                const w = def.variants[i].weight !== undefined ? def.variants[i].weight : 1;
+                if (rnd < w) {
+                    targetIndex = i;
+                    break;
+                }
+                rnd -= w;
+            }
+
+            lastPlayedIndex.set(key, targetIndex);
+            if (def.cooldownGroupMs) lastCooldownGroupTime[key] = now;
+            return targetIndex;
+        }
+
+        // ── Service Worker registration & Self Caching ────────────────────
+        // The service worker (sw.js) owns all UI caching and update checks.
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => { });
+        }
+
+
+        // ── Autoplay unlock on first touch ──────────────────────────────
+        function _unlockAudio() {
+            ensureAudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+        document.addEventListener('touchstart', _unlockAudio, { once: true, capture: true, passive: true });
+        document.addEventListener('mousedown', _unlockAudio, { once: true, capture: true });
+
+        // ── Wire up board buttons for INSTANT playback ──────────────────
+        function bindPressEvent(btn, key) {
+            let activeInterval = null;
+
+            function trigger(e) {
+                if (e && e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+
+                // Debounce
+                const now = Date.now();
+                if (btn._lastPress && (now - btn._lastPress < 60)) return;
+                btn._lastPress = now;
+
+                playSound(key, btn);
+
+                // Turbo logic
+                if (activeInterval) clearInterval(activeInterval);
+                if (turboEnabled) {
+                    activeInterval = setInterval(() => {
+                        playSound(key, btn);
+                    }, currentTurboRate);
+                }
+            }
+
+            function halt() {
+                if (activeInterval) {
+                    clearInterval(activeInterval);
+                    activeInterval = null;
+                }
+            }
+
+            // Pointer events are the modern standard: WebKit handles "tap vs scroll" 
+            // natively. If a scroll starts, it fires 'pointercancel'.
+            btn.addEventListener('pointerdown', (e) => {
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                trigger(e);
+            });
+            btn.addEventListener('pointerup', halt);
+            btn.addEventListener('pointercancel', halt);
+            btn.addEventListener('pointerleave', halt);
+
+            // Re-triggering safety
+            btn.addEventListener('keydown', trigger);
+            btn.addEventListener('keyup', halt);
+
+            // Prevent native click to stop double-firing
+            btn.addEventListener('click', e => e.preventDefault());
+        }
+
+        document.querySelectorAll('#board .sound-btn').forEach(btn => {
+            bindPressEvent(btn, btn.dataset.sound);
+        });
+
+        // ── Quick Controls ──────────────────────────────────────────────────
+        const quickStopBtn = document.getElementById('quick-stop-btn');
+        quickStopBtn.addEventListener('click', () => {
+            // Stop all currently playing sounds
+            [...clipQueue].forEach(c => {
+                try { c.source.stop(); } catch (e) {}
+            });
+            if (activeStreamKey) {
+                activeStreamKey = null;
+                renderStreamables();
+            }
+        });
+
+        const pitchStrip = document.getElementById('pitch-touch-strip');
+        let pitchStripActive = false;
+        let pitchStripStartX = 0;
+        let pitchStripStartPitch = 1;
+        let tempPitch = 1;
+        let pitchHoldActive = false;
+        
+        document.getElementById('pitch-hold-btn').addEventListener('click', () => {
+            pitchHoldActive = !pitchHoldActive;
+            const holdBtn = document.getElementById('pitch-hold-btn');
+            if (pitchHoldActive) {
+                holdBtn.style.background = 'var(--accent-color)';
+                holdBtn.style.color = 'var(--bg-color)';
+            } else {
+                holdBtn.style.background = 'transparent';
+                holdBtn.style.color = 'var(--accent-color)';
+                if (!pitchStripActive) {
+                    tempPitch = currentPitch;
+                    applyTempPitch(currentPitch);
+                }
+            }
+        });
+
+        function startPitchDrag(e) {
+            pitchStripActive = true;
+            pitchStripStartX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            pitchStripStartPitch = pitchHoldActive ? tempPitch : currentPitch;
+            tempPitch = pitchStripStartPitch;
+            pitchStrip.style.opacity = '1';
+            pitchStrip.style.borderStyle = 'solid';
+            if (!e.type.includes('touch')) {
+                document.addEventListener('mousemove', movePitchDrag, { passive: false });
+                document.addEventListener('mouseup', endPitchDrag);
+            }
+        }
+        
+        function applyTempPitch(val) {
+            if (typeof clipQueue !== 'undefined') {
+                clipQueue.forEach(c => {
+                    try { 
+                        if (c.source && c.source.playbackRate) {
+                            c.source.playbackRate.value = val; 
+                        }
+                    } catch (err) {}
+                });
+            }
+        }
+
+        function movePitchDrag(e) {
+            if (!pitchStripActive) return;
+            e.preventDefault(); // Prevent scrolling
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const deltaX = clientX - pitchStripStartX;
+            
+            // Sensitivity: 150px movement = +/- 1x pitch
+            tempPitch = pitchStripStartPitch + (deltaX / 150);
+            tempPitch = Math.max(0.25, Math.min(3, tempPitch));
+            
+            applyTempPitch(tempPitch);
+        }
+
+        function endPitchDrag(e) {
+            pitchStripActive = false;
+            pitchStrip.style.opacity = '0.7';
+            pitchStrip.style.borderStyle = 'dashed';
+            if (!pitchHoldActive) {
+                applyTempPitch(currentPitch); // Revert to global pitch
+            }
+            if (!e || !e.type.includes('touch')) {
+                document.removeEventListener('mousemove', movePitchDrag);
+                document.removeEventListener('mouseup', endPitchDrag);
+            }
+        }
+
+        pitchStrip.addEventListener('touchstart', startPitchDrag, { passive: false });
+        pitchStrip.addEventListener('touchmove', movePitchDrag, { passive: false });
+        pitchStrip.addEventListener('touchend', endPitchDrag);
+        pitchStrip.addEventListener('touchcancel', endPitchDrag);
+        
+        pitchStrip.addEventListener('mousedown', startPitchDrag);
+
+    </script>
+</body>
+
+</html>
