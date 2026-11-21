@@ -1,5 +1,11 @@
 [
   {
+    "version": "0.7.2",
+    "date": "2026-11-20",
+    "title": "Same Variation, Everywhere",
+    "subtitle": "New shared option in Repeater settings: when on, every connected device plays the same variation of a sound. Changing it changes it for everyone. The Sillyboard server also moved to a new home."
+  },
+  {
     "version": "0.7.1",
     "date": "2026-11-20",
     "title": "Weird",

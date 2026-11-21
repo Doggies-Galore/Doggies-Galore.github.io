@@ -1054,6 +1054,17 @@
                 <input type="checkbox" id="pitch-global-cbx">
             </div>
 
+            <div class="custom-slider-container"
+                style="flex-direction:row; align-items:center; justify-content: space-between; margin-top: 12px;">
+                <label for="sync-variants-cbx"
+                    style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); cursor:pointer; display:flex; align-items:center; gap:10px;">
+                    Same variation on all devices
+                </label>
+                <input type="checkbox" id="sync-variants-cbx">
+            </div>
+            <p style="font-size: 0.8rem; opacity: 0.6; margin-top: 6px;">Shared setting: changing it changes it for
+                everyone connected.</p>
+
 
 
             <div id="repeater-status"
@@ -2028,6 +2039,19 @@
         let repeaterEnabled = localStorage.getItem('sillyboard-repeater') !== 'false';
         repeaterCbx.checked = repeaterEnabled;
 
+        // Shared (server-owned) setting; the server tells us the current value on connect
+        let syncVariants = false;
+        const syncVariantsCbx = document.getElementById('sync-variants-cbx');
+        syncVariantsCbx.addEventListener('change', () => {
+            const want = syncVariantsCbx.checked;
+            if (repeaterSocket && repeaterSocket.readyState === WebSocket.OPEN) {
+                repeaterSocket.send(JSON.stringify({ type: 'set_settings', state: { syncVariants: want } }));
+                // the server's broadcast is the source of truth and will confirm/correct this
+            } else {
+                syncVariantsCbx.checked = syncVariants; // can't change while disconnected
+            }
+        });
+
         let repeaterSocket = null;
         let serverTimeOffset = 0; // serverTime - localTime (ms)
         let clientRttMs = 200;    // rolling average RTT to server (ms)
@@ -2080,7 +2104,10 @@
             }
         }
 
-        const REPEATER_URL = "wss://aibostation.tail76b4d2.ts.net/";
+        // For now the Mac is the Sillyboard server (the Pi was wss://aibostation.tail76b4d2.ts.net/).
+        // Override on a device with: localStorage.setItem('sillyboard-server', 'wss://host/')
+        const REPEATER_URL = localStorage.getItem('sillyboard-server') ||
+            "wss://mylos-macbook-pro-2021-1.tail76b4d2.ts.net/";
 
         function updateRepeaterStatus(txt, op = 0.6) {
             repeaterStatus.textContent = 'Status: ' + txt;
@@ -2144,6 +2171,12 @@
                     }
                 } else if (data.type === 'event_mode') {
                     handleEventMode(data.state);
+                } else if (data.type === 'settings') {
+                    // Shared settings: whoever changes one changes it for everyone
+                    if (data.state && typeof data.state.syncVariants === 'boolean') {
+                        syncVariants = data.state.syncVariants;
+                        if (syncVariantsCbx) syncVariantsCbx.checked = syncVariants;
+                    }
                 }
             };
 
@@ -3680,6 +3713,9 @@
                 const leadMs = Math.max(150, clientRttMs * 1.5);
                 const targetServerTime = Date.now() + serverTimeOffset + leadMs;
 
+                // "Sync variations": the sender picks the variant once and every device plays it
+                if (syncVariants && variantIndex === null) variantIndex = calculateTargetIndex(key);
+
                 if (selectedRemoteIds.size > 0) {
                     // REMOTE MODE: Only play on selected devices, skip local
                     repeaterSocket.send(JSON.stringify({
@@ -3687,7 +3723,8 @@
                         key: key,
                         targetServerTime: targetServerTime,
                         targetIds: Array.from(selectedRemoteIds),
-                        pitch: pitchGlobal ? currentPitch : 1.0
+                        pitch: pitchGlobal ? currentPitch : 1.0,
+                        variant: syncVariants ? variantIndex : null
                     }));
                     return; // DO NOT PLAY LOCALLY
                 } else {
@@ -3697,7 +3734,8 @@
                         key: key,
                         targetServerTime: targetServerTime,
                         clientId: myClientId,
-                        pitch: pitchGlobal ? currentPitch : 1.0
+                        pitch: pitchGlobal ? currentPitch : 1.0,
+                        variant: syncVariants ? variantIndex : null
                     }));
                     // Schedule local playback at the same wall-clock moment
                     scheduledTime = audioCtx.currentTime + (leadMs / 1000);
@@ -3710,8 +3748,9 @@
             ensureAudioContext();
             if (audioCtx.state === 'suspended') audioCtx.resume();
 
-            const finalVariantIdx = variantIndex !== null ? variantIndex : calculateTargetIndex(key);
-            const buffer = pool[finalVariantIdx];
+            let finalVariantIdx = variantIndex !== null && variantIndex !== undefined ? variantIndex : calculateTargetIndex(key);
+            if (!pool[finalVariantIdx]) finalVariantIdx = calculateTargetIndex(key); // that variant isn't loaded here yet
+            const buffer = pool[finalVariantIdx] || pool[0];
 
             const source = audioCtx.createBufferSource();
             source.buffer = buffer;
