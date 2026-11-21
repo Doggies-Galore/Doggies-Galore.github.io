@@ -1825,7 +1825,45 @@
             silentOsc.connect(silentNode);
             silentNode.connect(audioCtx.destination);
             silentOsc.start();
+
+            // ── Weird: B4 censor-beep generator ──────────────────────────────
+            // The oscillator runs continuously at gain 0 and is only ramped open/shut,
+            // so a press costs one AudioParam ramp (no node creation = lowest latency)
+            // and the short ramps remove clicks.
+            toneOsc = audioCtx.createOscillator();
+            toneOsc.type = 'sine';
+            toneOsc.frequency.value = 493.883; // B4
+            toneGain = audioCtx.createGain();
+            toneGain.gain.value = 0;
+            toneOsc.connect(toneGain);
+            toneGain.connect(gainNode); // follows the master volume
+            toneOsc.start();
         }
+
+        let toneOsc = null;
+        let toneGain = null;
+        let beepHeld = false;
+        const BEEP_LEVEL = 0.5;
+        function beepOn() {
+            ensureAudioContext();
+            if (audioCtx.state !== 'running') audioCtx.resume();
+            if (beepHeld) return;
+            beepHeld = true;
+            const t = audioCtx.currentTime;
+            toneGain.gain.cancelScheduledValues(t);
+            toneGain.gain.setTargetAtTime(BEEP_LEVEL, t, 0.003); // ~10 ms to full
+            document.querySelectorAll('[data-sound="_tone_beep"]').forEach(b => b.classList.add('playing'));
+        }
+        function beepOff() {
+            if (!beepHeld) return;
+            beepHeld = false;
+            const t = audioCtx.currentTime;
+            toneGain.gain.cancelScheduledValues(t);
+            toneGain.gain.setTargetAtTime(0, t, 0.006); // ~20 ms fade, no click
+            document.querySelectorAll('[data-sound="_tone_beep"]').forEach(b => b.classList.remove('playing'));
+        }
+        window.addEventListener('blur', () => beepOff());
+        document.addEventListener('visibilitychange', () => { if (document.hidden) beepOff(); });
 
         const ampSlider = document.getElementById('amp-slider');
         const ampValueLabel = document.getElementById('amp-value-label');
@@ -3004,10 +3042,11 @@
                     });
                 }
 
-                for (let i = 0; i < allValidKeys.length; i += SOUNDS_PER_PAGE) {
+                const allWithTone = allValidKeys.concat(['_tone_beep']);
+                for (let i = 0; i < allWithTone.length; i += SOUNDS_PER_PAGE) {
                     pagesArray.push({
                         category: 'All',
-                        keys: allValidKeys.slice(i, i + SOUNDS_PER_PAGE)
+                        keys: allWithTone.slice(i, i + SOUNDS_PER_PAGE)
                     });
                 }
             } else {
@@ -3035,6 +3074,10 @@
                         }
                     }
                 });
+
+                // Built-in "Weird" category (generated sounds)
+                categoryNames.push('Weird');
+                pagesArray.push({ category: 'Weird', keys: ['_tone_beep'] });
 
                 const unorganized = allValidKeys.filter(k => !placedKeys.has(k));
                 if (unorganized.length > 0) {
@@ -3088,6 +3131,7 @@
         }
 
         function renderBoardPage() {
+            // (a held beep button is about to be destroyed; the new one re-syncs below)
             boardEl.innerHTML = '';
             Object.keys(boardButtons).forEach(k => delete boardButtons[k]);
 
@@ -3108,6 +3152,11 @@
                     btn.setAttribute('aria-label', 'Play ' + label);
                     btn.innerHTML = '<span class="btn-label">' + label + '</span>';
                     btn.onclick = () => broadcastVoiceMessage(rec.data);
+                } else if (key === '_tone_beep') {
+                    btn.setAttribute('aria-label', 'Hold to play B4 beep');
+                    btn.innerHTML = '<span class="btn-label">B4 Beep</span>';
+                    bindPressEvent(btn, key);
+                    if (beepHeld) btn.classList.add('playing');
                 } else {
                     btn.setAttribute('aria-label', 'Play ' + SOUND_DEFS[key].label);
                     btn.innerHTML = '<span class="btn-label">' + SOUND_DEFS[key].label + '</span>';
@@ -3788,6 +3837,26 @@
 
         // ── Wire up board buttons for INSTANT playback ──────────────────
         function bindPressEvent(btn, key) {
+            // Weird: generated tone, held for as long as the button is pressed
+            if (key === '_tone_beep') {
+                if (btn._toneBound) return;
+                btn._toneBound = true;
+                btn.style.touchAction = 'none';
+                btn.addEventListener('pointerdown', (e) => {
+                    if (e.pointerType === 'mouse' && e.button !== 0) return;
+                    try { btn.setPointerCapture(e.pointerId); } catch (err) { }
+                    beepOn();
+                });
+                ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev =>
+                    btn.addEventListener(ev, beepOff));
+                btn.addEventListener('keydown', (e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) { e.preventDefault(); beepOn(); }
+                });
+                btn.addEventListener('keyup', beepOff);
+                btn.addEventListener('contextmenu', e => e.preventDefault());
+                btn.addEventListener('click', e => e.preventDefault());
+                return;
+            }
             let activeInterval = null;
 
             function trigger(e) {
@@ -3841,6 +3910,7 @@
         // ── Quick Controls ──────────────────────────────────────────────────
         const quickStopBtn = document.getElementById('quick-stop-btn');
         quickStopBtn.addEventListener('click', () => {
+            beepOff();
             // Stop all currently playing sounds
             [...clipQueue].forEach(c => {
                 try { c.source.stop(); } catch (e) {}
