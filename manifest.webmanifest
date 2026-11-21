@@ -2,7 +2,7 @@
   "name": "Sillyboard",
   "short_name": "Sillyboard",
   "description": "The grooviest soundboard app",
-  "start_url": "./",
+  "start_url": "sillyboard.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",

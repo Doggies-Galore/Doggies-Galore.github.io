@@ -129,14 +129,6 @@
             }
         ]
     },
-    "150": {
-        "label": "1:50",
-        "variants": [
-            {
-                "src": "Soundboard/voice-message.wav"
-            }
-        ]
-    },
     "fahh": {
         "label": "Fahh",
         "variants": [
@@ -451,6 +443,10 @@
             {
                 "src": "Soundboard/Soundboard%20-Fish%202.wav",
                 "weight": 10
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Fish%203.wav",
+                "weight": 10
             }
         ]
     },
@@ -465,9 +461,6 @@
     "ted": {
         "label": "Ted",
         "variants": [
-            {
-                "src": "Soundboard/Soundboard%20-Ted.wav"
-            },
             {
                 "src": "Soundboard/SoundBoardThank%20you%2C%20Ted.wav"
             }
@@ -535,6 +528,88 @@
             }
         ]
     },
+    "whip": {
+        "label": "Whip",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Whip%201.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Whip%202.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Whip%203.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Whip%204.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Whip%205.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Whip%206.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Whip%207.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Whip%208.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Whip%209.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Whip%2010.wav"
+            }
+        ]
+    },
+    "cbat": {
+        "label": "Cbat",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Cbat01.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Cbat02.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Cbat03.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Cbat04.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Cbat05.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Cbat06.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Cbat07.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Cbat08.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Cbat09.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Cbat10.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Cbat11.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Cbat12.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Cbat13.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Cbat14.wav"
+            }
+        ]
+    },
     "alarm": {
         "label": "Alarm",
         "variants": [
@@ -590,6 +665,145 @@
         "variants": [
             {
                 "src": "Soundboard/SoundBoard%20ChangedHarmonizer.wav"
+            }
+        ]
+    },
+    "teto": {
+        "label": "Teto",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Teto1.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Teto2.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Teto3.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Teto4.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Teto5.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Teto6.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Teto7.wav"
+            }
+        ]
+    },
+    "butterdog": {
+        "label": "Butter Dog",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Butter%20Dog.wav"
+            }
+        ]
+    },
+    "tomodachi": {
+        "label": "Tomodachi",
+        "variants": [
+            { "src": "Soundboard/SoundBoard%20-Tomodachi1.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi2.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi3.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi4.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi5.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi6.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi7.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi8.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi9.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi10.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi11.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi12.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi13.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi14.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi15.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi16.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi17.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi18.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi19.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi20.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi21.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi22.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi23.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi24.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi25.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi26.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi27.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi28.wav" },
+            { "src": "Soundboard/SoundBoard%20-Tomodachi29.wav" }
+        ]
+    },
+    "portal": {
+        "label": "Portal",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Portal.wav"
+            }
+        ]
+    },
+    "ford": {
+        "label": "Ford",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Ford.wav"
+            }
+        ]
+    },
+    "goofy": {
+        "label": "Goofy",
+        "variants": [
+            { "src": "Soundboard/SoundBoard%20-Goofy1.wav" },
+            { "src": "Soundboard/SoundBoard%20-Goofy2.wav" },
+            { "src": "Soundboard/SoundBoard%20-Goofy3.wav" },
+            { "src": "Soundboard/SoundBoard%20-Goofy4.wav" },
+            { "src": "Soundboard/SoundBoard%20-Goofy5.wav" },
+            { "src": "Soundboard/SoundBoard%20-Goofy6.wav" },
+            { "src": "Soundboard/SoundBoard%20-Goofy7.wav" },
+            { "src": "Soundboard/SoundBoard%20-Goofy8.wav" },
+            { "src": "Soundboard/SoundBoard%20-Goofy9.wav" },
+            { "src": "Soundboard/SoundBoard%20-Goofy10.wav" },
+            { "src": "Soundboard/SoundBoard%20-Goofy11.wav" },
+            { "src": "Soundboard/SoundBoard%20-Goofy12.wav" },
+            { "src": "Soundboard/SoundBoard%20-Goofy13.wav" },
+            { "src": "Soundboard/SoundBoard%20-Goofy14.wav" }
+        ]
+    },
+    "fnaf": {
+        "label": "FNAF",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-FNAF1.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-FNAF2.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-FNAF3.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-FNAF4.wav"
+            }
+        ]
+    },
+    "dodge": {
+        "label": "Dodge",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Dodge1.wav"
+            },
+            {
+                "src": "Soundboard/SoundBoard%20-Dodge2.wav"
+            }
+        ]
+    },
+    "twinkie": {
+        "label": "Twinkie",
+        "variants": [
+            {
+                "src": "Soundboard/SoundBoard%20-Twinkie.wav"
             }
         ]
     }

@@ -1,5 +1,17 @@
 [
   {
+    "version": "0.7.0",
+    "date": "2026-11-20",
+    "title": "Installable Sillyboard",
+    "subtitle": "Sillyboard is now a PWA: install it to your home screen, the UI loads instantly from cache and only updates when the cloud copy changes, and sounds are saved on your device after the first play. Ogg Opus is now the default sound format (WAV still available in Labs), and the Cbat sounds that weren't loading are fixed."
+  },
+  {
+    "version": "0.6.0",
+    "date": "2026-06-22",
+    "title": "Major Update I",
+    "subtitle": "Refactored the way that Sillyboard is loaded, added a brand-new way of storing sounds, which cuts the file size by an order of magnitude."
+  },
+  {
     "version": "0.5.2",
     "date": "2026-05-30",
     "title": "Quality of Life? But I hardly know her!",
